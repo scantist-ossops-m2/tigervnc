@@ -1248,45 +1248,45 @@ void Viewport::initContextMenu()
 {
   contextMenu->clear();
 
-  fltk_menu_add(contextMenu, p_("ContextMenu|", "Dis&connect"),
+  fltk_menu_add(contextMenu, C_("ContextMenu|", "Dis&connect"),
                 0, NULL, (void*)ID_DISCONNECT, FL_MENU_DIVIDER);
 
-  fltk_menu_add(contextMenu, p_("ContextMenu|", "&Full screen"),
+  fltk_menu_add(contextMenu, C_("ContextMenu|", "&Full screen"),
                 0, NULL, (void*)ID_FULLSCREEN,
                 FL_MENU_TOGGLE | (window()->fullscreen_active()?FL_MENU_VALUE:0));
-  fltk_menu_add(contextMenu, p_("ContextMenu|", "Minimi&ze"),
+  fltk_menu_add(contextMenu, C_("ContextMenu|", "Minimi&ze"),
                 0, NULL, (void*)ID_MINIMIZE, 0);
-  fltk_menu_add(contextMenu, p_("ContextMenu|", "Resize &window to session"),
+  fltk_menu_add(contextMenu, C_("ContextMenu|", "Resize &window to session"),
                 0, NULL, (void*)ID_RESIZE,
                 (window()->fullscreen_active()?FL_MENU_INACTIVE:0) |
                 FL_MENU_DIVIDER);
 
-  fltk_menu_add(contextMenu, p_("ContextMenu|", "&Ctrl"),
+  fltk_menu_add(contextMenu, C_("ContextMenu|", "&Ctrl"),
                 0, NULL, (void*)ID_CTRL,
                 FL_MENU_TOGGLE | (menuCtrlKey?FL_MENU_VALUE:0));
-  fltk_menu_add(contextMenu, p_("ContextMenu|", "&Alt"),
+  fltk_menu_add(contextMenu, C_("ContextMenu|", "&Alt"),
                 0, NULL, (void*)ID_ALT,
                 FL_MENU_TOGGLE | (menuAltKey?FL_MENU_VALUE:0));
 
   if (menuKeySym) {
     char sendMenuKey[64];
-    snprintf(sendMenuKey, 64, p_("ContextMenu|", "Send %s"), (const char *)menuKey);
+    snprintf(sendMenuKey, 64, C_("ContextMenu|", "Send %s"), (const char *)menuKey);
     fltk_menu_add(contextMenu, sendMenuKey, 0, NULL, (void*)ID_MENUKEY, 0);
     fltk_menu_add(contextMenu, "Secret shortcut menu key", menuKeyFLTK, NULL,
                   (void*)ID_MENUKEY, FL_MENU_INVISIBLE);
   }
 
-  fltk_menu_add(contextMenu, p_("ContextMenu|", "Send Ctrl-Alt-&Del"),
+  fltk_menu_add(contextMenu, C_("ContextMenu|", "Send Ctrl-Alt-&Del"),
                 0, NULL, (void*)ID_CTRLALTDEL, FL_MENU_DIVIDER);
 
-  fltk_menu_add(contextMenu, p_("ContextMenu|", "&Refresh screen"),
+  fltk_menu_add(contextMenu, C_("ContextMenu|", "&Refresh screen"),
                 0, NULL, (void*)ID_REFRESH, FL_MENU_DIVIDER);
 
-  fltk_menu_add(contextMenu, p_("ContextMenu|", "&Options..."),
+  fltk_menu_add(contextMenu, C_("ContextMenu|", "&Options..."),
                 0, NULL, (void*)ID_OPTIONS, 0);
-  fltk_menu_add(contextMenu, p_("ContextMenu|", "Connection &info..."),
+  fltk_menu_add(contextMenu, C_("ContextMenu|", "Connection &info..."),
                 0, NULL, (void*)ID_INFO, 0);
-  fltk_menu_add(contextMenu, p_("ContextMenu|", "About &TigerVNC viewer..."),
+  fltk_menu_add(contextMenu, C_("ContextMenu|", "About &TigerVNC viewer..."),
                 0, NULL, (void*)ID_ABOUT, 0);
 }
 
