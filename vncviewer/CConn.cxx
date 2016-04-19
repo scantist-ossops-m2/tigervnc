@@ -32,6 +32,7 @@
 #include <rfb/Hostname.h>
 #include <rfb/LogWriter.h>
 #include <rfb/Security.h>
+#include <rfb/i18n.h>
 #include <rfb/screenTypes.h>
 #include <rfb/fenceTypes.h>
 #include <rfb/Timer.h>
@@ -47,7 +48,6 @@
 #include "OptionsDialog.h"
 #include "DesktopWindow.h"
 #include "PlatformPixelBuffer.h"
-#include "i18n.h"
 #include "parameters.h"
 #include "vncviewer.h"
 

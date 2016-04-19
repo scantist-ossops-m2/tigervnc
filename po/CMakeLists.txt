@@ -9,12 +9,40 @@ endif (NOT GETTEXT_MSGMERGE_EXECUTABLE AND NOT GETTEXT_MSGFMT_EXECUTABLE)
 find_program(GETTEXT_XGETTEXT_EXECUTABLE xgettext)
 if (GETTEXT_XGETTEXT_EXECUTABLE)
   # Get list of all source files
-  file(GLOB_RECURSE po_source
+  file(GLOB po_source
     RELATIVE ${PROJECT_SOURCE_DIR}
+    ${PROJECT_SOURCE_DIR}/common/network/*.h
+    ${PROJECT_SOURCE_DIR}/common/network/*.cxx
+    ${PROJECT_SOURCE_DIR}/common/os/*.h
+    ${PROJECT_SOURCE_DIR}/common/os/*.cxx
+    ${PROJECT_SOURCE_DIR}/common/rdr/*.h
+    ${PROJECT_SOURCE_DIR}/common/rdr/*.cxx
+    ${PROJECT_SOURCE_DIR}/common/rfb/*.h
+    ${PROJECT_SOURCE_DIR}/common/rfb/*.cxx
+    ${PROJECT_SOURCE_DIR}/unix/tx/*.h
+    ${PROJECT_SOURCE_DIR}/unix/tx/*.cxx
+    ${PROJECT_SOURCE_DIR}/unix/vncconfig/*.h
+    ${PROJECT_SOURCE_DIR}/unix/vncconfig/*.cxx
+    ${PROJECT_SOURCE_DIR}/unix/vncpasswd/*.h
+    ${PROJECT_SOURCE_DIR}/unix/vncpasswd/*.cxx
+    ${PROJECT_SOURCE_DIR}/unix/x0vncserver/*.h
+    ${PROJECT_SOURCE_DIR}/unix/x0vncserver/*.cxx
+    ${PROJECT_SOURCE_DIR}/unix/xserver/hw/vnc/*.h
+    ${PROJECT_SOURCE_DIR}/unix/xserver/hw/vnc/*.c
+    ${PROJECT_SOURCE_DIR}/unix/xserver/hw/vnc/*.cc
     ${PROJECT_SOURCE_DIR}/vncviewer/*.h
+    ${PROJECT_SOURCE_DIR}/vncviewer/*.c
     ${PROJECT_SOURCE_DIR}/vncviewer/*.cxx
+    ${PROJECT_SOURCE_DIR}/vncviewer/*.m
+    ${PROJECT_SOURCE_DIR}/vncviewer/*.mm
     ${PROJECT_SOURCE_DIR}/vncviewer/*.desktop.in.in
     ${PROJECT_SOURCE_DIR}/vncviewer/*.metainfo.xml.in
+    ${PROJECT_SOURCE_DIR}/win/rfb_win32/*.h
+    ${PROJECT_SOURCE_DIR}/win/rfb_win32/*.cxx
+    ${PROJECT_SOURCE_DIR}/win/vncconfig/*.h
+    ${PROJECT_SOURCE_DIR}/win/vncconfig/*.cxx
+    ${PROJECT_SOURCE_DIR}/win/winvnc/*.h
+    ${PROJECT_SOURCE_DIR}/win/winvnc/*.cxx
   )
 
   add_custom_target(translations_update

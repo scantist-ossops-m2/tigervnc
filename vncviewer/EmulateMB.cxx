@@ -55,9 +55,9 @@
 #include <assert.h>
 
 #include <rfb/Exception.h>
+#include <rfb/i18n.h>
 
 #include "parameters.h"
-#include "i18n.h"
 #include "EmulateMB.h"
 
 /*

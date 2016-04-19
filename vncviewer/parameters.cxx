@@ -36,6 +36,7 @@
 #include <rfb/Exception.h>
 #include <rfb/LogWriter.h>
 #include <rfb/SecurityClient.h>
+#include <rfb/i18n.h>
 
 #include <FL/fl_utf8.h>
 
@@ -44,8 +45,6 @@
 #include <limits.h>
 #include <errno.h>
 #include <assert.h>
-
-#include "i18n.h"
 
 using namespace rfb;
 using namespace std;

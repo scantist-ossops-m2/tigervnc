@@ -30,11 +30,11 @@
 
 #include <rfb/LogWriter.h>
 #include <rfb/CMsgWriter.h>
+#include <rfb/i18n.h>
 #include <rfb/util.h>
 
 #include "DesktopWindow.h"
 #include "OptionsDialog.h"
-#include "i18n.h"
 #include "parameters.h"
 #include "vncviewer.h"
 #include "CConn.h"

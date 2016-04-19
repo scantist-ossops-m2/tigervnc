@@ -59,14 +59,16 @@ add_library(rfb STATIC
   ZRLEEncoder.cxx
   ZRLEDecoder.cxx
   encodings.cxx
+  i18n.cxx
   obfuscate.cxx
   util.cxx)
 
 target_include_directories(rfb PUBLIC ${CMAKE_SOURCE_DIR}/common)
+target_include_directories(rfb SYSTEM PUBLIC ${GETTEXT_INCLUDE_DIR})
 target_include_directories(rfb SYSTEM PUBLIC ${JPEG_INCLUDE_DIR})
 target_include_directories(rfb SYSTEM PUBLIC ${PIXMAN_INCLUDE_DIRS})
 target_link_libraries(rfb os rdr network)
-target_link_libraries(rfb ${JPEG_LIBRARIES} ${PIXMAN_LIBRARIES})
+target_link_libraries(rfb ${GETTEXT_LIBRARIES} ${JPEG_LIBRARIES} ${PIXMAN_LIBRARIES})
 target_link_directories(rfb PUBLIC ${PIXMAN_LIBRARY_DIRS})
 
 if(ENABLE_H264 AND NOT H264_LIBS STREQUAL "NONE")
@@ -110,6 +112,10 @@ if (NETTLE_FOUND)
                         ${NETTLE_LIBRARIES} ${GMP_LIBRARIES})
   target_link_directories(rfb PUBLIC ${HOGWEED_LIBRARY_DIRS}
                           ${NETTLE_LIBRARY_DIRS} ${GMP_LIBRARY_DIRS})
+endif()
+
+if(APPLE)
+  target_link_libraries(rfb "-framework Carbon")
 endif()
 
 if(UNIX)

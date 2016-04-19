@@ -35,8 +35,8 @@
 #include <rfb/keysymdef.h>
 #endif
 #include <rfb/LogWriter.h>
+#include <rfb/i18n.h>
 
-#include "i18n.h"
 #include "XInputTouchHandler.h"
 
 static rfb::LogWriter vlog("XInputTouchHandler");

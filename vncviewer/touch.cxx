@@ -38,8 +38,8 @@
 
 #include <rfb/Exception.h>
 #include <rfb/LogWriter.h>
+#include <rfb/i18n.h>
 
-#include "i18n.h"
 #include "vncviewer.h"
 #include "BaseTouchHandler.h"
 #if defined(WIN32)

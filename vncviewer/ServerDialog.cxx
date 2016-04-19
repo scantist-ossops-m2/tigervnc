@@ -38,11 +38,11 @@
 #include <os/os.h>
 #include <rfb/Exception.h>
 #include <rfb/LogWriter.h>
+#include <rfb/i18n.h>
 
 #include "fltk/layout.h"
 #include "ServerDialog.h"
 #include "OptionsDialog.h"
-#include "i18n.h"
 #include "vncviewer.h"
 #include "parameters.h"
 

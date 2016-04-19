@@ -29,6 +29,7 @@
 #include <rfb/LogWriter.h>
 #include <rfb/Exception.h>
 #include <rfb/ledStates.h>
+#include <rfb/i18n.h>
 #include <rfb/util.h>
 
 // FLTK can pull in the X11 headers on some systems
@@ -62,7 +63,6 @@
 #include "CConn.h"
 #include "OptionsDialog.h"
 #include "DesktopWindow.h"
-#include "i18n.h"
 #include "parameters.h"
 #include "keysym2ucs.h"
 #include "menukey.h"

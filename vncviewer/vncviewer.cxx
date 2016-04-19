@@ -24,7 +24,6 @@
 
 #include <assert.h>
 #include <string.h>
-#include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -40,10 +39,6 @@
 #define mkdir(path, mode) _mkdir(path)
 #endif
 
-#ifdef __APPLE__
-#include <Carbon/Carbon.h>
-#endif
-
 #if !defined(WIN32) && !defined(__APPLE__)
 #include <X11/Xlib.h>
 #include <X11/XKBlib.h>
@@ -56,6 +51,7 @@
 #include <rfb/LogWriter.h>
 #include <rfb/Timer.h>
 #include <rfb/Exception.h>
+#include <rfb/i18n.h>
 #include <rdr/Exception.h>
 #include <network/TcpSocket.h>
 #include <os/os.h>
@@ -67,7 +63,6 @@
 
 #include "fltk/theme.h"
 #include "fltk/util.h"
-#include "i18n.h"
 #include "parameters.h"
 #include "CConn.h"
 #include "ServerDialog.h"
@@ -268,57 +263,6 @@ static void CleanupSignalHandler(int sig)
   exit(1);
 }
 
-static const char* getlocaledir()
-{
-#if defined(WIN32)
-  static char localebuf[PATH_MAX];
-  char *slash;
-
-  GetModuleFileName(NULL, localebuf, sizeof(localebuf));
-
-  slash = strrchr(localebuf, '\\');
-  if (slash == NULL)
-    return NULL;
-
-  *slash = '\0';
-
-  if ((strlen(localebuf) + strlen("\\locale")) >= sizeof(localebuf))
-    return NULL;
-
-  strcat(localebuf, "\\locale");
-
-  return localebuf;
-#elif defined(__APPLE__)
-  CFBundleRef bundle;
-  CFURLRef localeurl;
-  CFStringRef localestr;
-  Boolean ret;
-
-  static char localebuf[PATH_MAX];
-
-  bundle = CFBundleGetMainBundle();
-  if (bundle == NULL)
-    return NULL;
-
-  localeurl = CFBundleCopyResourceURL(bundle, CFSTR("locale"),
-                                      NULL, NULL);
-  if (localeurl == NULL)
-    return NULL;
-
-  localestr = CFURLCopyFileSystemPath(localeurl, kCFURLPOSIXPathStyle);
-
-  CFRelease(localeurl);
-
-  ret = CFStringGetCString(localestr, localebuf, sizeof(localebuf),
-                           kCFStringEncodingUTF8);
-  if (!ret)
-    return NULL;
-
-  return localebuf;
-#else
-  return CMAKE_INSTALL_FULL_LOCALEDIR;
-#endif
-}
 static void init_fltk()
 {
   // Adjust look of FLTK
@@ -618,19 +562,12 @@ static int mktunnel()
 
 int main(int argc, char** argv)
 {
-  const char *localedir;
   UserDialog dlg;
 
   argv0 = argv[0];
 
   setlocale(LC_ALL, "");
-
-  localedir = getlocaledir();
-  if (localedir == NULL)
-    fprintf(stderr, "Failed to determine locale directory\n");
-  else
-    bindtextdomain(PACKAGE_NAME, localedir);
-  textdomain(PACKAGE_NAME);
+  initTranslations();
 
   // Write about text to console, still using normal locale codeset
   fprintf(stderr,"\n%s\n", about_text());
@@ -638,7 +575,7 @@ int main(int argc, char** argv)
   // Set gettext codeset to what our GUI toolkit uses. Since we are
   // passing strings from strerror/gai_strerror to the GUI, these must
   // be in GUI codeset as well.
-  bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
+  bind_textdomain_codeset(DEFAULT_TEXT_DOMAIN, "UTF-8");
   bind_textdomain_codeset("libc", "UTF-8");
 
   rfb::initStdIOLoggers();

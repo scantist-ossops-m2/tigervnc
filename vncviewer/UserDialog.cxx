@@ -35,11 +35,11 @@
 #include <FL/Fl_Pixmap.H>
 
 #include <rfb/Exception.h>
+#include <rfb/i18n.h>
 #include <rfb/obfuscate.h>
 
 #include "fltk/layout.h"
 #include "fltk/util.h"
-#include "i18n.h"
 #include "parameters.h"
 #include "UserDialog.h"
 

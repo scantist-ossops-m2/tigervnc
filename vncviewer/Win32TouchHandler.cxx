@@ -26,8 +26,8 @@
 #include <rfb/keysymdef.h>
 #include <rfb/Exception.h>
 #include <rfb/LogWriter.h>
+#include <rfb/i18n.h>
 
-#include "i18n.h"
 #include "Win32TouchHandler.h"
 
 static rfb::LogWriter vlog("Win32TouchHandler");

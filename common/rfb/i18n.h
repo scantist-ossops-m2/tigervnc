@@ -17,8 +17,10 @@
  * USA.
  */
 
-#ifndef _I18N_H
-#define _I18N_H 1
+#ifndef __RFB_I18N_H__
+#define __RFB_I18N_H__
+
+#define DEFAULT_TEXT_DOMAIN "tigervnc"
 
 /* Need to tell gcc that pgettext() doesn't screw up format strings */
 #ifdef __GNUC__
@@ -56,4 +58,6 @@ extern int swprintf (wchar_t *, size_t, const wchar_t *, ...)
 #define C_(Context, String) pgettext (Context, String)
 #define N_(String) gettext_noop (String)
 
-#endif /* _I18N_H */
+void initTranslations();
+
+#endif

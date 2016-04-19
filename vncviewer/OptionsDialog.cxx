@@ -25,6 +25,7 @@
 #include <list>
 
 #include <rfb/encodings.h>
+#include <rfb/i18n.h>
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_NETTLE)
 #include <rfb/Security.h>
@@ -35,7 +36,6 @@
 #endif
 
 #include "OptionsDialog.h"
-#include "i18n.h"
 #include "menukey.h"
 #include "parameters.h"
 
