@@ -24,6 +24,8 @@
 
 #include <assert.h>
 
+#include <algorithm>
+
 // Missing in at least some versions of MinGW
 #ifndef MAPVK_VK_TO_CHAR
 #define MAPVK_VK_TO_CHAR 2
@@ -200,6 +202,7 @@ bool KeyboardWin32::handleEvent(const void* event)
     bool isExtended;
     int systemKeyCode, keyCode;
     rdr::U32 keySym;
+    BYTE state[256];
 
     vKey = msg->wParam;
     isExtended = (msg->lParam & (1 << 24)) != 0;
@@ -252,9 +255,25 @@ bool KeyboardWin32::handleEvent(const void* event)
     if (isExtended)
       systemKeyCode |= 0x80;
 
-    keyCode = translateSystemKeyCode(systemKeyCode);
+    keyCode = translateToKeyCode(systemKeyCode);
 
-    keySym = translateVKey(vKey, isExtended);
+    GetKeyboardState(state);
+
+    // Pressing Ctrl wreaks havoc with the symbol lookup, so turn
+    // that off. But AltGr shows up as Ctrl+Alt in Windows, so keep
+    // Ctrl if Alt is active.
+    if (!(state[VK_LCONTROL] & 0x80) || !(state[VK_RMENU] & 0x80))
+      state[VK_CONTROL] = state[VK_LCONTROL] = state[VK_RCONTROL] = 0;
+
+    keySym = translateVKey(vKey, isExtended, state);
+
+    if (keySym == NoSymbol) {
+      // Most Ctrl+Alt combinations will fail to produce a symbol, so
+      // try it again with Ctrl unconditionally disabled.
+      state[VK_CONTROL] = state[VK_LCONTROL] = state[VK_RCONTROL] = 0;
+      keySym = translateVKey(vKey, isExtended, state);
+    }
+
     if (keySym == NoSymbol) {
       if (isExtended)
         vlog.error(_("No symbol for extended virtual key 0x%02x"), (int)vKey);
@@ -350,7 +369,7 @@ bool KeyboardWin32::handleEvent(const void* event)
   return false;
 }
 
-rdr::U32 KeyboardWin32::translateSystemKeyCode(int systemKeyCode)
+rdr::U32 KeyboardWin32::translateToKeyCode(int systemKeyCode)
 {
   // Fortunately RFB and Windows use the same scan code set (mostly),
   // so there is no conversion needed
@@ -372,6 +391,114 @@ rdr::U32 KeyboardWin32::translateSystemKeyCode(int systemKeyCode)
     return 0x54;
 
   return systemKeyCode;
+}
+
+std::list<rdr::U32> KeyboardWin32::translateToKeySyms(int systemKeyCode)
+{
+  unsigned vkey;
+  bool extended;
+
+  std::list<rdr::U32> keySyms;
+  unsigned mods;
+
+  BYTE state[256];
+
+  rdr::U32 ks;
+
+  UINT ch;
+
+  extended = systemKeyCode & 0x80;
+  if (extended)
+    systemKeyCode = 0xe0 | (systemKeyCode & 0x7f);
+
+  vkey = MapVirtualKey(systemKeyCode, MAPVK_VSC_TO_VK_EX);
+  if (vkey == 0)
+    return keySyms;
+
+  // Start with no modifiers
+  memset(state, 0, sizeof(state));
+  ks = translateVKey(vkey, extended, state);
+  if (ks != NoSymbol)
+    keySyms.push_back(ks);
+
+  // Next just a single modifier at a time
+  for (mods = 1; mods < 16; mods <<= 1) {
+    std::list<rdr::U32>::const_iterator iter;
+
+    memset(state, 0, sizeof(state));
+    if (mods & 0x1)
+      state[VK_CONTROL] = state[VK_LCONTROL] = 0x80;
+    if (mods & 0x2)
+      state[VK_SHIFT] = state[VK_LSHIFT] = 0x80;
+    if (mods & 0x4)
+      state[VK_MENU] = state[VK_LMENU] = 0x80;
+    if (mods & 0x8) {
+      state[VK_CONTROL] = state[VK_LCONTROL] = 0x80;
+      state[VK_MENU] = state[VK_RMENU] = 0x80;
+    }
+
+    ks = translateVKey(vkey, extended, state);
+    if (ks == NoSymbol)
+      continue;
+
+    iter = std::find(keySyms.begin(), keySyms.end(), ks);
+    if (iter != keySyms.end())
+      continue;
+
+    keySyms.push_back(ks);
+  }
+
+  // Finally everything
+  for (mods = 0; mods < 16; mods++) {
+    std::list<rdr::U32>::const_iterator iter;
+
+    memset(state, 0, sizeof(state));
+    if (mods & 0x1)
+      state[VK_CONTROL] = state[VK_LCONTROL] = 0x80;
+    if (mods & 0x2)
+      state[VK_SHIFT] = state[VK_LSHIFT] = 0x80;
+    if (mods & 0x4)
+      state[VK_MENU] = state[VK_LMENU] = 0x80;
+    if (mods & 0x8) {
+      state[VK_CONTROL] = state[VK_LCONTROL] = 0x80;
+      state[VK_MENU] = state[VK_RMENU] = 0x80;
+    }
+
+    ks = translateVKey(vkey, extended, state);
+    if (ks == NoSymbol)
+      continue;
+
+    iter = std::find(keySyms.begin(), keySyms.end(), ks);
+    if (iter != keySyms.end())
+      continue;
+
+    keySyms.push_back(ks);
+  }
+
+  // As a final resort we use MapVirtualKey() as that gives us a Latin
+  // character even on non-Latin keyboards, which is useful for
+  // shortcuts
+  //
+  // FIXME: Can this give us anything but ASCII?
+
+  ch = MapVirtualKeyW(vkey, MAPVK_VK_TO_CHAR);
+  if (ch != 0) {
+    if (ch & 0x80000000)
+      ch = ucs2combining(ch & 0xffff);
+    else
+      ch = ch & 0xffff;
+
+    ks = ucs2keysym(ch);
+    if (ks != NoSymbol) {
+      std::list<rdr::U32>::const_iterator iter;
+
+      iter = std::find(keySyms.begin(), keySyms.end(), ks);
+      if (iter == keySyms.end())
+        keySyms.push_back(ks);
+    }
+  }
+
+  return keySyms;
 }
 
 void KeyboardWin32::reset()
@@ -461,12 +588,12 @@ rdr::U32 KeyboardWin32::lookupVKeyMap(unsigned vkey, bool extended,
   return NoSymbol;
 }
 
-rdr::U32 KeyboardWin32::translateVKey(unsigned vkey, bool extended)
+rdr::U32 KeyboardWin32::translateVKey(unsigned vkey, bool extended,
+                                      const unsigned char state[256])
 {
   HKL layout;
   WORD lang, primary_lang;
 
-  BYTE state[256];
   int ret;
   WCHAR wstr[10];
 
@@ -520,24 +647,9 @@ rdr::U32 KeyboardWin32::translateVKey(unsigned vkey, bool extended)
   // does what we want though. Unfortunately it keeps state, so
   // we have to be careful around dead characters.
 
-  GetKeyboardState(state);
-
-  // Pressing Ctrl wreaks havoc with the symbol lookup, so turn
-  // that off. But AltGr shows up as Ctrl+Alt in Windows, so keep
-  // Ctrl if Alt is active.
-  if (!(state[VK_LCONTROL] & 0x80) || !(state[VK_RMENU] & 0x80))
-    state[VK_CONTROL] = state[VK_LCONTROL] = state[VK_RCONTROL] = 0;
-
   // FIXME: Multi character results, like U+0644 U+0627
   //        on Arabic layout
   ret = ToUnicode(vkey, 0, state, wstr, sizeof(wstr)/sizeof(wstr[0]), 0);
-
-  if (ret == 0) {
-    // Most Ctrl+Alt combinations will fail to produce a symbol, so
-    // try it again with Ctrl unconditionally disabled.
-    state[VK_CONTROL] = state[VK_LCONTROL] = state[VK_RCONTROL] = 0;
-    ret = ToUnicode(vkey, 0, state, wstr, sizeof(wstr)/sizeof(wstr[0]), 0);
-  }
 
   if (ret == 1)
     return ucs2keysym(wstr[0]);

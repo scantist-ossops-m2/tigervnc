@@ -19,6 +19,8 @@
 #ifndef __KEYTRANSLATE_H__
 #define __KEYTRANSLATE_H__
 
+#include <list>
+
 #include <rdr/types.h>
 
 class KeyboardHandler {
@@ -34,7 +36,8 @@ public:
   virtual ~Keyboard() {};
 
   virtual bool handleEvent(const void* event) = 0;
-  virtual rdr::U32 translateSystemKeyCode(int systemKeyCode) = 0;
+  virtual rdr::U32 translateToKeyCode(int systemKeyCode) = 0;
+  virtual std::list<rdr::U32> translateToKeySyms(int systemKeyCode) = 0;
 
   virtual void reset() {};
 

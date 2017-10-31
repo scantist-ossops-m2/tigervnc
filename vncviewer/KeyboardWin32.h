@@ -27,7 +27,8 @@ public:
   virtual ~KeyboardWin32();
 
   virtual bool handleEvent(const void* event);
-  virtual rdr::U32 translateSystemKeyCode(int systemKeyCode);
+  virtual rdr::U32 translateToKeyCode(int systemKeyCode);
+  virtual std::list<rdr::U32> translateToKeySyms(int systemKeyCode);
 
   virtual void reset();
 
@@ -37,7 +38,8 @@ public:
 protected:
   rdr::U32 lookupVKeyMap(unsigned vkey, bool extended,
                          const unsigned map[][3], size_t size);
-  rdr::U32 translateVKey(unsigned vkey, bool extended);
+  rdr::U32 translateVKey(unsigned vkey, bool extended,
+                         const unsigned char state[256]);
 
   bool hasAltGr();
   static void handleAltGrTimeout(void *data);

@@ -26,6 +26,7 @@
 
 #include "EmulateMB.h"
 #include "Keyboard.h"
+#include "HotKeyHandler.h"
 
 class Fl_Menu_Button;
 class Fl_RGB_Image;
@@ -94,8 +95,6 @@ private:
   void initContextMenu();
   void popupContextMenu();
 
-  void setMenuKey();
-
   static void handleOptions(void *data);
 
 private:
@@ -107,6 +106,7 @@ private:
   int lastButtonMask;
 
   Keyboard* keyboard;
+  HotKeyHandler hotKeyHandler;
 
   bool firstLEDState;
 
@@ -115,8 +115,6 @@ private:
 
   int clipboardSource;
 
-  rdr::U32 menuKeySym;
-  int menuKeyCode, menuKeyFLTK;
   Fl_Menu_Button *contextMenu;
 
   bool menuCtrlKey;

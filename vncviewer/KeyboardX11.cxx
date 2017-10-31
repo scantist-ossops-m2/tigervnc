@@ -22,6 +22,8 @@
 
 #include <assert.h>
 
+#include <algorithm>
+
 #include <X11/XKBlib.h>
 #include <FL/x.H>
 
@@ -96,7 +98,7 @@ bool KeyboardX11::handleEvent(const void* event)
     char str;
     KeySym keysym;
 
-    keycode = translateSystemKeyCode(xevent->xkey.keycode);
+    keycode = translateToKeyCode(xevent->xkey.keycode);
 
     XLookupString((XKeyEvent*)&xevent->xkey, &str, 1, &keysym, NULL);
     if (keysym == NoSymbol) {
@@ -114,9 +116,34 @@ bool KeyboardX11::handleEvent(const void* event)
   return false;
 }
 
-rdr::U32 KeyboardX11::translateSystemKeyCode(int systemKeyCode)
+rdr::U32 KeyboardX11::translateToKeyCode(int systemKeyCode)
 {
   return code_map_keycode_to_qnum[systemKeyCode];
+}
+
+std::list<rdr::U32> KeyboardX11::translateToKeySyms(int systemKeyCode)
+{
+  Status status;
+  XkbStateRec state;
+  std::list<rdr::U32> keySyms;
+  unsigned char group;
+
+  status = XkbGetState(fl_display, XkbUseCoreKbd, &state);
+  if (status != Success)
+    return keySyms;
+
+  // Start with the currently used group
+  translateToKeySyms(systemKeyCode, state.group, &keySyms);
+
+  // Then all other groups
+  for (group = 0; group < XkbNumKbdGroups; group++) {
+    if (group == state.group)
+      continue;
+
+    translateToKeySyms(systemKeyCode, group, &keySyms);
+  }
+
+  return keySyms;
 }
 
 unsigned KeyboardX11::getLEDState()
@@ -221,4 +248,41 @@ out:
   XkbFreeKeyboard(xkb, XkbAllComponentsMask, True);
 
   return mask;
+}
+
+void KeyboardX11::translateToKeySyms(int systemKeyCode,
+                                     unsigned char group,
+                                     std::list<rdr::U32>* keySyms)
+{
+  unsigned int mods;
+
+  // Start with no modifiers
+  translateToKeySyms(systemKeyCode, group, 0, keySyms);
+
+  // Next just a single modifier at a time
+  for (mods = 1; mods < (Mod5Mask+1); mods <<= 1)
+    translateToKeySyms(systemKeyCode, group, mods, keySyms);
+
+  // Finally everything
+  for (mods = 0; mods < (Mod5Mask<<1); mods++)
+    translateToKeySyms(systemKeyCode, group, mods, keySyms);
+}
+
+void KeyboardX11::translateToKeySyms(int systemKeyCode,
+                                     unsigned char group,
+                                     unsigned char mods,
+                                     std::list<rdr::U32>* keySyms)
+{
+  KeySym ks;
+  std::list<rdr::U32>::const_iterator iter;
+
+  ks = XkbKeycodeToKeysym(fl_display, systemKeyCode, group, mods);
+  if (ks == NoSymbol)
+    return;
+
+  iter = std::find(keySyms->begin(), keySyms->end(), ks);
+  if (iter != keySyms->end())
+    return;
+
+  keySyms->push_back(ks);
 }

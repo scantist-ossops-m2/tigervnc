@@ -23,10 +23,8 @@
 
 #ifdef __OBJC__
 @class NSEvent;
-@class NSString;
 #else
 class NSEvent;
-class NSString;
 #endif
 
 class KeyboardMacOS : public Keyboard {
@@ -35,7 +33,8 @@ public:
   virtual ~KeyboardMacOS();
 
   virtual bool handleEvent(const void* event);
-  virtual rdr::U32 translateSystemKeyCode(int systemKeyCode);
+  virtual rdr::U32 translateToKeyCode(int systemKeyCode);
+  virtual std::list<rdr::U32> translateToKeySyms(int systemKeyCode);
 
   virtual unsigned getLEDState();
   virtual void setLEDState(unsigned state);
@@ -45,8 +44,7 @@ protected:
   bool isKeyPress(const NSEvent* nsevent);
   unsigned getSystemKeyCode(const NSEvent* nsevent);
   
-  NSString* keyTranslate(unsigned keyCode, unsigned modifierFlags);
-  rdr::U32 translateEventKeysym(const NSEvent* nsevent);
+  rdr::U32 translateToKeySym(unsigned keyCode, unsigned modifierFlags);
 
   int openHID(unsigned int *ioc);
   int getModifierLockState(int modifier, bool *on);

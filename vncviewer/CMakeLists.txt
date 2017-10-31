@@ -4,11 +4,11 @@ include_directories(${GETTEXT_INCLUDE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/common)
 
 add_executable(vncviewer
-  menukey.cxx
   BaseTouchHandler.cxx
   CConn.cxx
   DesktopWindow.cxx
   EmulateMB.cxx
+  HotKeyHandler.cxx
   UserDialog.cxx
   ServerDialog.cxx
   Surface.cxx

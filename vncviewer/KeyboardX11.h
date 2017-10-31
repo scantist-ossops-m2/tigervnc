@@ -27,13 +27,21 @@ public:
   virtual ~KeyboardX11();
 
   virtual bool handleEvent(const void* event);
-  virtual rdr::U32 translateSystemKeyCode(int systemKeyCode);
+  virtual rdr::U32 translateToKeyCode(int systemKeyCode);
+  virtual std::list<rdr::U32> translateToKeySyms(int systemKeyCode);
 
   virtual unsigned getLEDState();
   virtual void setLEDState(unsigned state);
 
 protected:
   unsigned getModifierMask(rdr::U32 keysym);
+
+private:
+  void translateToKeySyms(int systemKeyCode, unsigned char group,
+                          std::list<rdr::U32>* keySyms);
+  void translateToKeySyms(int systemKeyCode,
+                          unsigned char group, unsigned char mods,
+                          std::list<rdr::U32>* keySyms);
 
 private:
   int code_map_keycode_to_qnum[256];
