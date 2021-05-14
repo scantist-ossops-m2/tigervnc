@@ -113,11 +113,19 @@ enum { ID_DISCONNECT, ID_FULLSCREEN, ID_MINIMIZE, ID_RESIZE,
 static const WORD SCAN_FAKE = 0xaa;
 #endif
 
+// Used for fake key presses from the menu
+static const int FAKE_CTRL_KEY_CODE = 0x10001;
+static const int FAKE_ALT_KEY_CODE = 0x10002;
+static const int FAKE_DEL_KEY_CODE = 0x10003;
+
+// Used for fake key presses for lock key sync
+static const int FAKE_KEY_CODE = 0xffff;
+
 Viewport::Viewport(int w, int h, const rfb::PixelFormat& serverPF, CConn* cc_)
   : Fl_Widget(0, 0, w, h), cc(cc_), frameBuffer(NULL),
     lastPointerPos(0, 0), lastButtonMask(0),
 #ifdef WIN32
-    altGrArmed(false),
+    altGrArmed(false), leftShiftDown(false), rightShiftDown(false),
 #endif
     firstLEDState(true),
     pendingServerClipboard(false), pendingClientClipboard(false),
@@ -500,18 +508,18 @@ void Viewport::pushLEDState()
 
   if ((state & ledCapsLock) != (cc->server.ledState() & ledCapsLock)) {
     vlog.debug("Inserting fake CapsLock to get in sync with server");
-    handleKeyPress(0x3a, XK_Caps_Lock);
-    handleKeyRelease(0x3a);
+    handleKeyPress(FAKE_KEY_CODE, 0x3a, XK_Caps_Lock);
+    handleKeyRelease(FAKE_KEY_CODE);
   }
   if ((state & ledNumLock) != (cc->server.ledState() & ledNumLock)) {
     vlog.debug("Inserting fake NumLock to get in sync with server");
-    handleKeyPress(0x45, XK_Num_Lock);
-    handleKeyRelease(0x45);
+    handleKeyPress(FAKE_KEY_CODE, 0x45, XK_Num_Lock);
+    handleKeyRelease(FAKE_KEY_CODE);
   }
   if ((state & ledScrollLock) != (cc->server.ledState() & ledScrollLock)) {
     vlog.debug("Inserting fake ScrollLock to get in sync with server");
-    handleKeyPress(0x46, XK_Scroll_Lock);
-    handleKeyRelease(0x46);
+    handleKeyPress(FAKE_KEY_CODE, 0x46, XK_Scroll_Lock);
+    handleKeyRelease(FAKE_KEY_CODE);
   }
 }
 
@@ -561,7 +569,6 @@ int Viewport::handle(int event)
 {
   char *filtered;
   int buttonMask, wheelMask;
-  DownMap::const_iterator iter;
 
   switch (event) {
   case FL_PASTE:
@@ -635,9 +642,9 @@ int Viewport::handle(int event)
 
     // Resend Ctrl/Alt if needed
     if (menuCtrlKey)
-      handleKeyPress(0x1d, XK_Control_L);
+      handleKeyPress(FAKE_CTRL_KEY_CODE, 0x1d, XK_Control_L);
     if (menuAltKey)
-      handleKeyPress(0x38, XK_Alt_L);
+      handleKeyPress(FAKE_ALT_KEY_CODE, 0x38, XK_Alt_L);
 
     // Yes, we would like some focus please!
     return 1;
@@ -645,8 +652,13 @@ int Viewport::handle(int event)
   case FL_UNFOCUS:
     // Release all keys that were pressed as that generally makes most
     // sense (e.g. Alt+Tab where we only see the Alt press)
-    while (!downKeySym.empty())
-      handleKeyRelease(downKeySym.begin()->first);
+    try {
+      cc->releaseAllKeys();
+    } catch (rdr::Exception& e) {
+      vlog.error("%s", e.str());
+      abort_connection(_("An unexpected error occurred when communicating "
+                         "with the server:\n\n%s"), e.str());
+    }
     Fl::enable_im();
     return 1;
 
@@ -823,7 +835,8 @@ void Viewport::handlePointerTimeout(void *data)
 }
 
 
-void Viewport::handleKeyPress(int keyCode, rdr::U32 keySym)
+void Viewport::handleKeyPress(int systemKeyCode,
+                              rdr::U32 keyCode, rdr::U32 keySym)
 {
   static bool menuRecursion = false;
 
@@ -839,52 +852,8 @@ void Viewport::handleKeyPress(int keyCode, rdr::U32 keySym)
   if (viewOnly)
     return;
 
-  if (keyCode == 0) {
-    vlog.error(_("No key code specified on key press"));
-    return;
-  }
-
-#ifdef __APPLE__
-  // Alt on OS X behaves more like AltGr on other systems, and to get
-  // sane behaviour we should translate things in that manner for the
-  // remote VNC server. However that means we lose the ability to use
-  // Alt as a shortcut modifier. Do what RealVNC does and hijack the
-  // left command key as an Alt replacement.
-  switch (keySym) {
-  case XK_Super_L:
-    keySym = XK_Alt_L;
-    break;
-  case XK_Super_R:
-    keySym = XK_Super_L;
-    break;
-  case XK_Alt_L:
-    keySym = XK_Mode_switch;
-    break;
-  case XK_Alt_R:
-    keySym = XK_ISO_Level3_Shift;
-    break;
-  }
-#endif
-
-  // Because of the way keyboards work, we cannot expect to have the same
-  // symbol on release as when pressed. This breaks the VNC protocol however,
-  // so we need to keep track of what keysym a key _code_ generated on press
-  // and send the same on release.
-  downKeySym[keyCode] = keySym;
-
-#if defined(WIN32) || defined(__APPLE__)
-  vlog.debug("Key pressed: 0x%04x => 0x%04x", keyCode, keySym);
-#else
-  vlog.debug("Key pressed: 0x%04x => XK_%s (0x%04x)",
-             keyCode, XKeysymToString(keySym), keySym);
-#endif
-
   try {
-    // Fake keycode?
-    if (keyCode > 0xff)
-      cc->writer()->writeKeyEvent(keySym, 0, true);
-    else
-      cc->writer()->writeKeyEvent(keySym, keyCode, true);
+    cc->sendKeyPress(systemKeyCode, keyCode, keySym);
   } catch (rdr::Exception& e) {
     vlog.error("%s", e.str());
     abort_connection_with_unexpected_error(e);
@@ -892,39 +861,17 @@ void Viewport::handleKeyPress(int keyCode, rdr::U32 keySym)
 }
 
 
-void Viewport::handleKeyRelease(int keyCode)
+void Viewport::handleKeyRelease(int systemKeyCode)
 {
-  DownMap::iterator iter;
-
   if (viewOnly)
     return;
 
-  iter = downKeySym.find(keyCode);
-  if (iter == downKeySym.end()) {
-    // These occur somewhat frequently so let's not spam them unless
-    // logging is turned up.
-    vlog.debug("Unexpected release of key code %d", keyCode);
-    return;
-  }
-
-#if defined(WIN32) || defined(__APPLE__)
-  vlog.debug("Key released: 0x%04x => 0x%04x", keyCode, iter->second);
-#else
-  vlog.debug("Key released: 0x%04x => XK_%s (0x%04x)",
-             keyCode, XKeysymToString(iter->second), iter->second);
-#endif
-
   try {
-    if (keyCode > 0xff)
-      cc->writer()->writeKeyEvent(iter->second, 0, false);
-    else
-      cc->writer()->writeKeyEvent(iter->second, keyCode, false);
+    cc->sendKeyRelease(systemKeyCode);
   } catch (rdr::Exception& e) {
     vlog.error("%s", e.str());
     abort_connection_with_unexpected_error(e);
   }
-
-  downKeySym.erase(iter);
 }
 
 
@@ -1061,7 +1008,7 @@ int Viewport::handleSystemEvent(void *event, void *data)
       }
     }
 
-    self->handleKeyPress(keyCode, keySym);
+    self->handleKeyPress(keyCode, keyCode, keySym);
 
     // We don't get reliable WM_KEYUP for these
     switch (keySym) {
@@ -1072,6 +1019,12 @@ int Viewport::handleSystemEvent(void *event, void *data)
     case XK_Romaji:
       self->handleKeyRelease(keyCode);
     }
+
+    // Shift key tracking, see below
+    if (keyCode == 0x2a)
+        self->leftShiftDown = true;
+    if (keyCode == 0x36)
+        self->rightShiftDown = true;
 
     return 1;
   } else if ((msg->message == WM_KEYUP) || (msg->message == WM_SYSKEYUP)) {
@@ -1116,26 +1069,30 @@ int Viewport::handleSystemEvent(void *event, void *data)
     // Windows has a rather nasty bug where it won't send key release
     // events for a Shift button if the other Shift is still pressed
     if ((keyCode == 0x2a) || (keyCode == 0x36)) {
-      if (self->downKeySym.count(0x2a))
+      if (self->leftShiftDown)
         self->handleKeyRelease(0x2a);
-      if (self->downKeySym.count(0x36))
+      if (self->rightShiftDown)
         self->handleKeyRelease(0x36);
+      self->leftShiftDown = false;
+      self->rightShiftDown = false;
     }
 
     return 1;
   }
 #elif defined(__APPLE__)
   if (cocoa_is_keyboard_event(event)) {
-    int keyCode;
+    int systemKeyCode;
 
-    keyCode = cocoa_event_keycode(event);
-    if ((unsigned)keyCode >= code_map_osx_to_qnum_len)
-      keyCode = 0;
-    else
-      keyCode = code_map_osx_to_qnum[keyCode];
+    systemKeyCode = cocoa_event_keycode(event);
 
     if (cocoa_is_key_press(event)) {
+      rdr::U32 keyCode;
       rdr::U32 keySym;
+
+      if ((unsigned)systemKeyCode >= code_map_osx_to_qnum_len)
+        keyCode = 0;
+      else
+        keyCode = code_map_osx_to_qnum[systemKeyCode];
 
       keySym = cocoa_event_keysym(event);
       if (keySym == NoSymbol) {
@@ -1143,14 +1100,14 @@ int Viewport::handleSystemEvent(void *event, void *data)
                    (int)keyCode);
       }
 
-      self->handleKeyPress(keyCode, keySym);
+      self->handleKeyPress(systemKeyCode, keyCode, keySym);
 
       // We don't get any release events for CapsLock, so we have to
       // send the release right away.
       if (keySym == XK_Caps_Lock)
-        self->handleKeyRelease(keyCode);
+        self->handleKeyRelease(systemKeyCode);
     } else {
-      self->handleKeyRelease(keyCode);
+      self->handleKeyRelease(systemKeyCode);
     }
 
     return 1;
@@ -1165,41 +1122,16 @@ int Viewport::handleSystemEvent(void *event, void *data)
 
     keycode = code_map_keycode_to_qnum[xevent->xkey.keycode];
 
-    // Generate a fake keycode just for tracking if we can't figure
-    // out the proper one
-    if (keycode == 0)
-        keycode = 0x100 | xevent->xkey.keycode;
-
     XLookupString(&xevent->xkey, &str, 1, &keysym, NULL);
     if (keysym == NoSymbol) {
       vlog.error(_("No symbol for key code %d (in the current state)"),
                  (int)xevent->xkey.keycode);
     }
 
-    switch (keysym) {
-    // For the first few years, there wasn't a good consensus on what the
-    // Windows keys should be mapped to for X11. So we need to help out a
-    // bit and map all variants to the same key...
-    case XK_Hyper_L:
-      keysym = XK_Super_L;
-      break;
-    case XK_Hyper_R:
-      keysym = XK_Super_R;
-      break;
-    // There has been several variants for Shift-Tab over the years.
-    // RFB states that we should always send a normal tab.
-    case XK_ISO_Left_Tab:
-      keysym = XK_Tab;
-      break;
-    }
-
-    self->handleKeyPress(keycode, keysym);
+    self->handleKeyPress(xevent->xkey.keycode, keycode, keysym);
     return 1;
   } else if (xevent->type == KeyRelease) {
-    int keycode = code_map_keycode_to_qnum[xevent->xkey.keycode];
-    if (keycode == 0)
-        keycode = 0x100 | xevent->xkey.keycode;
-    self->handleKeyRelease(keycode);
+    self->handleKeyRelease(xevent->xkey.keycode);
     return 1;
   }
 #endif
@@ -1215,7 +1147,7 @@ void Viewport::handleAltGrTimeout(void *data)
   assert(self);
 
   self->altGrArmed = false;
-  self->handleKeyPress(0x1d, XK_Control_L);
+  self->handleKeyPress(0x1d, 0x1d, XK_Control_L);
 }
 
 void Viewport::resolveAltGrDetection(bool isAltGrSequence)
@@ -1224,7 +1156,7 @@ void Viewport::resolveAltGrDetection(bool isAltGrSequence)
   Fl::remove_timeout(handleAltGrTimeout);
   // when it's not an AltGr sequence we can't supress the Ctrl anymore
   if (!isAltGrSequence)
-    handleKeyPress(0x1d, XK_Control_L);
+    handleKeyPress(0x1d, 0x1d, XK_Control_L);
 }
 #endif
 
@@ -1326,30 +1258,30 @@ void Viewport::popupContextMenu()
     break;
   case ID_CTRL:
     if (m->value())
-      handleKeyPress(0x1d, XK_Control_L);
+      handleKeyPress(FAKE_CTRL_KEY_CODE, 0x1d, XK_Control_L);
     else
-      handleKeyRelease(0x1d);
+      handleKeyRelease(FAKE_CTRL_KEY_CODE);
     menuCtrlKey = !menuCtrlKey;
     break;
   case ID_ALT:
     if (m->value())
-      handleKeyPress(0x38, XK_Alt_L);
+      handleKeyPress(FAKE_ALT_KEY_CODE, 0x38, XK_Alt_L);
     else
-      handleKeyRelease(0x38);
+      handleKeyRelease(FAKE_ALT_KEY_CODE);
     menuAltKey = !menuAltKey;
     break;
   case ID_MENUKEY:
-    handleKeyPress(menuKeyCode, menuKeySym);
-    handleKeyRelease(menuKeyCode);
+    handleKeyPress(FAKE_KEY_CODE, menuKeyCode, menuKeySym);
+    handleKeyRelease(FAKE_KEY_CODE);
     break;
   case ID_CTRLALTDEL:
-    handleKeyPress(0x1d, XK_Control_L);
-    handleKeyPress(0x38, XK_Alt_L);
-    handleKeyPress(0xd3, XK_Delete);
+    handleKeyPress(FAKE_CTRL_KEY_CODE, 0x1d, XK_Control_L);
+    handleKeyPress(FAKE_ALT_KEY_CODE, 0x38, XK_Alt_L);
+    handleKeyPress(FAKE_DEL_KEY_CODE, 0xd3, XK_Delete);
 
-    handleKeyRelease(0xd3);
-    handleKeyRelease(0x38);
-    handleKeyRelease(0x1d);
+    handleKeyRelease(FAKE_DEL_KEY_CODE);
+    handleKeyRelease(FAKE_ALT_KEY_CODE);
+    handleKeyRelease(FAKE_CTRL_KEY_CODE);
     break;
   case ID_REFRESH:
     cc->refreshFramebuffer();

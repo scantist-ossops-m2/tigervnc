@@ -20,8 +20,6 @@
 #ifndef __VIEWPORT_H__
 #define __VIEWPORT_H__
 
-#include <map>
-
 #include <rfb/Rect.h>
 
 #include <FL/Fl_Widget.H>
@@ -84,8 +82,9 @@ private:
   void handlePointerEvent(const rfb::Point& pos, int buttonMask);
   static void handlePointerTimeout(void *data);
 
-  void handleKeyPress(int keyCode, rdr::U32 keySym);
-  void handleKeyRelease(int keyCode);
+  void handleKeyPress(int systemKeyCode,
+                      rdr::U32 keyCode, rdr::U32 keySym);
+  void handleKeyRelease(int systemKeyCode);
 
   static int handleSystemEvent(void *event, void *data);
 
@@ -111,12 +110,12 @@ private:
   rfb::Point lastPointerPos;
   int lastButtonMask;
 
-  typedef std::map<int, rdr::U32> DownMap;
-  DownMap downKeySym;
-
 #ifdef WIN32
   bool altGrArmed;
   unsigned int altGrCtrlTime;
+
+  bool leftShiftDown;
+  bool rightShiftDown;
 #endif
 
   bool firstLEDState;
