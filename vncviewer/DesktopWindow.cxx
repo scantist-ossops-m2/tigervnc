@@ -1,5 +1,5 @@
 /* Copyright (C) 2002-2005 RealVNC Ltd.  All Rights Reserved.
- * Copyright 2011 Pierre Ossman <ossman@cendio.se> for Cendio AB
+ * Copyright 2011-2021 Pierre Ossman <ossman@cendio.se> for Cendio AB
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -682,7 +682,8 @@ void DesktopWindow::resize(int x, int y, int w, int h)
 
   // Some systems require a grab after the window size has been changed.
   // Otherwise they might hold on to displays, resulting in them being unusable.
-  maybeGrabKeyboard();
+  if (keyboardGrabbed)
+    grabKeyboard();
 }
 
 
@@ -831,10 +832,13 @@ int DesktopWindow::handle(int event)
     // Update scroll bars
     repositionWidgets();
 
-    if (fullscreen_active())
-      maybeGrabKeyboard();
-    else
-      ungrabKeyboard();
+    // Automatically toggle keyboard grab?
+    if (fullscreenSystemKeys) {
+      if (fullscreen_active())
+        grabKeyboard();
+      else
+        ungrabKeyboard();
+    }
 
     break;
 
@@ -905,16 +909,15 @@ int DesktopWindow::fltkDispatch(int event, Fl_Window *win)
   if (dw) {
     switch (event) {
     // Focus might not stay with us just because we have grabbed the
-    // keyboard. E.g. we might have sub windows, or we're not using
-    // all monitors and the user clicked on another application.
-    // Make sure we update our grabs with the focus changes.
+    // keyboard. E.g. we might have sub windows, or the user clicked on
+    // another application. Make sure we update our grabs with the focus
+    // changes.
     case FL_FOCUS:
-      dw->maybeGrabKeyboard();
+      if (fullscreenSystemKeys && dw->fullscreen_active())
+        dw->grabKeyboard();
       break;
     case FL_UNFOCUS:
-      if (fullscreenSystemKeys) {
-        dw->ungrabKeyboard();
-      }
+      dw->ungrabKeyboard();
       break;
 
     case FL_RELEASE:
@@ -942,7 +945,7 @@ int DesktopWindow::fltkHandle(int event)
     // not be resized to cover the new screen. A timer makes sense
     // also on other systems, to make sure that whatever desktop
     // environment has a chance to deal with things before we do.
-    // Please note that when using FullscreenSystemKeys on macOS, the
+    // Please note that when using keyboard grab on macOS, the
     // display configuration cannot be changed: macOS will not detect
     // added or removed screens and there will be no
     // FL_SCREEN_CONFIGURATION_CHANGED event. This is by design:
@@ -1056,12 +1059,6 @@ bool DesktopWindow::hasFocus()
   return focus->window() == this;
 }
 
-void DesktopWindow::maybeGrabKeyboard()
-{
-  if (fullscreenSystemKeys && fullscreen_active() && hasFocus())
-    grabKeyboard();
-}
-
 void DesktopWindow::grabKeyboard()
 {
   // Grabbing the keyboard is fairly safe as FLTK reroutes events to the
@@ -1069,6 +1066,17 @@ void DesktopWindow::grabKeyboard()
   // event.
 
   // FIXME: Push this stuff into FLTK.
+
+  if (!hasFocus())
+    return;
+
+#ifdef __APPLE__
+  // FIXME: We currently cannot grab keyboard in windowed mode on macOS
+  if (!fullscreen_active()) {
+    vlog.error(_("Cannot grab keyboard in windowed mode"));
+    return;
+  }
+#endif
 
 #if defined(WIN32)
   int ret;
@@ -1165,7 +1173,7 @@ void DesktopWindow::handleGrab(void *data)
 
   assert(self);
 
-  self->maybeGrabKeyboard();
+  self->grabKeyboard();
 }
 
 
@@ -1472,11 +1480,6 @@ void DesktopWindow::handleClose(Fl_Widget *wnd, void *data)
 void DesktopWindow::handleOptions(void *data)
 {
   DesktopWindow *self = (DesktopWindow*)data;
-
-  if (fullscreenSystemKeys)
-    self->maybeGrabKeyboard();
-  else
-    self->ungrabKeyboard();
 
   // Call fullscreen_on even if active since it handles
   // fullScreenMode
