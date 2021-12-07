@@ -32,6 +32,7 @@
 #include <rfb/CMsgWriter.h>
 #include <rfb/CSecurity.h>
 #include <rfb/Decoder.h>
+#include <rfb/KeysymStr.h>
 #include <rfb/Security.h>
 #include <rfb/SecurityClient.h>
 #include <rfb/CConnection.h>
@@ -746,9 +747,8 @@ void CConnection::sendKeyPress(int systemKeyCode,
   downKeys[systemKeyCode].keyCode = keyCode;
   downKeys[systemKeyCode].keySym = keySym;
 
-  // FIXME: Should we include our own XKeysymToString()?
-  vlog.debug("Key pressed: %d => 0x%04x / 0x%04x",
-             systemKeyCode, keyCode, keySym);
+  vlog.debug("Key pressed: %d => 0x%04x / %s (0x%04x)",
+             systemKeyCode, keyCode, KeySymName(keySym), keySym);
 
   writer()->writeKeyEvent(keySym, keyCode, true);
 }
@@ -765,8 +765,9 @@ void CConnection::sendKeyRelease(int systemKeyCode)
     return;
   }
 
-  vlog.debug("Key released: %d => 0x%04x / 0x%04x",
-             systemKeyCode, iter->second.keyCode, iter->second.keySym);
+  vlog.debug("Key released: %d => 0x%04x / %s (0x%04x)",
+             systemKeyCode, iter->second.keyCode,
+             KeySymName(iter->second.keySym), iter->second.keySym);
 
   writer()->writeKeyEvent(iter->second.keySym,
                           iter->second.keyCode, false);
