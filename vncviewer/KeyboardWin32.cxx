@@ -421,6 +421,8 @@ std::list<rdr::U32> KeyboardWin32::translateToKeySyms(int systemKeyCode)
   if (ks != NoSymbol)
     keySyms.push_back(ks);
 
+  vlog.debug("%d / 0x%x => 0x%02x %s => 0x%04x", systemKeyCode, 0, vkey, extended ? "(extended)" : "", ks);
+
   // Next just a single modifier at a time
   for (mods = 1; mods < 16; mods <<= 1) {
     std::list<rdr::U32>::const_iterator iter;
@@ -440,6 +442,8 @@ std::list<rdr::U32> KeyboardWin32::translateToKeySyms(int systemKeyCode)
     ks = translateVKey(vkey, extended, state);
     if (ks == NoSymbol)
       continue;
+
+    vlog.debug("%d / 0x%x => 0x%02x %s => 0x%04x", systemKeyCode, mods, vkey, extended ? "(extended)" : "", ks);
 
     iter = std::find(keySyms.begin(), keySyms.end(), ks);
     if (iter != keySyms.end())
@@ -467,6 +471,8 @@ std::list<rdr::U32> KeyboardWin32::translateToKeySyms(int systemKeyCode)
     ks = translateVKey(vkey, extended, state);
     if (ks == NoSymbol)
       continue;
+
+    vlog.debug("%d / 0x%x => 0x%02x %s => 0x%04x", systemKeyCode, mods, vkey, extended ? "(extended)" : "", ks);
 
     iter = std::find(keySyms.begin(), keySyms.end(), ks);
     if (iter != keySyms.end())

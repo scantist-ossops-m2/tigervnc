@@ -180,6 +180,8 @@ bool KeyboardMacOS::handleEvent(const void* event)
                  systemKeyCode);
     }
 
+    vlog.debug("%d / 0x%02x => 0x%04x", systemKeyCode, modifiers, keySym);
+
     handler->handleKeyPress(systemKeyCode, keyCode, keySym);
 
     // We don't get any release events for CapsLock, so we have to
@@ -225,6 +227,8 @@ std::list<rdr::U32> KeyboardMacOS::translateToKeySyms(int systemKeyCode)
     if (iter != keySyms.end())
       continue;
 
+    vlog.debug("%d / 0x%02x => 0x%04x", systemKeyCode, mods, ks);
+
     keySyms.push_back(ks);
   }
 
@@ -240,6 +244,7 @@ std::list<rdr::U32> KeyboardMacOS::translateToKeySyms(int systemKeyCode)
     if (iter != keySyms.end())
       continue;
 
+    vlog.debug("%d / 0x%02x => 0x%04x", systemKeyCode, mods, ks);
     keySyms.push_back(ks);
   }
 
