@@ -1,5 +1,5 @@
 /* Copyright (C) 2002-2005 RealVNC Ltd.  All Rights Reserved.
- * Copyright 2011-2019 Pierre Ossman <ossman@cendio.se> for Cendio AB
+ * Copyright 2011-2021 Pierre Ossman <ossman@cendio.se> for Cendio AB
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,15 +25,18 @@
 #include <FL/Fl_Widget.H>
 
 #include "EmulateMB.h"
+#include "Keyboard.h"
 
 class Fl_Menu_Button;
 class Fl_RGB_Image;
 
 class CConn;
+class Keyboard;
 class PlatformPixelBuffer;
 class Surface;
 
-class Viewport : public Fl_Widget, public EmulateMB {
+class Viewport : public Fl_Widget, protected EmulateMB,
+                 protected KeyboardHandler {
 public:
 
   Viewport(int w, int h, const rfb::PixelFormat& serverPF, CConn* cc_);
@@ -73,8 +76,6 @@ protected:
 private:
   bool hasFocus();
 
-  unsigned int getModifierMask(unsigned int keysym);
-
   static void handleClipboardChange(int source, void *data);
 
   void flushPendingClipboard();
@@ -82,16 +83,11 @@ private:
   void handlePointerEvent(const rfb::Point& pos, int buttonMask);
   static void handlePointerTimeout(void *data);
 
-  void handleKeyPress(int systemKeyCode,
-                      rdr::U32 keyCode, rdr::U32 keySym);
-  void handleKeyRelease(int systemKeyCode);
+  virtual void handleKeyPress(int systemKeyCode,
+                              rdr::U32 keyCode, rdr::U32 keySym);
+  virtual void handleKeyRelease(int systemKeyCode);
 
   static int handleSystemEvent(void *event, void *data);
-
-#ifdef WIN32
-  static void handleAltGrTimeout(void *data);
-  void resolveAltGrDetection(bool isAltGrSequence);
-#endif
 
   void pushLEDState();
 
@@ -110,13 +106,7 @@ private:
   rfb::Point lastPointerPos;
   int lastButtonMask;
 
-#ifdef WIN32
-  bool altGrArmed;
-  unsigned int altGrCtrlTime;
-
-  bool leftShiftDown;
-  bool rightShiftDown;
-#endif
+  Keyboard* keyboard;
 
   bool firstLEDState;
 
