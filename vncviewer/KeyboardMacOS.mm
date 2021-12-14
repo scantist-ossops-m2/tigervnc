@@ -294,12 +294,34 @@ void KeyboardMacOS::setLEDState(unsigned state)
   // No support for Scroll Lock //
 }
 
+bool KeyboardMacOS::isKeyboardSync(const void* event)
+{
+  const NSEvent* nsevent = (const NSEvent*)event;
+
+  assert(event);
+
+  // If we get a NSFlagsChanged event with key code 0 then this isn't
+  // an actual keyboard event but rather the system trying to sync up
+  // modifier state after it has stolen input for some reason (e.g.
+  // Cmd+Tab)
+
+  if ([nsevent type] != NSFlagsChanged)
+    return false;
+  if ([nsevent keyCode] != 0)
+    return false;
+
+  return true;
+}
+
 bool KeyboardMacOS::isKeyboardEvent(const NSEvent* nsevent)
 {
   switch ([nsevent type]) {
   case NSKeyDown:
   case NSKeyUp:
+    return true;
   case NSFlagsChanged:
+    if (isKeyboardSync(nsevent))
+      return false;
     return true;
   default:
     return false;

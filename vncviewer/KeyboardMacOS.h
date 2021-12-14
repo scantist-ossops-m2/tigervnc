@@ -39,6 +39,9 @@ public:
   virtual unsigned getLEDState();
   virtual void setLEDState(unsigned state);
 
+  // Special helper on macOS
+  static bool isKeyboardSync(const void* event);
+
 protected:
   bool isKeyboardEvent(const NSEvent* nsevent);
   bool isKeyPress(const NSEvent* nsevent);

@@ -456,21 +456,8 @@ int Viewport::handle(int event)
     return 1;
 
   case FL_UNFOCUS:
-    // Release all keys that were pressed as that generally makes most
-    // sense (e.g. Alt+Tab where we only see the Alt press)
-    try {
-      cc->releaseAllKeys();
-    } catch (rdr::Exception& e) {
-      vlog.error("%s", e.str());
-      abort_connection(_("An unexpected error occurred when communicating "
-                         "with the server:\n\n%s"), e.str());
-    }
-    keyboard->reset();
-
-    hotKeyHandler.reset();
-    hotKeyBypass = false;
-    hotKeyActive = false;
-    pressedKeys.clear();
+    // We won't get more key events, so reset our knowledge about keys
+    resetKeyboard();
 
     Fl::enable_im();
     return 1;
@@ -599,6 +586,24 @@ void Viewport::handlePointerTimeout(void *data)
   }
 }
 
+void Viewport::resetKeyboard()
+{
+  // Release all keys that were pressed as that generally makes most
+  // sense (e.g. Alt+Tab where we only see the Alt press)
+  try {
+    cc->releaseAllKeys();
+  } catch (rdr::Exception& e) {
+    vlog.error("%s", e.str());
+    abort_connection(_("An unexpected error occurred when communicating "
+                       "with the server:\n\n%s"), e.str());
+  }
+  keyboard->reset();
+
+  hotKeyHandler.reset();
+  hotKeyBypass = false;
+  hotKeyActive = false;
+  pressedKeys.clear();
+}
 
 void Viewport::handleKeyPress(int systemKeyCode,
                               rdr::U32 keyCode, rdr::U32 keySym)
@@ -785,6 +790,14 @@ int Viewport::handleSystemEvent(void *event, void *data)
 
   if (!self->hasFocus())
     return 0;
+
+#ifdef __APPLE__
+  // Special event that means we temporarily lost some input
+  if (KeyboardMacOS::isKeyboardSync(event)) {
+    self->resetKeyboard();
+    return 1;
+  }
+#endif
 
   consumed = self->keyboard->handleEvent(event);
   if (consumed)
