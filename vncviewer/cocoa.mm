@@ -20,15 +20,14 @@
 #include <config.h>
 #endif
 
-#include <FL/Fl.H>
+#include <assert.h>
+#include <dlfcn.h>
+
 #include <FL/Fl_Window.H>
 #include <FL/x.H>
 
 #import <Cocoa/Cocoa.h>
-
-#include <rfb/Rect.h>
-
-static bool captured = false;
+#import <ApplicationServices/ApplicationServices.h>
 
 int cocoa_get_level(Fl_Window *win)
 {
@@ -44,79 +43,132 @@ void cocoa_set_level(Fl_Window *win, int level)
   [nsw setLevel:level];
 }
 
-int cocoa_capture_displays(Fl_Window *win)
+static CFMachPortRef event_tap;
+static CFRunLoopSourceRef tap_source;
+
+// http://atnan.com/blog/2012/02/29/modern-privileged-helper-tools-using-smjobbless-plus-xpc
+// https://github.com/numist/Switch/issues/7
+// 
+
+static CGEventRef cocoa_event_tap(CGEventTapProxy proxy,
+                                  CGEventType type, CGEventRef event,
+                                  void *refcon)
 {
-  NSWindow *nsw;
+  fprintf(stderr, "Got event of type %d\n", type);
 
-  nsw = (NSWindow*)fl_xid(win);
+  if ((type != kCGEventKeyDown) && (type != kCGEventKeyUp) && (type != kCGEventFlagsChanged))
+    return event;
 
-  CGDisplayCount count;
-  CGDirectDisplayID displays[16];
+  fprintf(stderr, "Code: %d, Flags: 0x%08x\n",
+          (int)CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode),
+          (int)CGEventGetFlags(event));
 
-  int sx, sy, sw, sh;
-  rfb::Rect windows_rect, screen_rect;
+  fprintf(stderr, "Heading for PSN: %lld\n",
+          CGEventGetIntegerValueField(event, kCGEventTargetProcessSerialNumber));
 
-  windows_rect.setXYWH(win->x(), win->y(), win->w(), win->h());
+  fprintf(stderr, "Heading for PID: %lld (I am %d)\n",
+          CGEventGetIntegerValueField(event, kCGEventTargetUnixProcessID),
+          getpid());
 
-  if (CGGetActiveDisplayList(16, displays, &count) != kCGErrorSuccess)
-    return 1;
 
-  if (count != (unsigned)Fl::screen_count())
-    return 1;
+#if 0
+  ProcessSerialNumber psn;
 
-  for (int i = 0; i < Fl::screen_count(); i++) {
-    Fl::screen_xywh(sx, sy, sw, sh, i);
+  psn.highLongOfPSN = 0;
+  psn.lowLongOfPSN = kCurrentProcess;
 
-    screen_rect.setXYWH(sx, sy, sw, sh);
-    if (screen_rect.enclosed_by(windows_rect)) {
-      if (CGDisplayCapture(displays[i]) != kCGErrorSuccess)
-        return 1;
+  CGEventPostToPSN(&psn, event);
+  return NULL;
+#else
+  return event;
+#endif
+}
 
-    } else {
-      // A display might have been captured with the previous
-      // monitor selection. In that case we don't want to keep
-      // it when its no longer inside the window_rect.
-      CGDisplayRelease(displays[i]);
-    }
-  }
+int cocoa_tap_keyboard(Fl_Window *win)
+{
+  CFStringRef keys[1];
+  CFBooleanRef values[1];
+  CFDictionaryRef options;
+  Boolean trusted;
 
-  captured = true;
+  CGEventMask mask;
 
-  if ([nsw level] == CGShieldingWindowLevel())
+  if (event_tap != NULL)
     return 0;
 
-  [nsw setLevel:CGShieldingWindowLevel()];
+//if (!AXIsProcessTrusted())
+//  AXMakeProcessTrusted(
+
+  // FIXME: macOS 10.9
+  void *lib;
+  typedef Boolean (*AXIsProcessTrustedWithOptionsRef)(CFDictionaryRef);
+  AXIsProcessTrustedWithOptionsRef AXIsProcessTrustedWithOptions;
+  CFStringRef kAXTrustedCheckOptionPrompt;
+
+  lib = dlopen(NULL, 0);
+  assert(lib);
+  AXIsProcessTrustedWithOptions = (AXIsProcessTrustedWithOptionsRef)dlsym(lib, "AXIsProcessTrustedWithOptions");
+  assert(AXIsProcessTrustedWithOptions);
+  dlclose(lib);
+  kAXTrustedCheckOptionPrompt = CFSTR("AXTrustedCheckOptionPrompt");
+
+
+  keys[0] = kAXTrustedCheckOptionPrompt;
+  values[0] = kCFBooleanTrue;
+  options = CFDictionaryCreate(kCFAllocatorDefault,
+                               (const void**)keys,
+                               (const void**)values, 1,
+                               &kCFCopyStringDictionaryKeyCallBacks,
+                               &kCFTypeDictionaryValueCallBacks);
+  if (options == NULL)
+    return 1;
+  CFShow(options);
+
+  trusted = AXIsProcessTrustedWithOptions(options);
+  CFRelease(options);
+
+  if (!trusted)
+    return 1;
+
+//NSDictionary *options = @{(id)kAXTrustedCheckOptionPrompt: @YES};
+//BOOL accessibilityEnabled = AXIsProcessTrustedWithOptions((CFDictionaryRef)options);
+
+  mask = CGEventMaskBit(kCGEventKeyDown) |
+         CGEventMaskBit(kCGEventKeyUp) |
+         CGEventMaskBit(kCGEventFlagsChanged);
+
+  // FIXME: Right modes/prio?
+  event_tap = CGEventTapCreate(kCGAnnotatedSessionEventTap,
+                               kCGHeadInsertEventTap,
+                               kCGEventTapOptionDefault,
+                               mask, cocoa_event_tap, NULL);
+  if (event_tap == NULL)
+    return 1;
+
+  tap_source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault,
+                                             event_tap, 0);
+  CFRunLoopAddSource(CFRunLoopGetCurrent(), tap_source,
+                     kCFRunLoopCommonModes);
+
+  // FIXME: Needed?
+  CGEventTapEnable(event_tap, true);
 
   return 0;
 }
 
-void cocoa_release_displays(Fl_Window *win)
+// FIXME: Called in destructor?
+void cocoa_untap_keyboard(Fl_Window *win)
 {
-  NSWindow *nsw;
-  int newlevel;
-
-  if (captured)
-    CGReleaseAllDisplays();
-
-  captured = false;
-
-  nsw = (NSWindow*)fl_xid(win);
-
-  // Someone else has already changed the level of this window
-  if ([nsw level] != CGShieldingWindowLevel())
+  if (event_tap == NULL)
     return;
 
-  // FIXME: Store the previous level somewhere so we don't have to hard
-  //        code a level here.
-  if (win->fullscreen_active() && win->contains(Fl::focus()))
-    newlevel = NSStatusWindowLevel;
-  else
-    newlevel = NSNormalWindowLevel;
+  CFRunLoopRemoveSource(CFRunLoopGetCurrent(), tap_source,
+                        kCFRunLoopCommonModes);
+  CFRelease(tap_source);
+  tap_source = NULL;
 
-  // Only change if different as the level change also moves the window
-  // to the top of that level.
-  if ([nsw level] != newlevel)
-    [nsw setLevel:newlevel];
+  CFRelease(event_tap);
+  event_tap = NULL;
 }
 
 CGColorSpaceRef cocoa_win_color_space(Fl_Window *win)

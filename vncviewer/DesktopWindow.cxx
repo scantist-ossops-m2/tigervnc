@@ -723,11 +723,6 @@ void DesktopWindow::resize(int x, int y, int w, int h)
 
     repositionWidgets();
   }
-
-  // Some systems require a grab after the window size has been changed.
-  // Otherwise they might hold on to displays, resulting in them being unusable.
-  if (keyboardGrabbed)
-    grabKeyboard();
 }
 
 void DesktopWindow::addOverlayTip(const char* text, ...)
@@ -1033,14 +1028,6 @@ int DesktopWindow::fltkHandle(int event)
     // not be resized to cover the new screen. A timer makes sense
     // also on other systems, to make sure that whatever desktop
     // environment has a chance to deal with things before we do.
-    // Please note that when using keyboard grab on macOS, the
-    // display configuration cannot be changed: macOS will not detect
-    // added or removed screens and there will be no
-    // FL_SCREEN_CONFIGURATION_CHANGED event. This is by design:
-    // "When you capture a display, you have exclusive use of the
-    // display. Other applications and system services are not allowed
-    // to use the display or change its configuration. In addition,
-    // they are not notified of display changes"
     Fl::remove_timeout(reconfigureFullscreen);
     Fl::add_timeout(0.5, reconfigureFullscreen);
   }
@@ -1160,14 +1147,6 @@ void DesktopWindow::grabKeyboard()
   if (!hasFocus())
     return;
 
-#ifdef __APPLE__
-  // FIXME: We currently cannot grab keyboard in windowed mode on macOS
-  if (!fullscreen_active()) {
-    vlog.error(_("Cannot grab keyboard in windowed mode"));
-    return;
-  }
-#endif
-
 #if defined(WIN32)
   int ret;
   
@@ -1180,7 +1159,7 @@ void DesktopWindow::grabKeyboard()
 #elif defined(__APPLE__)
   int ret;
   
-  ret = cocoa_capture_displays(this);
+  ret = cocoa_tap_keyboard(this);
   if (ret != 0) {
     vlog.error(_("Failure grabbing keyboard"));
     addOverlayError(_("Failure grabbing keyboard"));
@@ -1239,7 +1218,7 @@ void DesktopWindow::ungrabKeyboard()
 #if defined(WIN32)
   win32_disable_lowlevel_keyboard(fl_xid(this));
 #elif defined(__APPLE__)
-  cocoa_release_displays(this);
+  cocoa_untap_keyboard(this);
 #else
   // FLTK has a grab so lets not mess with it
   if (Fl::grab())

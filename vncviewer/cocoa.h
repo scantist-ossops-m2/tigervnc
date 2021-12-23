@@ -24,8 +24,8 @@ class Fl_Window;
 int cocoa_get_level(Fl_Window *win);
 void cocoa_set_level(Fl_Window *win, int level);
 
-int cocoa_capture_displays(Fl_Window *win);
-void cocoa_release_displays(Fl_Window *win);
+int cocoa_tap_keyboard(Fl_Window *win);
+void cocoa_untap_keyboard(Fl_Window *win);
 
 typedef struct CGColorSpace *CGColorSpaceRef;
 
