@@ -59,7 +59,7 @@ public:
   void updateWindow();
 
   // Updated session title
-  void setName(const char *name);
+  void updateCaption();
 
   // Resize the current framebuffer, but retain the contents
   void resizeFramebuffer(int new_w, int new_h);
