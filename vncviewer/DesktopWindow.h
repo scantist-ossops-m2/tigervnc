@@ -93,7 +93,9 @@ public:
   void ungrabKeyboard();
 
 private:
-  void addOverlay(const char *text, ...) __printf_attr(2, 3);
+  void addOverlayTip(const char *text, ...) __printf_attr(2, 3);
+  void addOverlayError(const char *text, ...) __printf_attr(2, 3);
+  void addOverlay(const char *text, bool always);
   static void updateOverlay(void *data);
 
   static int fltkDispatch(int event, Fl_Window *win);
