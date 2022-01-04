@@ -113,8 +113,14 @@ int cocoa_tap_keyboard(Fl_Window *win)
   trusted = AXIsProcessTrustedWithOptions(options);
   CFRelease(options);
 
-  if (!trusted)
+  if (!trusted) {
+    NSWindow *nsw;
+    nsw = (NSWindow*)fl_xid(win);
+    [nsw setLevel:NSNormalWindowLevel];
+    [nsw orderBack:nil];
+    [NSApp deactivate];
     return 1;
+  }
 
 //NSDictionary *options = @{(id)kAXTrustedCheckOptionPrompt: @YES};
 //BOOL accessibilityEnabled = AXIsProcessTrustedWithOptions((CFDictionaryRef)options);
