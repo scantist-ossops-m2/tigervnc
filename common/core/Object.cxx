@@ -31,6 +31,12 @@ Object::Object()
 
 Object::~Object()
 {
+    // Disconnect from any signals we might have subscribed to
+    while (!connectedObjects.empty())
+        (*connectedObjects.begin())->disconnectSignals(this);
+
+    // And prevent other objects from trying to disconnect from us as we
+    // are going away
     {
         std::map<std::string, ReceiverList>::iterator sigiter;
 
@@ -38,10 +44,8 @@ Object::~Object()
             ReceiverList *siglist;
 
             siglist = &sigiter->second;
-            while (!siglist->empty()) {
-                delete siglist->front();
-                siglist->erase(siglist->begin());
-            }
+            while (!siglist->empty())
+                disconnectSignals((*siglist->begin())->getObject());
         }
     }
 }
@@ -68,23 +72,27 @@ void Object::emitSignal(const char *name)
         (*iter)->emit(this, name);
 }
 
-void Object::connectSignal(const char *name, SignalReceiver *receiver)
+void Object::connectSignal(const char *name, Object *obj, SignalReceiver *receiver)
 {
     if (signalReceivers.count(name) == 0)
         throw Exception("Unknown signal: %s", name);
 
     signalReceivers[name].push_back(receiver);
+
+    obj->connectedObjects.insert(this);
 }
 
-void Object::disconnectSignal(const char *name,
+void Object::disconnectSignal(const char *name, Object *obj,
                               SignalReceiver *receiver)
 {
     ReceiverList *siglist;
     ReceiverList::iterator iter;
+    bool hasOthers;
 
     if (signalReceivers.count(name) == 0)
         throw Exception("Unknown signal: %s", name);
 
+    hasOthers = false;
     siglist = &signalReceivers[name];
     iter = siglist->begin();
     while (iter != siglist->end()) {
@@ -92,9 +100,14 @@ void Object::disconnectSignal(const char *name,
             delete *iter;
             siglist->erase(iter++);
         } else {
+            if ((*iter)->getObject() == obj)
+                hasOthers = true;
             ++iter;
         }
     }
+
+    if (!hasOthers)
+        obj->connectedObjects.erase(this);
 }
 
 void Object::disconnectSignals(Object *obj)
@@ -117,4 +130,6 @@ void Object::disconnectSignals(Object *obj)
             }
         }
     }
+
+    obj->connectedObjects.erase(this);
 }
