@@ -75,3 +75,24 @@ void Object::connectSignal(const char *name, SignalReceiver *receiver)
 
     signalReceivers[name].push_back(receiver);
 }
+
+void Object::disconnectSignal(const char *name,
+                              SignalReceiver *receiver)
+{
+    ReceiverList *siglist;
+    ReceiverList::iterator iter;
+
+    if (signalReceivers.count(name) == 0)
+        throw Exception("Unknown signal: %s", name);
+
+    siglist = &signalReceivers[name];
+    iter = siglist->begin();
+    while (iter != siglist->end()) {
+        if (**iter == *receiver) {
+            delete *iter;
+            siglist->erase(iter++);
+        } else {
+            ++iter;
+        }
+    }
+}
