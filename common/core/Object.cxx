@@ -20,6 +20,7 @@
 #include <config.h>
 #endif
 
+#include <core/Exception.h>
 #include <core/Object.h>
 
 using namespace core;
@@ -30,4 +31,47 @@ Object::Object()
 
 Object::~Object()
 {
+    {
+        std::map<std::string, ReceiverList>::iterator sigiter;
+
+        for (sigiter = signalReceivers.begin(); sigiter != signalReceivers.end(); ++sigiter) {
+            ReceiverList *siglist;
+
+            siglist = &sigiter->second;
+            while (!siglist->empty()) {
+                delete siglist->front();
+                siglist->erase(siglist->begin());
+            }
+        }
+    }
+}
+
+void Object::registerSignal(const char *name)
+{
+    if (signalReceivers.count(name) != 0)
+        throw Exception("Signal already registered: %s", name);
+
+    // Just to force it being created
+    signalReceivers[name].clear();
+}
+
+void Object::emitSignal(const char *name)
+{
+    ReceiverList *siglist;
+    ReceiverList::iterator iter;
+
+    if (signalReceivers.count(name) == 0)
+        throw Exception("Unknown signal: %s", name);
+
+    siglist = &signalReceivers[name];
+    for (iter = siglist->begin(); iter != siglist->end(); ++iter)
+        (*iter)->emit(this, name);
+}
+
+void Object::connectSignal(const char *name, SignalReceiver *receiver)
+{
+    if (signalReceivers.count(name) == 0)
+        throw Exception("Unknown signal: %s", name);
+
+    signalReceivers[name].push_back(receiver);
 }
