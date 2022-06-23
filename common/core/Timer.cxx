@@ -97,7 +97,7 @@ void Timer::insertTimer(Timer* t) {
 
 Timer::Timer() {
   registerSignal("timer");
-  registerSignal("timer2");
+  registerSignal<TimerInfo>("timer2");
 }
 
 Timer::~Timer() {

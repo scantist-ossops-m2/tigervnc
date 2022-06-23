@@ -48,15 +48,22 @@ Object::~Object()
                 disconnectSignals((*siglist->begin())->getObject());
         }
     }
+
+    while (!signalCheckers.empty()) {
+        delete signalCheckers.begin()->second;
+        signalCheckers.erase(signalCheckers.begin());
+    }
 }
 
-void Object::registerSignal(const char *name)
+void Object::registerSignal(const char *name, InfoChecker *checker)
 {
     if (signalReceivers.count(name) != 0)
         throw Exception("Signal already registered: %s", name);
 
     // Just to force it being created
     signalReceivers[name].clear();
+
+    signalCheckers[name] = checker;
 }
 
 void Object::emitSignal(const char *name)
@@ -66,6 +73,9 @@ void Object::emitSignal(const char *name)
 
     if (signalReceivers.count(name) == 0)
         throw Exception("Unknown signal: %s", name);
+
+    if (signalCheckers[name] != NULL)
+        throw Exception("Missing signal info");
 
     siglist = &signalReceivers[name];
     for (iter = siglist->begin(); iter != siglist->end(); ++iter)
@@ -80,18 +90,36 @@ void Object::emitSignal(const char *name, const SignalInfo &info)
     if (signalReceivers.count(name) == 0)
         throw Exception("Unknown signal: %s", name);
 
+    if (signalCheckers[name] == NULL)
+        throw Exception("Unexpected signal info");
+
+    if (!signalCheckers[name]->isInstanceOf(info))
+        throw Exception("Wrong signal info");
+
     siglist = &signalReceivers[name];
     for (iter = siglist->begin(); iter != siglist->end(); ++iter)
         (*iter)->emit(this, name, info);
 }
 
-void Object::connectSignal(const char *name, Object *obj, SignalReceiver *receiver)
+void Object::connectSignal(const char *name, Object *obj,
+                           SignalReceiver *receiver,
+                           const std::type_info *info)
 {
     ReceiverList *siglist;
     ReceiverList::iterator iter;
 
     if (signalReceivers.count(name) == 0)
         throw Exception("Unknown signal: %s", name);
+
+    if (signalCheckers[name] == NULL) {
+        if (info != NULL)
+            throw Exception("Unexpected signal info");
+    } else {
+        if (info == NULL)
+            throw Exception("Missing signal info");
+        if (!signalCheckers[name]->isType(*info))
+            throw Exception("Wrong signal info");
+    }
 
     siglist = &signalReceivers[name];
 
