@@ -74,10 +74,23 @@ void Object::emitSignal(const char *name)
 
 void Object::connectSignal(const char *name, Object *obj, SignalReceiver *receiver)
 {
+    ReceiverList *siglist;
+    ReceiverList::iterator iter;
+
     if (signalReceivers.count(name) == 0)
         throw Exception("Unknown signal: %s", name);
 
-    signalReceivers[name].push_back(receiver);
+    siglist = &signalReceivers[name];
+
+    iter = siglist->begin();
+    while (iter != siglist->end()) {
+        if (**iter == *receiver)
+            throw Exception("Already connected: %s", name);
+        else
+            ++iter;
+    }
+
+    siglist->push_back(receiver);
 
     obj->connectedObjects.insert(this);
 }
