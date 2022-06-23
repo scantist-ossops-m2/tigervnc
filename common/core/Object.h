@@ -50,6 +50,10 @@ public:
     void disconnectSignal(const char *name, T *obj,
                           void (T::*callback)(Object*, const char*));
 
+    // disconnectSignals() unregisters all methods for all names for the
+    // specified object.
+    void disconnectSignals(Object *obj);
+
 protected:
     // registerSignal() registers a new signal type with the specified
     // name. This must always be done before connectSignal() or
@@ -88,6 +92,7 @@ public:
 
     virtual void emit(Object*, const char*)=0;
 
+    virtual Object* getObject()=0;
     virtual bool operator==(SignalReceiver&)=0;
 };
 
@@ -99,6 +104,7 @@ public:
 
     virtual void emit(Object*, const char*);
 
+    virtual Object* getObject();
     virtual bool operator==(SignalReceiver&);
 
 private:
@@ -135,6 +141,12 @@ template<class T>
 void Object::SignalReceiverT<T>::emit(Object *sender, const char *name)
 {
     (obj->*callback)(sender, name);
+}
+
+template<class T>
+Object* Object::SignalReceiverT<T>::getObject()
+{
+    return obj;
 }
 
 template<class T>
