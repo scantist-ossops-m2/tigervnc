@@ -39,6 +39,10 @@ namespace core {
      occur.
   */
 
+  struct TimerInfo : core::SignalInfo {
+    int goobar;
+  };
+
   class Timer : public Object {
   public:
     // checkTimeouts()

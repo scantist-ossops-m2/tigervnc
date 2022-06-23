@@ -244,6 +244,7 @@ namespace rfb {
     bool processInitMsg();
 
     void authFailureTimeout(core::Timer*, const char*);
+    void handleAuthFailureTimeout3(core::Timer*, const char*, const core::TimerInfo&) {}
 
     int defaultMajorVersion, defaultMinorVersion;
 

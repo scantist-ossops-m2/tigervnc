@@ -72,6 +72,19 @@ void Object::emitSignal(const char *name)
         (*iter)->emit(this, name);
 }
 
+void Object::emitSignal(const char *name, const SignalInfo &info)
+{
+    ReceiverList *siglist;
+    ReceiverList::iterator iter;
+
+    if (signalReceivers.count(name) == 0)
+        throw Exception("Unknown signal: %s", name);
+
+    siglist = &signalReceivers[name];
+    for (iter = siglist->begin(); iter != siglist->end(); ++iter)
+        (*iter)->emit(this, name, info);
+}
+
 void Object::connectSignal(const char *name, Object *obj, SignalReceiver *receiver)
 {
     ReceiverList *siglist;

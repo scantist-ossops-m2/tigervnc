@@ -64,6 +64,8 @@ SConnection::SConnection()
 {
   authFailureTimer.connectSignal("timer", this,
                                  &SConnection::authFailureTimeout);
+  authFailureTimer.connectSignal("timer2", this, &SConnection::handleAuthFailureTimeout3);
+  authFailureTimer.disconnectSignal("timer2", this, &SConnection::handleAuthFailureTimeout3);
 
   defaultMajorVersion = 3;
   defaultMinorVersion = 8;

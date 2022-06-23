@@ -52,6 +52,8 @@ int Timer::checkTimeouts() {
     pending.pop_front();
 
     timer->emitSignal("timer");
+    TimerInfo info;
+    timer->emitSignal("timer2", info);
 
     if (pending.empty())
       return -1;
@@ -95,6 +97,7 @@ void Timer::insertTimer(Timer* t) {
 
 Timer::Timer() {
   registerSignal("timer");
+  registerSignal("timer2");
 }
 
 Timer::~Timer() {
