@@ -29,6 +29,8 @@
 #include <set>
 #include <map>
 
+#include <core/Exception.h>
+
 namespace core {
 
 class Object {
@@ -42,16 +44,16 @@ public:
     // be called whenever a signal of the specified name is emitted. Any
     // method registered will automatically be unregistered when the
     // method's object is destroyed.
-    template<class T>
+    template<class T, class S>
     void connectSignal(const char *name, T *obj,
-                       void (T::*callback)(Object*, const char*));
+                       void (T::*callback)(S*, const char*));
 
     // disconnectSignal() unregisters a method that was previously
     // registered using connectSignal(). Only the specified object and
     // the specific name will be unregistered.
-    template<class T>
+    template<class T, class S>
     void disconnectSignal(const char *name, T *obj,
-                          void (T::*callback)(Object*, const char*));
+                          void (T::*callback)(S*, const char*));
 
     // disconnectSignals() unregisters all methods for all names for the
     // specified object. This is automatically called when the specified
@@ -71,7 +73,7 @@ protected:
 private:
     // Helper classes to handle the type glue for calling object methods
     class SignalReceiver;
-    template<class T> class SignalReceiverT;
+    template<class T, class S> class SignalReceiverTS;
 
     void connectSignal(const char *name, Object *obj, SignalReceiver *receiver);
     void disconnectSignal(const char *name, Object *obj, SignalReceiver *receiver);
@@ -103,11 +105,11 @@ public:
     virtual bool operator==(SignalReceiver&)=0;
 };
 
-template<class T>
-class Object::SignalReceiverT: public Object::SignalReceiver {
+template<class T, class S>
+class Object::SignalReceiverTS: public Object::SignalReceiver {
 public:
-    SignalReceiverT(T *obj, void (T::*callback)(Object*, const char*));
-    virtual ~SignalReceiverT() {}
+    SignalReceiverTS(T *obj, void (T::*callback)(S*, const char*));
+    virtual ~SignalReceiverTS() {}
 
     virtual void emit(Object*, const char*);
 
@@ -116,52 +118,60 @@ public:
 
 private:
     T *obj;
-    void (T::*callback)(Object*, const char*);
+    void (T::*callback)(S*, const char*);
 };
 
 // Object - Inline methods definitions
 
-template<class T>
+template<class T, class S>
 void Object::connectSignal(const char *name, T *obj,
-                           void (T::*callback)(Object*, const char*))
+                           void (T::*callback)(S*, const char*))
 {
-    connectSignal(name, obj, new SignalReceiverT<T>(obj, callback));
+    if (dynamic_cast<S*>(this) == NULL)
+        throw Exception("Invalid callback object type");
+    connectSignal(name, obj, new SignalReceiverTS<T,S>(obj, callback));
 }
 
-template<class T>
+template<class T, class S>
 void Object::disconnectSignal(const char *name, T *obj,
-                            void (T::*callback)(Object*, const char*))
+                              void (T::*callback)(S*, const char*))
 {
-    SignalReceiverT<T> other(obj, callback);
+    SignalReceiverTS<T,S> other(obj, callback);
     disconnectSignal(name, obj, &other);
 }
 
 // Object::SignalReceiver - Inline methods definitions
 
-template<class T>
-Object::SignalReceiverT<T>::SignalReceiverT(T *obj_, void (T::*callback_)(Object*, const char*))
+template<class T, class S>
+Object::SignalReceiverTS<T,S>::SignalReceiverTS(T *obj_, void (T::*callback_)(S*, const char*))
     : obj(obj_), callback(callback_)
 {
 }
 
-template<class T>
-void Object::SignalReceiverT<T>::emit(Object *sender, const char *name)
+template<class T, class S>
+void Object::SignalReceiverTS<T,S>::emit(Object *_sender, const char *name)
 {
+    S *sender;
+
+    sender = dynamic_cast<S*>(_sender);
+    if (sender == NULL)
+        throw Exception("Incorrect object type");
+
     (obj->*callback)(sender, name);
 }
 
-template<class T>
-Object* Object::SignalReceiverT<T>::getObject()
+template<class T, class S>
+Object* Object::SignalReceiverTS<T,S>::getObject()
 {
     return obj;
 }
 
-template<class T>
-bool Object::SignalReceiverT<T>::operator==(Object::SignalReceiver &_other)
+template<class T, class S>
+bool Object::SignalReceiverTS<T,S>::operator==(Object::SignalReceiver &_other)
 {
-    Object::SignalReceiverT<T> *other;
+    Object::SignalReceiverTS<T,S> *other;
 
-    other = dynamic_cast<Object::SignalReceiverT<T>*>(&_other);
+    other = dynamic_cast<Object::SignalReceiverTS<T,S>*>(&_other);
     if (other == NULL)
         return false;
 
