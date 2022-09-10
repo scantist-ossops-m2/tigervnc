@@ -35,6 +35,11 @@ namespace rfb {
                                 const PixelFormat& pf,
                                 const rdr::U8* colour);
   private:
+    template<class T>
+    inline void writePixel(rdr::OutStream* os, T pixel);
+    template<class T>
+    int rreEncode(T* data, int w, int h, rdr::OutStream* os, T bg);
+  private:
     rdr::MemOutStream mos;
     ManagedPixelBuffer bufferCopy;
   };

@@ -22,6 +22,8 @@
 
 namespace rfb {
 
+  class PixelFormat;
+
   class RREDecoder : public Decoder {
   public:
     RREDecoder();
@@ -31,6 +33,12 @@ namespace rfb {
     virtual void decodeRect(const Rect& r, const void* buffer,
                             size_t buflen, const ServerParams& server,
                             ModifiablePixelBuffer* pb);
+  private:
+    template<class T>
+    inline T readPixel(rdr::InStream* is);
+    template<class T>
+    void rreDecode(const Rect& r, rdr::InStream* is,
+                   const PixelFormat& pf, ModifiablePixelBuffer* pb);
   };
 }
 #endif

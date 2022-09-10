@@ -32,6 +32,20 @@ namespace rfb {
     virtual void writeSolidRect(int width, int height,
                                 const PixelFormat& pf,
                                 const rdr::U8* colour);
+  private:
+    template<class T>
+    inline void writePixel(rdr::OutStream* os, T pixel);
+
+    template<class T>
+    void hextileEncode(rdr::OutStream* os, const PixelBuffer* pb);
+    template<class T>
+    int hextileEncodeTile(T* data, int w, int h, int tileType,
+                          rdr::U8* encoded, T bg);
+    template<class T>
+    int testTileType(T* data, int w, int h, T* bg, T* fg);
+
+    template<class T>
+    void hextileEncodeBetter(rdr::OutStream* os, const PixelBuffer* pb);
   };
 }
 #endif

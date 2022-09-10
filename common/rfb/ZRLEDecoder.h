@@ -23,6 +23,8 @@
 
 namespace rfb {
 
+  class PixelFormat;
+
   class ZRLEDecoder : public Decoder {
   public:
     ZRLEDecoder();
@@ -32,6 +34,13 @@ namespace rfb {
     virtual void decodeRect(const Rect& r, const void* buffer,
                             size_t buflen, const ServerParams& server,
                             ModifiablePixelBuffer* pb);
+
+  private:
+    template<class T>
+    void zrleDecode(const Rect& r, rdr::InStream* is,
+                    rdr::ZlibInStream* zis,
+                    const PixelFormat& pf, ModifiablePixelBuffer* pb);
+
   private:
     rdr::ZlibInStream zis;
   };

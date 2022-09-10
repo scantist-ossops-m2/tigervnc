@@ -50,19 +50,13 @@ namespace rfb {
     void FilterGradient24(const rdr::U8* inbuf, const PixelFormat& pf,
                           rdr::U32* outbuf, int stride, const Rect& r);
 
+    template<class T>
     void FilterGradient(const rdr::U8* inbuf, const PixelFormat& pf,
-                        rdr::U16* outbuf, int stride, const Rect& r);
-    void FilterGradient(const rdr::U8* inbuf, const PixelFormat& pf,
-                        rdr::U32* outbuf, int stride, const Rect& r);
+                        T* outbuf, int stride, const Rect& r);
 
-    void FilterPalette(const rdr::U8* palette, int palSize,
-                       const rdr::U8* inbuf, rdr::U8* outbuf,
-                       int stride, const Rect& r);
-    void FilterPalette(const rdr::U16* palette, int palSize,
-                       const rdr::U8* inbuf, rdr::U16* outbuf,
-                       int stride, const Rect& r);
-    void FilterPalette(const rdr::U32* palette, int palSize,
-                       const rdr::U8* inbuf, rdr::U32* outbuf,
+    template<class T>
+    void FilterPalette(const T* palette, int palSize,
+                       const rdr::U8* inbuf, T* outbuf,
                        int stride, const Rect& r);
 
   private:

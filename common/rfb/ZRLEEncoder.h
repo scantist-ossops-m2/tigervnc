@@ -50,26 +50,14 @@ namespace rfb {
                      unsigned int count);
 
   protected:
-    // Preprocessor generated, optimised methods
-
+    // Templated, optimised methods
+    template<class T>
     void writePaletteTile(int width, int height,
-                          const rdr::U8* buffer, int stride,
+                          const T* buffer, int stride,
                           const PixelFormat& pf, const Palette& palette);
-    void writePaletteTile(int width, int height,
-                          const rdr::U16* buffer, int stride,
-                          const PixelFormat& pf, const Palette& palette);
-    void writePaletteTile(int width, int height,
-                          const rdr::U32* buffer, int stride,
-                          const PixelFormat& pf, const Palette& palette);
-
+    template<class T>
     void writePaletteRLETile(int width, int height,
-                             const rdr::U8* buffer, int stride,
-                             const PixelFormat& pf, const Palette& palette);
-    void writePaletteRLETile(int width, int height,
-                             const rdr::U16* buffer, int stride,
-                             const PixelFormat& pf, const Palette& palette);
-    void writePaletteRLETile(int width, int height,
-                             const rdr::U32* buffer, int stride,
+                             const T* buffer, int stride,
                              const PixelFormat& pf, const Palette& palette);
 
   protected:

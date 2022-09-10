@@ -91,26 +91,14 @@ namespace rfb {
     bool isSane(void);
 
   private:
-    // Preprocessor generated, optimised methods
-
-    void directBufferFromBufferFrom888(rdr::U8* dst, const PixelFormat &srcPF,
+    // Templated, optimised methods
+    template<class T>
+    void directBufferFromBufferFrom888(T* dst, const PixelFormat &srcPF,
                                        const rdr::U8* src, int w, int h,
                                        int dstStride, int srcStride) const;
-    void directBufferFromBufferFrom888(rdr::U16* dst, const PixelFormat &srcPF,
-                                       const rdr::U8* src, int w, int h,
-                                       int dstStride, int srcStride) const;
-    void directBufferFromBufferFrom888(rdr::U32* dst, const PixelFormat &srcPF,
-                                       const rdr::U8* src, int w, int h,
-                                       int dstStride, int srcStride) const;
-
+    template<class T>
     void directBufferFromBufferTo888(rdr::U8* dst, const PixelFormat &srcPF,
-                                     const rdr::U8* src, int w, int h,
-                                     int dstStride, int srcStride) const;
-    void directBufferFromBufferTo888(rdr::U8* dst, const PixelFormat &srcPF,
-                                     const rdr::U16* src, int w, int h,
-                                     int dstStride, int srcStride) const;
-    void directBufferFromBufferTo888(rdr::U8* dst, const PixelFormat &srcPF,
-                                     const rdr::U32* src, int w, int h,
+                                     const T* src, int w, int h,
                                      int dstStride, int srcStride) const;
 
   public:
