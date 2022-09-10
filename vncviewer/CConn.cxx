@@ -29,7 +29,6 @@
 
 #include <rfb/CMsgWriter.h>
 #include <rfb/CSecurity.h>
-#include <rfb/Hostname.h>
 #include <rfb/LogWriter.h>
 #include <rfb/Security.h>
 #include <rfb/util.h>
@@ -57,6 +56,7 @@
 #endif
 
 using namespace rdr;
+using namespace network;
 using namespace rfb;
 using namespace std;
 

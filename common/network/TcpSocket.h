@@ -48,6 +48,8 @@ namespace network {
   /* Tunnelling support. */
   int findFreeTcpPort (void);
 
+  void getHostAndPort(const char* hi, char** host, int* port, int basePort=5900);
+
   int getSockPort(int sock);
 
   class TcpSocket : public Socket {
@@ -112,6 +114,10 @@ namespace network {
     std::list<Pattern> filter;
   };
 
+  struct GAIException : public rdr::Exception {
+    int err;
+    GAIException(const char* s, int err_);
+  };
 }
 
 #endif // __NETWORK_TCP_SOCKET_H__
