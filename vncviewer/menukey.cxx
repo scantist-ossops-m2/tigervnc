@@ -65,7 +65,7 @@ const MenuKeySymbol* getMenuKeySymbols()
   return menuSymbols;
 }
 
-void getMenuKey(int *fltkcode, int *keycode, rdr::U32 *keysym)
+void getMenuKey(int *fltkcode, int *keycode, uint32_t *keysym)
 {
   QString menuKeyStr;
 
