@@ -59,8 +59,8 @@ namespace rfb {
       PROCESS_INFORMATION procInfo;
       DWORD returnCode;
     protected:
-      TCharArray exeName;
-      TCharArray params;
+      core::TCharArray exeName;
+      core::TCharArray params;
     };
 
 

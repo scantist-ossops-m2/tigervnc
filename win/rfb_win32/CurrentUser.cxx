@@ -29,6 +29,7 @@
 #include <lmcons.h>
 #include <wtsapi32.h>
 
+using namespace core;
 using namespace rfb;
 using namespace win32;
 

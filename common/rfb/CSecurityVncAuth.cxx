@@ -31,7 +31,7 @@
 #include <rfb/CConnection.h>
 #include <rfb/Password.h>
 #include <rfb/CSecurityVncAuth.h>
-#include <rfb/util.h>
+#include <core/util.h>
 #include <rfb/Security.h>
 extern "C" {
 #include <rfb/d3des.h>

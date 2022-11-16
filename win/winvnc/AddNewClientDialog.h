@@ -41,14 +41,14 @@ namespace winvnc {
     // Dialog methods (protected)
     virtual void initDialog() {
       if (hostName.buf)
-        setItemString(IDC_HOST, rfb::TStr(hostName.buf));
+        setItemString(IDC_HOST, core::TStr(hostName.buf));
     }
     virtual bool onOk() {
-      hostName.replaceBuf(rfb::strDup(rfb::CStr(getItemString(IDC_HOST))));
+      hostName.replaceBuf(core::strDup(core::CStr(getItemString(IDC_HOST))));
       return true;
     }
 
-    rfb::CharArray hostName;
+    core::CharArray hostName;
   };
 
 };

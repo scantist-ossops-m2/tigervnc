@@ -26,7 +26,7 @@
 #include <string.h>
 #include <syslog.h>
 
-#include <rfb/util.h>
+#include <core/util.h>
 #include <rfb/Logger_syslog.h>
 #include <rfb/LogWriter.h>
 

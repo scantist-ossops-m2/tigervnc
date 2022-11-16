@@ -27,7 +27,7 @@
 #define __TXBUTTON_H__
 
 #include "TXWindow.h"
-#include <rfb/util.h>
+#include <core/util.h>
 
 // TXButtonCallback's buttonActivate() method is called when a button is
 // activated.
@@ -59,7 +59,7 @@ public:
 
   // setText() changes the text in the button.
   void setText(const char* text_) {
-    text.buf = rfb::strDup(text_);
+    text.buf = core::strDup(text_);
     int textWidth = XTextWidth(defaultFS, text.buf, strlen(text.buf));
     int textHeight = (defaultFS->ascent + defaultFS->descent);
     int newWidth = __rfbmax(width(), textWidth + xPad*2 + bevel*2);
@@ -115,7 +115,7 @@ private:
   }
 
   GC gc;
-  rfb::CharArray text;
+  core::CharArray text;
   TXButtonCallback* cb;
   bool down;
   bool disabled_;

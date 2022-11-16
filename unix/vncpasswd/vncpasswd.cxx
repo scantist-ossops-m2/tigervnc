@@ -30,11 +30,12 @@
 #include <unistd.h>
 #include <os/os.h>
 #include <rfb/Password.h>
-#include <rfb/util.h>
+#include <core/util.h>
 
 #include <termios.h>
 
 
+using namespace core;
 using namespace rfb;
 
 char* prog;

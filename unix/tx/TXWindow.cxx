@@ -29,7 +29,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
-#include <rfb/util.h>
+#include <core/util.h>
 
 std::list<TXWindow*> windows;
 
@@ -100,7 +100,7 @@ void TXWindow::init(Display* dpy, const char* defaultWindowClass_)
   static unsigned char tickBits[] = { 0x80, 0xc0, 0xe2, 0x76, 0x3e, 0x1c, 0x08, 0x00};
   tick = XCreateBitmapFromData(dpy, DefaultRootWindow(dpy), (char*)tickBits,
                                tickSize, tickSize);
-  defaultWindowClass = rfb::strDup(defaultWindowClass_);
+  defaultWindowClass = core::strDup(defaultWindowClass_);
 }
 
 void TXWindow::handleXEvents(Display* dpy)

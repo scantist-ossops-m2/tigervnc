@@ -78,7 +78,7 @@ void ServerParams::setPF(const PixelFormat& pf)
 void ServerParams::setName(const char* name)
 {
   delete [] name_;
-  name_ = strDup(name);
+  name_ = core::strDup(name);
 }
 
 void ServerParams::setCursor(const Cursor& other)

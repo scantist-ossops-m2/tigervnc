@@ -31,7 +31,7 @@
 #include <rfb/Password.h>
 #include <rfb/Configuration.h>
 #include <rfb/LogWriter.h>
-#include <rfb/util.h>
+#include <core/util.h>
 #include <rfb/Exception.h>
 #include <string.h>
 #include <stdio.h>
@@ -127,7 +127,7 @@ void VncAuthPasswdParameter::getVncAuthPasswd(PlainPasswd *password, PlainPasswd
 
   if (obfuscated.length == 0) {
     if (passwdFile) {
-      CharArray fname(passwdFile->getData());
+      core::CharArray fname(passwdFile->getData());
       if (!fname.buf[0]) {
         vlog.info("neither %s nor %s params set", getName(), passwdFile->getName());
         return;

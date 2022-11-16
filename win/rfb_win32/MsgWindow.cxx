@@ -30,6 +30,7 @@
 #include <malloc.h>
 #include <tchar.h>
 
+using namespace core;
 using namespace rfb;
 using namespace rfb::win32;
 

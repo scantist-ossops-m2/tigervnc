@@ -22,7 +22,7 @@
 
 #include <rfb_win32/TCharArray.h>
 
-namespace rfb {
+namespace core {
 
   WCHAR* wstrDup(const WCHAR* s) {
     if (!s) return 0;

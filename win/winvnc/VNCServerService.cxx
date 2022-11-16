@@ -31,6 +31,7 @@
 #include <tlhelp32.h>
 
 using namespace winvnc;
+using namespace core;
 using namespace rfb;
 using namespace win32;
 

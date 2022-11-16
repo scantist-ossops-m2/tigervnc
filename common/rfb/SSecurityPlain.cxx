@@ -45,10 +45,10 @@ StringParameter PasswordValidator::plainUsers
 
 bool PasswordValidator::validUser(const char* username)
 {
-  CharArray users(plainUsers.getValueStr()), user;
+  core::CharArray users(plainUsers.getValueStr()), user;
 
   while (users.buf) {
-    strSplit(users.buf, ',', &user.buf, &users.buf);
+    core::strSplit(users.buf, ',', &user.buf, &users.buf);
 #ifdef WIN32
     if (0 == stricmp(user.buf, "*"))
 	  return true;
@@ -82,7 +82,7 @@ bool SSecurityPlain::processMsg()
   rdr::InStream* is = sc->getInStream();
   char* pw;
   char *uname;
-  CharArray password;
+  core::CharArray password;
 
   if (!valid)
     throw AuthFailureException("No password validator configured");

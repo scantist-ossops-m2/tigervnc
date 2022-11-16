@@ -255,8 +255,8 @@ void ComparingUpdateTracker::logStats()
   double ratio;
   char a[1024], b[1024];
 
-  siPrefix(totalPixels, "pixels", a, sizeof(a));
-  siPrefix(missedPixels, "pixels", b, sizeof(b));
+  core::siPrefix(totalPixels, "pixels", a, sizeof(a));
+  core::siPrefix(missedPixels, "pixels", b, sizeof(b));
 
   ratio = (double)totalPixels / missedPixels;
 

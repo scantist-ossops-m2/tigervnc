@@ -130,7 +130,7 @@ namespace rfb {
       HICON icon;
       std::list<PropSheetPage*> pages;
       HINSTANCE inst;
-      TCharArray title;
+      core::TCharArray title;
       HWND handle;
       bool alreadyShowing;
     };

@@ -40,13 +40,13 @@ static unsigned char d3desObfuscationKey[] = {23,82,107,6,35,78,88,7};
 
 PlainPasswd::PlainPasswd() {}
 
-PlainPasswd::PlainPasswd(char* pwd) : CharArray(pwd) {
+PlainPasswd::PlainPasswd(char* pwd) : core::CharArray(pwd) {
 }
 
-PlainPasswd::PlainPasswd(size_t len) : CharArray(len) {
+PlainPasswd::PlainPasswd(size_t len) : core::CharArray(len) {
 }
 
-PlainPasswd::PlainPasswd(const ObfuscatedPasswd& obfPwd) : CharArray(9) {
+PlainPasswd::PlainPasswd(const ObfuscatedPasswd& obfPwd) : core::CharArray(9) {
   if (obfPwd.length < 8)
     throw rdr::Exception("bad obfuscated password length");
   deskey(d3desObfuscationKey, DE1);
@@ -61,17 +61,17 @@ PlainPasswd::~PlainPasswd() {
 void PlainPasswd::replaceBuf(char* b) {
   if (buf)
     memset(buf, 0, strlen(buf));
-  CharArray::replaceBuf(b);
+  core::CharArray::replaceBuf(b);
 }
 
 
 ObfuscatedPasswd::ObfuscatedPasswd() : length(0) {
 }
 
-ObfuscatedPasswd::ObfuscatedPasswd(size_t len) : CharArray(len), length(len) {
+ObfuscatedPasswd::ObfuscatedPasswd(size_t len) : core::CharArray(len), length(len) {
 }
 
-ObfuscatedPasswd::ObfuscatedPasswd(const PlainPasswd& plainPwd) : CharArray(8), length(8) {
+ObfuscatedPasswd::ObfuscatedPasswd(const PlainPasswd& plainPwd) : core::CharArray(8), length(8) {
   size_t l = strlen(plainPwd.buf), i;
   for (i=0; i<8; i++)
     buf[i] = i<l ? plainPwd.buf[i] : 0;

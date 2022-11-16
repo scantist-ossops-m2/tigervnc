@@ -228,10 +228,10 @@ void DecodeManager::logStats()
 
     ratio = (double)stats[i].equivalent / stats[i].bytes;
 
-    siPrefix(stats[i].rects, "rects", a, sizeof(a));
-    siPrefix(stats[i].pixels, "pixels", b, sizeof(b));
+    core::siPrefix(stats[i].rects, "rects", a, sizeof(a));
+    core::siPrefix(stats[i].pixels, "pixels", b, sizeof(b));
     vlog.info("    %s: %s, %s", encodingName(i), a, b);
-    iecPrefix(stats[i].bytes, "B", a, sizeof(a));
+    core::iecPrefix(stats[i].bytes, "B", a, sizeof(a));
     vlog.info("    %*s  %s (1:%g ratio)",
               (int)strlen(encodingName(i)), "",
               a, ratio);
@@ -239,10 +239,10 @@ void DecodeManager::logStats()
 
   ratio = (double)equivalent / bytes;
 
-  siPrefix(rects, "rects", a, sizeof(a));
-  siPrefix(pixels, "pixels", b, sizeof(b));
+  core::siPrefix(rects, "rects", a, sizeof(a));
+  core::siPrefix(pixels, "pixels", b, sizeof(b));
   vlog.info("  Total: %s, %s", a, b);
-  iecPrefix(bytes, "B", a, sizeof(a));
+  core::iecPrefix(bytes, "B", a, sizeof(a));
   vlog.info("         %s (1:%g ratio)", a, ratio);
 }
 

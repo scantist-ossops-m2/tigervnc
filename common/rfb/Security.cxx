@@ -41,7 +41,7 @@
 #include <rfb/CSecurityTLS.h>
 #include <rfb/SSecurityTLS.h>
 #endif
-#include <rfb/util.h>
+#include <core/util.h>
 
 using namespace rdr;
 using namespace rfb;
@@ -211,9 +211,9 @@ const char* rfb::secTypeName(uint32_t num)
 std::list<uint32_t> rfb::parseSecTypes(const char* types_)
 {
   std::list<uint32_t> result;
-  CharArray types(strDup(types_)), type;
+  core::CharArray types(core::strDup(types_)), type;
   while (types.buf) {
-    strSplit(types.buf, ',', &type.buf, &types.buf);
+    core::strSplit(types.buf, ',', &type.buf, &types.buf);
     uint32_t typeNum = secTypeNum(type.buf);
     if (typeNum != secTypeInvalid)
       result.push_back(typeNum);

@@ -24,7 +24,7 @@
 
 #include <windows.h>
 #include <rfb_win32/Security.h>
-#include <rfb/util.h>
+#include <core/util.h>
 
 namespace rfb {
 
@@ -101,7 +101,7 @@ namespace rfb {
     protected:
       HKEY key;
       bool freeKey;
-      TCharArray valueName;
+      core::TCharArray valueName;
       DWORD valueNameBufLen;
     };
 

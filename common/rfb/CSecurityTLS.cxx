@@ -361,7 +361,7 @@ void CSecurityTLS::checkSession()
     throw AuthFailureException("decoding of certificate failed");
 
   if (gnutls_x509_crt_check_hostname(crt, client->getServerName()) == 0) {
-    CharArray text;
+    core::CharArray text;
     vlog.debug("hostname mismatch");
     text.format("Hostname (%s) does not match the server certificate, "
                 "do you want to continue?", client->getServerName());
@@ -402,7 +402,7 @@ void CSecurityTLS::checkSession()
                                "path for known hosts storage");
   }
 
-  CharArray dbPath(strlen(homeDir) + 16 + 1);
+  core::CharArray dbPath(strlen(homeDir) + 16 + 1);
   sprintf(dbPath.buf, "%sx509_known_hosts", homeDir);
   delete [] homeDir;
 
@@ -433,7 +433,7 @@ void CSecurityTLS::checkSession()
 
   /* New host */
   if (err == GNUTLS_E_NO_CERTIFICATE_FOUND) {
-    CharArray text;
+    core::CharArray text;
 
     vlog.debug("Server host not previously known");
     vlog.debug("%s", info.data);
@@ -464,7 +464,7 @@ void CSecurityTLS::checkSession()
         throw AuthFailureException("Expired certificate");
     }
   } else if (err == GNUTLS_E_CERTIFICATE_KEY_MISMATCH) {
-    CharArray text;
+    core::CharArray text;
 
     vlog.debug("Server host key mismatch");
     vlog.debug("%s", info.data);

@@ -85,24 +85,24 @@ char* UnixSocket::getPeerAddress() {
   salen = sizeof(addr);
   if (getpeername(getFd(), (struct sockaddr *)&addr, &salen) != 0) {
     vlog.error("unable to get peer name for socket");
-    return rfb::strDup("");
+    return core::strDup("");
   }
 
   if (salen > offsetof(struct sockaddr_un, sun_path))
-    return rfb::strDup(addr.sun_path);
+    return core::strDup(addr.sun_path);
 
   salen = sizeof(addr);
   if (getsockname(getFd(), (struct sockaddr *)&addr, &salen) != 0) {
     vlog.error("unable to get local name for socket");
-    return rfb::strDup("");
+    return core::strDup("");
   }
 
   if (salen > offsetof(struct sockaddr_un, sun_path))
-    return rfb::strDup(addr.sun_path);
+    return core::strDup(addr.sun_path);
 
   // socketpair() will create unnamed sockets
 
-  return rfb::strDup("(unnamed UNIX socket)");
+  return core::strDup("(unnamed UNIX socket)");
 }
 
 char* UnixSocket::getPeerEndpoint() {

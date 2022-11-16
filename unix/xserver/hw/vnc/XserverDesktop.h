@@ -123,8 +123,8 @@ private:
 
   uint32_t queryConnectId;
   network::Socket* queryConnectSocket;
-  rfb::CharArray queryConnectAddress;
-  rfb::CharArray queryConnectUsername;
+  core::CharArray queryConnectAddress;
+  core::CharArray queryConnectUsername;
   rfb::Timer queryConnectTimer;
 
   OutputIdMap outputIdMap;

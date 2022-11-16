@@ -31,7 +31,7 @@
 #include <rfb/CSecurity.h>
 #include <rfb/LogWriter.h>
 #include <rfb/Security.h>
-#include <rfb/util.h>
+#include <core/util.h>
 #include <rfb/screenTypes.h>
 #include <rfb/fenceTypes.h>
 #include <rfb/Timer.h>

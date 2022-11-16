@@ -105,8 +105,8 @@ bool CSecurityDH::readKey()
 
 void CSecurityDH::writeCredentials()
 {
-  CharArray username;
-  CharArray password;
+  core::CharArray username;
+  core::CharArray password;
   rdr::RandomStream rs;
 
   (CSecurity::upg)->getUserPasswd(isSecure(), &username.buf, &password.buf);

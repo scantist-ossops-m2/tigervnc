@@ -66,7 +66,7 @@ namespace rfb {
     //   Returns the name of the user the thread is currently running as.
     //   Raises a SystemException in case of error.
 
-    struct UserName : public TCharArray {
+    struct UserName : public core::TCharArray {
       UserName();
     };
 

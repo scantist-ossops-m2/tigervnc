@@ -81,7 +81,7 @@ void ClientParams::setPF(const PixelFormat& pf)
 void ClientParams::setName(const char* name)
 {
   delete [] name_;
-  name_ = strDup(name);
+  name_ = core::strDup(name);
 }
 
 void ClientParams::setCursor(const Cursor& other)

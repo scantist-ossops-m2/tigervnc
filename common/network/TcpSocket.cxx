@@ -157,7 +157,7 @@ void network::getHostAndPort(const char* hi, char** host, int* port, int basePor
     hostEnd--;
 
   if (hostStart == hostEnd)
-    *host = rfb::strDup("localhost");
+    *host = core::strDup("localhost");
   else {
     size_t len;
     len = hostEnd - hostStart + 1;
@@ -308,7 +308,7 @@ char* TcpSocket::getPeerAddress() {
 
   if (getpeername(getFd(), &sa.u.sa, &sa_size) != 0) {
     vlog.error("unable to get peer name for socket");
-    return rfb::strDup("");
+    return core::strDup("");
   }
 
   if (sa.u.sa.sa_family == AF_INET6) {
@@ -322,12 +322,12 @@ char* TcpSocket::getPeerAddress() {
                       NI_NUMERICHOST);
     if (ret != 0) {
       vlog.error("unable to convert peer name to a string");
-      return rfb::strDup("");
+      return core::strDup("");
     }
 
     strcat(buffer, "]");
 
-    return rfb::strDup(buffer);
+    return core::strDup(buffer);
   }
 
   if (sa.u.sa.sa_family == AF_INET) {
@@ -336,18 +336,18 @@ char* TcpSocket::getPeerAddress() {
     name = inet_ntoa(sa.u.sin.sin_addr);
     if (name == NULL) {
       vlog.error("unable to convert peer name to a string");
-      return rfb::strDup("");
+      return core::strDup("");
     }
 
-    return rfb::strDup(name);
+    return core::strDup(name);
   }
 
   vlog.error("unknown address family for socket");
-  return rfb::strDup("");
+  return core::strDup("");
 }
 
 char* TcpSocket::getPeerEndpoint() {
-  rfb::CharArray address; address.buf = getPeerAddress();
+  core::CharArray address; address.buf = getPeerAddress();
   vnc_sockaddr_t sa;
   socklen_t sa_size = sizeof(sa);
   int port;
@@ -593,11 +593,11 @@ void network::createTcpListeners(std::list<SocketListener*> *listeners,
 
 
 TcpFilter::TcpFilter(const char* spec) {
-  rfb::CharArray tmp;
-  tmp.buf = rfb::strDup(spec);
+  core::CharArray tmp;
+  tmp.buf = core::strDup(spec);
   while (tmp.buf) {
-    rfb::CharArray first;
-    rfb::strSplit(tmp.buf, ',', &first.buf, &tmp.buf);
+    core::CharArray first;
+    core::strSplit(tmp.buf, ',', &first.buf, &tmp.buf);
     if (strlen(first.buf))
       filter.push_back(parsePattern(first.buf));
   }
@@ -660,7 +660,7 @@ patternMatchIP(const TcpFilter::Pattern& pattern, vnc_sockaddr_t *sa) {
 
 bool
 TcpFilter::verifyConnection(Socket* s) {
-  rfb::CharArray name;
+  core::CharArray name;
   vnc_sockaddr_t sa;
   socklen_t sa_size = sizeof(sa);
 
@@ -694,13 +694,13 @@ TcpFilter::verifyConnection(Socket* s) {
 TcpFilter::Pattern TcpFilter::parsePattern(const char* p) {
   TcpFilter::Pattern pattern;
 
-  rfb::CharArray addr, pref;
+  core::CharArray addr, pref;
   bool prefix_specified;
   int family;
 
   initSockets();
 
-  prefix_specified = rfb::strSplit(&p[1], '/', &addr.buf, &pref.buf);
+  prefix_specified = core::strSplit(&p[1], '/', &addr.buf, &pref.buf);
   if (addr.buf[0] == '\0') {
     // Match any address
     memset (&pattern.address, 0, sizeof (pattern.address));
@@ -735,7 +735,7 @@ TcpFilter::Pattern TcpFilter::parsePattern(const char* p) {
 
     if (prefix_specified) {
       if (family == AF_INET &&
-          rfb::strContains(pref.buf, '.')) {
+          core::strContains(pref.buf, '.')) {
         throw Exception("mask no longer supported for filter, "
                         "use prefix instead");
       }
@@ -802,21 +802,21 @@ TcpFilter::Pattern TcpFilter::parsePattern(const char* p) {
 }
 
 char* TcpFilter::patternToStr(const TcpFilter::Pattern& p) {
-  rfb::CharArray addr;
+  core::CharArray addr;
   char buffer[INET6_ADDRSTRLEN + 2];
 
   if (p.address.u.sa.sa_family == AF_INET) {
     getnameinfo(&p.address.u.sa, sizeof(p.address.u.sin),
                 buffer, sizeof (buffer), NULL, 0, NI_NUMERICHOST);
-    addr.buf = rfb::strDup(buffer);
+    addr.buf = core::strDup(buffer);
   } else if (p.address.u.sa.sa_family == AF_INET6) {
     buffer[0] = '[';
     getnameinfo(&p.address.u.sa, sizeof(p.address.u.sin6),
                 buffer + 1, sizeof (buffer) - 2, NULL, 0, NI_NUMERICHOST);
     strcat(buffer, "]");
-    addr.buf = rfb::strDup(buffer);
+    addr.buf = core::strDup(buffer);
   } else
-    addr.buf = rfb::strDup("");
+    addr.buf = core::strDup("");
 
   char action;
   switch (p.action) {

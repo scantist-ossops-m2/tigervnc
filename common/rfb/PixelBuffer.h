@@ -28,7 +28,7 @@
 #include <rfb/PixelFormat.h>
 #include <core/Rect.h>
 #include <rfb/Pixel.h>
-#include <rfb/util.h>
+#include <core/util.h>
 
 namespace core { class Region; }
 

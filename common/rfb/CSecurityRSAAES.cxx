@@ -208,7 +208,7 @@ void CSecurityRSAAES::verifyServer()
   sha1_update(&ctx, serverKey.size, serverKeyE);
   sha1_digest(&ctx, sizeof(f), f);
   const char *title = "Server key fingerprint";
-  CharArray text;
+  core::CharArray text;
   text.format(
     "The server has provided the following identifying information:\n"
     "Fingerprint: %02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x\n"
@@ -433,8 +433,8 @@ bool CSecurityRSAAES::readSubtype()
 
 void CSecurityRSAAES::writeCredentials()
 {
-  CharArray username;
-  CharArray password;
+  core::CharArray username;
+  core::CharArray password;
 
   (CSecurity::upg)->getUserPasswd(
     isSecure(),

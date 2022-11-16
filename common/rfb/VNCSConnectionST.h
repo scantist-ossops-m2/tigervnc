@@ -166,7 +166,7 @@ namespace rfb {
 
   private:
     network::Socket* sock;
-    CharArray peerEndpoint;
+    core::CharArray peerEndpoint;
     bool reverseConnection;
 
     bool inProcessMessages;
@@ -197,7 +197,7 @@ namespace rfb {
     core::Point pointerEventPos;
     bool clientHasCursor;
 
-    CharArray closeReason;
+    core::CharArray closeReason;
   };
 }
 #endif

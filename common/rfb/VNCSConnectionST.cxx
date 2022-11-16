@@ -65,9 +65,9 @@ VNCSConnectionST::VNCSConnectionST(VNCServerST* server_, network::Socket *s,
   if (rfb::Server::idleTimeout) {
     // minimum of 15 seconds while authenticating
     if (rfb::Server::idleTimeout < 15)
-      idleTimer.start(secsToMillis(15));
+      idleTimer.start(core::secsToMillis(15));
     else
-      idleTimer.start(secsToMillis(rfb::Server::idleTimeout));
+      idleTimer.start(core::secsToMillis(rfb::Server::idleTimeout));
   }
 }
 
@@ -113,7 +113,7 @@ void VNCSConnectionST::close(const char* reason)
 
   // Log the reason for the close
   if (!closeReason.buf)
-    closeReason.buf = strDup(reason);
+    closeReason.buf = core::strDup(reason);
   else
     vlog.debug("second close: %s (%s)", peerEndpoint.buf, reason);
 
@@ -425,7 +425,7 @@ void VNCSConnectionST::approveConnectionOrClose(bool accept,
 void VNCSConnectionST::authSuccess()
 {
   if (rfb::Server::idleTimeout)
-    idleTimer.start(secsToMillis(rfb::Server::idleTimeout));
+    idleTimer.start(core::secsToMillis(rfb::Server::idleTimeout));
 
   // - Set the connection parameters appropriately
   client.setDimensions(server->getPixelBuffer()->width(),
@@ -452,7 +452,7 @@ void VNCSConnectionST::queryConnection(const char* userName)
 void VNCSConnectionST::clientInit(bool shared)
 {
   if (rfb::Server::idleTimeout)
-    idleTimer.start(secsToMillis(rfb::Server::idleTimeout));
+    idleTimer.start(core::secsToMillis(rfb::Server::idleTimeout));
   if (rfb::Server::alwaysShared || reverseConnection) shared = true;
   if (!accessCheck(AccessNonShared)) shared = true;
   if (rfb::Server::neverShared) shared = false;
@@ -472,7 +472,7 @@ void VNCSConnectionST::setPixelFormat(const PixelFormat& pf)
 void VNCSConnectionST::pointerEvent(const core::Point& pos, int buttonMask)
 {
   if (rfb::Server::idleTimeout)
-    idleTimer.start(secsToMillis(rfb::Server::idleTimeout));
+    idleTimer.start(core::secsToMillis(rfb::Server::idleTimeout));
   pointerEventTime = time(0);
   if (!accessCheck(AccessPtrEvents)) return;
   if (!rfb::Server::acceptPointerEvents) return;
@@ -506,7 +506,7 @@ void VNCSConnectionST::keyEvent(uint32_t keysym, uint32_t keycode, bool down) {
   uint32_t lookup;
 
   if (rfb::Server::idleTimeout)
-    idleTimer.start(secsToMillis(rfb::Server::idleTimeout));
+    idleTimer.start(core::secsToMillis(rfb::Server::idleTimeout));
   if (!accessCheck(AccessKeyEvents)) return;
   if (!rfb::Server::acceptKeyEvents) return;
 

@@ -30,6 +30,8 @@
 #include <rdr/Exception.h>
 #include <stdio.h>
 
+using namespace core;
+
 namespace rfb {
 namespace win32 {
 

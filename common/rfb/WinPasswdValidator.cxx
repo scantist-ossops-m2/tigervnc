@@ -33,9 +33,9 @@ bool WinPasswdValidator::validateInternal(rfb::SConnection* /*sc*/,
 					  const char* username,
 					  const char* password)
 {
-	TCHAR* user = (TCHAR*) strDup(username);
-	TCHAR* pass = (TCHAR*) strDup(password);
-	TCHAR* domain = (TCHAR*) strDup(".");
+	TCHAR* user = (TCHAR*) core::strDup(username);
+	TCHAR* pass = (TCHAR*) core::strDup(password);
+	TCHAR* domain = (TCHAR*) core::strDup(".");
 	HANDLE handle;
 
 	BOOL ret = LogonUser(user, domain, pass, LOGON32_LOGON_NETWORK,

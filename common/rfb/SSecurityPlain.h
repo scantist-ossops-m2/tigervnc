@@ -23,7 +23,7 @@
 #include <rfb/SConnection.h>
 #include <rfb/SSecurity.h>
 #include <rfb/SSecurityVeNCrypt.h>
-#include <rfb/util.h>
+#include <core/util.h>
 #include <rfb/Configuration.h>
 
 namespace rfb {
@@ -53,7 +53,7 @@ namespace rfb {
   private:
     PasswordValidator* valid;
     unsigned int ulen, plen, state;
-    CharArray username;
+    core::CharArray username;
 
     static const unsigned int MaxSaneUsernameLength = 1024;
     static const unsigned int MaxSanePasswordLength = 1024;

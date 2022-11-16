@@ -247,7 +247,7 @@ bool SConnection::processSecurityMsg()
     state_ = RFBSTATE_SECURITY_FAILURE;
     // Introduce a slight delay of the authentication failure response
     // to make it difficult to brute force a password
-    authFailureMsg.replaceBuf(strDup(e.str()));
+    authFailureMsg.replaceBuf(core::strDup(e.str()));
     authFailureTimer.start(100);
     return true;
   }
@@ -381,10 +381,10 @@ void SConnection::clientCutText(const char* str)
 {
   hasLocalClipboard = false;
 
-  strFree(clientClipboard);
+  core::strFree(clientClipboard);
   clientClipboard = NULL;
 
-  clientClipboard = latin1ToUTF8(str);
+  clientClipboard = core::latin1ToUTF8(str);
 
   handleClipboardAnnounce(true);
 }
@@ -410,7 +410,7 @@ void SConnection::handleClipboardPeek()
 
 void SConnection::handleClipboardNotify(uint32_t flags)
 {
-  strFree(clientClipboard);
+  core::strFree(clientClipboard);
   clientClipboard = NULL;
 
   if (flags & rfb::clipboardUTF8) {
@@ -430,10 +430,10 @@ void SConnection::handleClipboardProvide(uint32_t flags,
     return;
   }
 
-  strFree(clientClipboard);
+  core::strFree(clientClipboard);
   clientClipboard = NULL;
 
-  clientClipboard = convertLF((const char*)data[0], lengths[0]);
+  clientClipboard = core::convertLF((const char*)data[0], lengths[0]);
 
   // FIXME: Should probably verify that this data was actually requested
   handleClipboardData(clientClipboard);
@@ -594,7 +594,7 @@ void SConnection::sendClipboardData(const char* data)
 {
   if (client.supportsEncoding(pseudoEncodingExtendedClipboard) &&
       (client.clipboardFlags() & rfb::clipboardProvide)) {
-    CharArray filtered(convertCRLF(data));
+    core::CharArray filtered(core::convertCRLF(data));
     size_t sizes[1] = { strlen(filtered.buf) + 1 };
     const uint8_t* data[1] = { (const uint8_t*)filtered.buf };
 
@@ -610,7 +610,7 @@ void SConnection::sendClipboardData(const char* data)
 
     writer()->writeClipboardProvide(rfb::clipboardUTF8, sizes, data);
   } else {
-    CharArray latin1(utf8ToLatin1(data));
+    core::CharArray latin1(core::utf8ToLatin1(data));
 
     writer()->writeServerCutText(latin1.buf);
   }
@@ -624,7 +624,7 @@ void SConnection::cleanup()
   reader_ = NULL;
   delete writer_;
   writer_ = NULL;
-  strFree(clientClipboard);
+  core::strFree(clientClipboard);
   clientClipboard = NULL;
 }
 

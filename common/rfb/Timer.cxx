@@ -27,7 +27,7 @@
 #include <sys/time.h>
 
 #include <rfb/Timer.h>
-#include <rfb/util.h>
+#include <core/util.h>
 #include <rfb/LogWriter.h>
 
 using namespace rfb;

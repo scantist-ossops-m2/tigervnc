@@ -26,7 +26,7 @@
 #endif
 
 #include <string.h>
-#include <rfb/util.h>
+#include <core/util.h>
 #include <rfb/ServerCore.h>
 
 rfb::IntParameter rfb::Server::idleTimeout

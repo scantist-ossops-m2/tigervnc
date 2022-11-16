@@ -26,8 +26,8 @@ namespace rfb {
   namespace win32 {
 
     // Get the computer name
-    struct ComputerName : TCharArray {
-      ComputerName() : TCharArray(MAX_COMPUTERNAME_LENGTH+1) {
+    struct ComputerName : core::TCharArray {
+      ComputerName() : core::TCharArray(MAX_COMPUTERNAME_LENGTH+1) {
         ULONG namelength = MAX_COMPUTERNAME_LENGTH+1;
         if (!GetComputerName(buf, &namelength))
           _tcscpy(buf, _T(""));

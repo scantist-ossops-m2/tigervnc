@@ -31,6 +31,7 @@
 
 #include "RFBGlue.h"
 
+using namespace core;
 using namespace rfb;
 
 // Loggers used by C code must be created here

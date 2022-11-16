@@ -108,7 +108,7 @@ void SMsgHandler::handleClipboardCaps(uint32_t flags, const uint32_t* lengths)
       else {
         char bytes[1024];
 
-        iecPrefix(lengths[i], "B", bytes, sizeof(bytes));
+        core::iecPrefix(lengths[i], "B", bytes, sizeof(bytes));
         vlog.debug("    %s (automatically send up to %s)",
                    type, bytes);
       }

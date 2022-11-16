@@ -21,6 +21,7 @@
 #include <rfb_win32/MsgBox.h>
 #include <rfb/Password.h>
 
+using namespace core;
 using namespace rfb;
 using namespace win32;
 

@@ -42,10 +42,10 @@
 
 #include <windows.h>
 #include <tchar.h>
-#include <rfb/util.h>
+#include <core/util.h>
 #include <rfb/Password.h>
 
-namespace rfb {
+namespace core {
 
   // -=- String duplication and cleanup functions.
   //     These routines also handle conversion between WCHAR* and char*
@@ -127,7 +127,7 @@ namespace rfb {
 #define tstrContains strContains
   typedef CharArray TCharArray;
   typedef CStr TStr;
-  typedef PlainPasswd TPlainPasswd;
+  typedef rfb::PlainPasswd TPlainPasswd;
 #endif
 
 };

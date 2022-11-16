@@ -28,7 +28,7 @@
 
 #include <stdlib.h>
 #include "TXWindow.h"
-#include <rfb/util.h>
+#include <core/util.h>
 
 class TXLabel : public TXWindow, public TXEventHandler {
 public:
@@ -47,7 +47,7 @@ public:
 
   // setText() changes the text in the label.
   void setText(const char* text_) {
-    text.buf = rfb::strDup(text_);
+    text.buf = core::strDup(text_);
     lines = 0;
     int lineStart = 0;
     int textWidth = 0;
@@ -117,7 +117,7 @@ private:
   }
 
   int lineSpacing;
-  rfb::CharArray text;
+  core::CharArray text;
   int lines;
   HAlign halign;
   VAlign valign;

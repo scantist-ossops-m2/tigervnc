@@ -21,8 +21,8 @@
 // util.h - miscellaneous useful bits
 //
 
-#ifndef __RFB_UTIL_H__
-#define __RFB_UTIL_H__
+#ifndef __CORE_UTIL_H__
+#define __CORE_UTIL_H__
 
 #include <limits.h>
 #include <string.h>
@@ -30,7 +30,7 @@
 
 struct timeval;
 
-namespace rfb {
+namespace core {
 
   // -=- Class to handle cleanup of arrays of characters
   class CharArray {

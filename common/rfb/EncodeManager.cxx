@@ -194,10 +194,10 @@ void EncodeManager::logStats()
 
     ratio = (double)copyStats.equivalent / copyStats.bytes;
 
-    siPrefix(copyStats.rects, "rects", a, sizeof(a));
-    siPrefix(copyStats.pixels, "pixels", b, sizeof(b));
+    core::siPrefix(copyStats.rects, "rects", a, sizeof(a));
+    core::siPrefix(copyStats.pixels, "pixels", b, sizeof(b));
     vlog.info("    %s: %s, %s", "Copies", a, b);
-    iecPrefix(copyStats.bytes, "B", a, sizeof(a));
+    core::iecPrefix(copyStats.bytes, "B", a, sizeof(a));
     vlog.info("    %*s  %s (1:%g ratio)",
               (int)strlen("Copies"), "",
               a, ratio);
@@ -225,10 +225,10 @@ void EncodeManager::logStats()
 
       ratio = (double)stats[i][j].equivalent / stats[i][j].bytes;
 
-      siPrefix(stats[i][j].rects, "rects", a, sizeof(a));
-      siPrefix(stats[i][j].pixels, "pixels", b, sizeof(b));
+      core::siPrefix(stats[i][j].rects, "rects", a, sizeof(a));
+      core::siPrefix(stats[i][j].pixels, "pixels", b, sizeof(b));
       vlog.info("    %s: %s, %s", encoderTypeName((EncoderType)j), a, b);
-      iecPrefix(stats[i][j].bytes, "B", a, sizeof(a));
+      core::iecPrefix(stats[i][j].bytes, "B", a, sizeof(a));
       vlog.info("    %*s  %s (1:%g ratio)",
                 (int)strlen(encoderTypeName((EncoderType)j)), "",
                 a, ratio);
@@ -237,10 +237,10 @@ void EncodeManager::logStats()
 
   ratio = (double)equivalent / bytes;
 
-  siPrefix(rects, "rects", a, sizeof(a));
-  siPrefix(pixels, "pixels", b, sizeof(b));
+  core::siPrefix(rects, "rects", a, sizeof(a));
+  core::siPrefix(pixels, "pixels", b, sizeof(b));
   vlog.info("  Total: %s, %s", a, b);
-  iecPrefix(bytes, "B", a, sizeof(a));
+  core::iecPrefix(bytes, "B", a, sizeof(a));
   vlog.info("         %s (1:%g ratio)", a, ratio);
 }
 

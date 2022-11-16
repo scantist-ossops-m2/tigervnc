@@ -26,9 +26,10 @@
 
 #include <rfb_win32/RegConfig.h>
 #include <rfb/LogWriter.h>
-#include <rfb/util.h>
+#include <core/util.h>
 //#include <rdr/HexOutStream.h>
 
+using namespace core;
 using namespace rfb;
 using namespace rfb::win32;
 

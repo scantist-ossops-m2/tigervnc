@@ -35,7 +35,7 @@
 #include <rfb/Security.h>
 #include <rfb/SecurityClient.h>
 #include <rfb/CConnection.h>
-#include <rfb/util.h>
+#include <core/util.h>
 
 #include <rfb/LogWriter.h>
 
@@ -52,7 +52,7 @@ CConnection::CConnection()
     supportsDesktopResize(false), supportsLEDState(false),
     is(0), os(0), reader_(0), writer_(0),
     shared(false),
-    state_(RFBSTATE_UNINITIALISED), serverName(strDup("")),
+    state_(RFBSTATE_UNINITIALISED), serverName(core::strDup("")),
     pendingPFChange(false), preferredEncoding(encodingTight),
     compressLevel(2), qualityLevel(-1),
     formatChange(false), encodingChange(false),
@@ -72,7 +72,7 @@ void CConnection::setServerName(const char* name_)
 {
   if (name_ == NULL)
     name_ = "";
-  serverName.replaceBuf(strDup(name_));
+  serverName.replaceBuf(core::strDup(name_));
 }
 
 void CConnection::setStreams(rdr::InStream* is_, rdr::OutStream* os_)
@@ -360,7 +360,7 @@ bool CConnection::processSecurityReasonMsg()
     return false;
   is->clearRestorePoint();
 
-  CharArray reason(len + 1);
+  core::CharArray reason(len + 1);
   is->readBytes(reason.buf, len);
   reason.buf[len] = '\0';
 
@@ -405,7 +405,7 @@ void CConnection::close()
   reader_ = NULL;
   delete writer_;
   writer_ = NULL;
-  strFree(serverClipboard);
+  core::strFree(serverClipboard);
   serverClipboard = NULL;
 }
 
@@ -545,10 +545,10 @@ void CConnection::serverCutText(const char* str)
 {
   hasLocalClipboard = false;
 
-  strFree(serverClipboard);
+  core::strFree(serverClipboard);
   serverClipboard = NULL;
 
-  serverClipboard = latin1ToUTF8(str);
+  serverClipboard = core::latin1ToUTF8(str);
 
   handleClipboardAnnounce(true);
 }
@@ -589,7 +589,7 @@ void CConnection::handleClipboardPeek()
 
 void CConnection::handleClipboardNotify(uint32_t flags)
 {
-  strFree(serverClipboard);
+  core::strFree(serverClipboard);
   serverClipboard = NULL;
 
   if (flags & rfb::clipboardUTF8) {
@@ -609,10 +609,10 @@ void CConnection::handleClipboardProvide(uint32_t flags,
     return;
   }
 
-  strFree(serverClipboard);
+  core::strFree(serverClipboard);
   serverClipboard = NULL;
 
-  serverClipboard = convertLF((const char*)data[0], lengths[0]);
+  serverClipboard = core::convertLF((const char*)data[0], lengths[0]);
 
   // FIXME: Should probably verify that this data was actually requested
   handleClipboardData(serverClipboard);
@@ -681,7 +681,7 @@ void CConnection::announceClipboard(bool available)
 void CConnection::sendClipboardData(const char* data)
 {
   if (server.clipboardFlags() & rfb::clipboardProvide) {
-    CharArray filtered(convertCRLF(data));
+    core::CharArray filtered(core::convertCRLF(data));
     size_t sizes[1] = { strlen(filtered.buf) + 1 };
     const uint8_t* data[1] = { (const uint8_t*)filtered.buf };
 
@@ -697,7 +697,7 @@ void CConnection::sendClipboardData(const char* data)
 
     writer()->writeClipboardProvide(rfb::clipboardUTF8, sizes, data);
   } else {
-    CharArray latin1(utf8ToLatin1(data));
+    core::CharArray latin1(core::utf8ToLatin1(data));
 
     writer()->writeClientCutText(latin1.buf);
   }

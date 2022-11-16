@@ -42,7 +42,7 @@ namespace rfb {
       virtual LRESULT processMessage(UINT msg, WPARAM wParam, LPARAM lParam);
 
     protected:
-      TCharArray name;
+      core::TCharArray name;
       HWND handle;
     };
 

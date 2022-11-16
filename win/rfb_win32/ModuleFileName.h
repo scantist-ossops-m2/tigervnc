@@ -25,8 +25,8 @@
 namespace rfb {
   namespace win32 {
 
-    struct ModuleFileName : public TCharArray {
-      ModuleFileName(HMODULE module=0) : TCharArray(MAX_PATH) {
+    struct ModuleFileName : public core::TCharArray {
+      ModuleFileName(HMODULE module=0) : core::TCharArray(MAX_PATH) {
         if (!module)
           module = GetModuleHandle(0);
         if (!GetModuleFileName(module, buf, MAX_PATH))

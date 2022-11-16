@@ -27,7 +27,7 @@
 #include <rfb/CMsgHandler.h>
 #include <rfb/DecodeManager.h>
 #include <rfb/SecurityClient.h>
-#include <rfb/util.h>
+#include <core/util.h>
 
 namespace rfb {
 
@@ -271,7 +271,7 @@ namespace rfb {
     bool shared;
     stateEnum state_;
 
-    CharArray serverName;
+    core::CharArray serverName;
 
     bool pendingPFChange;
     rfb::PixelFormat pendingPF;

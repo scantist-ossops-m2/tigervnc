@@ -31,7 +31,7 @@ namespace rfb {
     // Message box titles are based on the (standard Win32) flags
     // passed to the MsgBox helper function.
 
-    extern TStr AppName;
+    extern core::TStr AppName;
 
     // Wrapper around Win32 MessageBox()
     static int MsgBox(HWND parent, const TCHAR* msg, UINT flags) {
@@ -48,7 +48,7 @@ namespace rfb {
       flags |= MB_TOPMOST | MB_SETFOREGROUND;
       int len = _tcslen(AppName.buf) + 1;
       if (msgType) len += _tcslen(msgType) + 3;
-      TCharArray title(new TCHAR[len]);
+      core::TCharArray title(new TCHAR[len]);
       _tcscpy(title.buf, AppName.buf);
       if (msgType) {
         _tcscat(title.buf, _T(" : "));

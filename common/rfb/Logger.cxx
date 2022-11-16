@@ -28,7 +28,7 @@
 
 #include <rfb/Logger.h>
 #include <rfb/LogWriter.h>
-#include <rfb/util.h>
+#include <core/util.h>
 
 using namespace rfb;
 

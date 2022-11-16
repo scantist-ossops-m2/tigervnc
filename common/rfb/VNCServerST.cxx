@@ -62,7 +62,7 @@
 #include <rfb/ServerCore.h>
 #include <rfb/VNCServerST.h>
 #include <rfb/VNCSConnectionST.h>
-#include <rfb/util.h>
+#include <core/util.h>
 #include <rfb/ledStates.h>
 
 
@@ -80,7 +80,7 @@ static LogWriter connectionsLog("Connections");
 VNCServerST::VNCServerST(const char* name_, SDesktop* desktop_)
   : blHosts(&blacklist), desktop(desktop_), desktopStarted(false),
     blockCounter(0), pb(0), ledState(ledUnknown),
-    name(strDup(name_)), pointerClient(0), clipboardClient(0),
+    name(core::strDup(name_)), pointerClient(0), clipboardClient(0),
     comparer(0), cursor(new Cursor(0, 0, core::Point(), NULL)),
     renderedCursorInvalid(false),
     keyRemapper(&KeyRemapper::defInstance),
@@ -91,9 +91,9 @@ VNCServerST::VNCServerST(const char* name_, SDesktop* desktop_)
 
   // FIXME: Do we really want to kick off these right away?
   if (rfb::Server::maxIdleTime)
-    idleTimer.start(secsToMillis(rfb::Server::maxIdleTime));
+    idleTimer.start(core::secsToMillis(rfb::Server::maxIdleTime));
   if (rfb::Server::maxDisconnectionTime)
-    disconnectTimer.start(secsToMillis(rfb::Server::maxDisconnectionTime));
+    disconnectTimer.start(core::secsToMillis(rfb::Server::maxDisconnectionTime));
 }
 
 VNCServerST::~VNCServerST()
@@ -131,7 +131,7 @@ void VNCServerST::addSocket(network::Socket* sock, bool outgoing)
 {
   // - Check the connection isn't black-marked
   // *** do this in getSecurity instead?
-  CharArray address(sock->getPeerAddress());
+  core::CharArray address(sock->getPeerAddress());
   if (blHosts->isBlackmarked(address.buf)) {
     connectionsLog.error("blacklisted: %s", address.buf);
     try {
@@ -151,13 +151,13 @@ void VNCServerST::addSocket(network::Socket* sock, bool outgoing)
     return;
   }
 
-  CharArray name;
+  core::CharArray name;
   name.buf = sock->getPeerEndpoint();
   connectionsLog.status("accepted: %s", name.buf);
 
   // Adjust the exit timers
   if (rfb::Server::maxConnectionTime && clients.empty())
-    connectTimer.start(secsToMillis(rfb::Server::maxConnectionTime));
+    connectTimer.start(core::secsToMillis(rfb::Server::maxConnectionTime));
   disconnectTimer.stop();
 
   VNCSConnectionST* client = new VNCSConnectionST(this, sock, outgoing);
@@ -177,7 +177,7 @@ void VNCServerST::removeSocket(network::Socket* sock) {
         handleClipboardAnnounce(*ci, false);
       clipboardRequestors.remove(*ci);
 
-      CharArray name(strDup((*ci)->getPeerEndpoint()));
+      core::CharArray name(core::strDup((*ci)->getPeerEndpoint()));
 
       // - Delete the per-Socket resources
       delete *ci;
@@ -196,7 +196,7 @@ void VNCServerST::removeSocket(network::Socket* sock) {
       // Adjust the exit timers
       connectTimer.stop();
       if (rfb::Server::maxDisconnectionTime && clients.empty())
-        disconnectTimer.start(secsToMillis(rfb::Server::maxDisconnectionTime));
+        disconnectTimer.start(core::secsToMillis(rfb::Server::maxDisconnectionTime));
 
       return;
     }
@@ -388,7 +388,7 @@ void VNCServerST::bell()
 
 void VNCServerST::setName(const char* name_)
 {
-  name.replaceBuf(strDup(name_));
+  name.replaceBuf(core::strDup(name_));
   std::list<VNCSConnectionST*>::iterator ci, ci_next;
   for (ci = clients.begin(); ci != clients.end(); ci = ci_next) {
     ci_next = ci; ci_next++;
@@ -465,7 +465,7 @@ void VNCServerST::setLEDState(unsigned int state)
 void VNCServerST::keyEvent(uint32_t keysym, uint32_t keycode, bool down)
 {
   if (rfb::Server::maxIdleTime)
-    idleTimer.start(secsToMillis(rfb::Server::maxIdleTime));
+    idleTimer.start(core::secsToMillis(rfb::Server::maxIdleTime));
 
   // Remap the key if required
   if (keyRemapper) {
@@ -484,7 +484,7 @@ void VNCServerST::pointerEvent(VNCSConnectionST* client,
                                const core::Point& pos, int buttonMask)
 {
   if (rfb::Server::maxIdleTime)
-    idleTimer.start(secsToMillis(rfb::Server::maxIdleTime));
+    idleTimer.start(core::secsToMillis(rfb::Server::maxIdleTime));
 
   // Let one client own the cursor whilst buttons are pressed in order
   // to provide a bit more sane user experience
@@ -651,7 +651,7 @@ void VNCServerST::queryConnection(VNCSConnectionST* client,
                                   const char* userName)
 {
   // - Authentication succeeded - clear from blacklist
-  CharArray name;
+  core::CharArray name;
   name.buf = client->getSock()->getPeerAddress();
   blHosts->clearBlackmark(name.buf);
 

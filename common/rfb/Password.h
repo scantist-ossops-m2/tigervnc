@@ -18,13 +18,13 @@
 #ifndef __RFB_PASSWORD_H__
 #define __RFB_PASSWORD_H__
 
-#include <rfb/util.h>
+#include <core/util.h>
 
 namespace rfb {
 
   class ObfuscatedPasswd;
 
-  class PlainPasswd : public CharArray {
+  class PlainPasswd : public core::CharArray {
   public:
     PlainPasswd();
     PlainPasswd(char* pwd);
@@ -34,7 +34,7 @@ namespace rfb {
     void replaceBuf(char* b);
   };
 
-  class ObfuscatedPasswd : public CharArray {
+  class ObfuscatedPasswd : public core::CharArray {
   public:
     ObfuscatedPasswd();
     ObfuscatedPasswd(size_t l);

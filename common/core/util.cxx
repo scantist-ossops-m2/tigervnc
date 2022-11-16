@@ -27,9 +27,9 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-#include <rfb/util.h>
+#include <core/util.h>
 
-namespace rfb {
+namespace core {
 
   void CharArray::format(const char *fmt, ...) {
     va_list ap;

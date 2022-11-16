@@ -28,6 +28,7 @@
 #include <rdr/Exception.h>
 #include <stdio.h>
 
+using namespace core;
 using namespace rfb;
 using namespace win32;
 

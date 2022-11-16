@@ -22,6 +22,7 @@
 #include <rfb/Password.h>
 #include <rfb_win32/CurrentUser.h>
 
+using namespace core;
 using namespace rfb;
 using namespace win32;
 
@@ -76,7 +77,7 @@ void LegacyPage::LoadPrefs()
 
                 // Split the AuthHosts string into patterns to match
                 CharArray first;
-                rfb::strSplit(tmp.buf, ':', &first.buf, &tmp.buf);
+                core::strSplit(tmp.buf, ':', &first.buf, &tmp.buf);
                 if (strlen(first.buf)) {
                   int bits = 0;
                   CharArray pattern(1+4*4+4);
@@ -84,11 +85,11 @@ void LegacyPage::LoadPrefs()
                   pattern.buf[1] = 0;
 
                   // Split the pattern into IP address parts and process
-                  rfb::CharArray address;
-                  address.buf = rfb::strDup(&first.buf[1]);
+                  core::CharArray address;
+                  address.buf = core::strDup(&first.buf[1]);
                   while (address.buf) {
-                    rfb::CharArray part;
-                    rfb::strSplit(address.buf, '.', &part.buf, &address.buf);
+                    core::CharArray part;
+                    core::strSplit(address.buf, '.', &part.buf, &address.buf);
                     if (bits)
                       strcat(pattern.buf, ".");
                     if (strlen(part.buf) > 3)

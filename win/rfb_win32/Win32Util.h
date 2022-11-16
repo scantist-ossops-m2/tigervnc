@@ -31,7 +31,7 @@ namespace rfb {
 
   namespace win32 {
 
-    struct FileVersionInfo : public TCharArray {
+    struct FileVersionInfo : public core::TCharArray {
       FileVersionInfo(const TCHAR* filename=0);
       const TCHAR* getVerString(const TCHAR* name, DWORD langId = 0x080904b0);
     };

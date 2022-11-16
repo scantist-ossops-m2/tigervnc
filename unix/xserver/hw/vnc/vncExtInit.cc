@@ -33,7 +33,7 @@
 #include <rfb/Configuration.h>
 #include <rfb/Logger_stdio.h>
 #include <rfb/LogWriter.h>
-#include <rfb/util.h>
+#include <core/util.h>
 #include <rfb/ServerCore.h>
 #include <rdr/HexOutStream.h>
 #include <rfb/LogWriter.h>

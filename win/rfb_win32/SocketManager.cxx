@@ -28,6 +28,7 @@
 #include <rfb/Timer.h>
 #include <rfb_win32/SocketManager.h>
 
+using namespace core;
 using namespace rfb;
 using namespace rfb::win32;
 

@@ -34,7 +34,7 @@
 #include <FL/Fl_Return_Button.H>
 #include <FL/Fl_Pixmap.H>
 
-#include <rfb/util.h>
+#include <core/util.h>
 #include <rfb/Password.h>
 #include <rfb/Exception.h>
 
@@ -51,6 +51,7 @@
 #include "../media/insecure.xpm"
 #pragma GCC diagnostic pop
 
+using namespace core;
 using namespace rfb;
 
 static Fl_Pixmap secure_icon(secure);

@@ -32,7 +32,7 @@
 #include <rfb/clipboardTypes.h>
 #include <rfb/Exception.h>
 #include <rfb/LogWriter.h>
-#include <rfb/util.h>
+#include <core/util.h>
 #include <rfb/CMsgHandler.h>
 #include <rfb/CMsgReader.h>
 
@@ -72,7 +72,7 @@ bool CMsgReader::readServerInit()
   if (!is->hasDataOrRestore(len))
     return false;
   is->clearRestorePoint();
-  CharArray name(len + 1);
+  core::CharArray name(len + 1);
   is->readBytes(name.buf, len);
   name.buf[len] = '\0';
   handler->serverInit(width, height, pf, name.buf);
@@ -274,9 +274,9 @@ bool CMsgReader::readServerCutText()
     vlog.error("cut text too long (%d bytes) - ignoring",len);
     return true;
   }
-  CharArray ca(len);
+  core::CharArray ca(len);
   is->readBytes(ca.buf, len);
-  CharArray filtered(convertLF(ca.buf, len));
+  core::CharArray filtered(core::convertLF(ca.buf, len));
   handler->serverCutText(filtered.buf);
 
   return true;
@@ -761,7 +761,7 @@ bool CMsgReader::readSetDesktopName(int x, int y, int w, int h)
     return false;
   is->clearRestorePoint();
 
-  CharArray name(len + 1);
+  core::CharArray name(len + 1);
   is->readBytes(name.buf, len);
   name.buf[len] = '\0';
 

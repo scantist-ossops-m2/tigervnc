@@ -31,7 +31,7 @@
 #include <rfb/qemuTypes.h>
 #include <rfb/clipboardTypes.h>
 #include <rfb/Exception.h>
-#include <rfb/util.h>
+#include <core/util.h>
 #include <rfb/SMsgHandler.h>
 #include <rfb/SMsgReader.h>
 #include <rfb/Configuration.h>
@@ -313,9 +313,9 @@ bool SMsgReader::readClientCutText()
     return true;
   }
 
-  CharArray ca(len);
+  core::CharArray ca(len);
   is->readBytes(ca.buf, len);
-  CharArray filtered(convertLF(ca.buf, len));
+  core::CharArray filtered(core::convertLF(ca.buf, len));
   handler->clientCutText(filtered.buf);
 
   return true;

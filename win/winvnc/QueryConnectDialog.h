@@ -22,7 +22,7 @@
 #define __WINVNC_QUERY_CONNECT_DIALOG_H__
 
 #include <rfb_win32/Dialog.h>
-#include <rfb/util.h>
+#include <core/util.h>
 
 namespace os { class Thread; }
 
@@ -51,8 +51,8 @@ namespace winvnc {
 
     int countdown;
     network::Socket* sock;
-    rfb::CharArray peerIp;
-    rfb::CharArray userName;
+    core::CharArray peerIp;
+    core::CharArray userName;
     bool approve;
     VNCServerWin32* server;
   };

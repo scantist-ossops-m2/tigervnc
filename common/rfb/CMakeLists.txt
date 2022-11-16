@@ -61,8 +61,7 @@ add_library(rfb STATIC
   VNCServerST.cxx
   ZRLEEncoder.cxx
   ZRLEDecoder.cxx
-  encodings.cxx
-  util.cxx)
+  encodings.cxx)
 
 target_link_libraries(rfb core os rdr)
 target_link_libraries(rfb ${JPEG_LIBRARIES})

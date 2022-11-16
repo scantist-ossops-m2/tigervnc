@@ -24,7 +24,7 @@
 #include <rfb/CConnection.h>
 #include <rfb/CSecurityPlain.h>
 #include <rfb/UserPasswdGetter.h>
-#include <rfb/util.h>
+#include <core/util.h>
 
 #include <rdr/OutStream.h>
 
@@ -34,8 +34,8 @@ bool CSecurityPlain::processMsg()
 {
    rdr::OutStream* os = cc->getOutStream();
 
-  CharArray username;
-  CharArray password;
+  core::CharArray username;
+  core::CharArray password;
 
   (CSecurity::upg)->getUserPasswd(cc->isSecure(), &username.buf, &password.buf);
 

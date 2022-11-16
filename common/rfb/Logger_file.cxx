@@ -27,7 +27,7 @@
 
 #include <os/Mutex.h>
 
-#include <rfb/util.h>
+#include <core/util.h>
 #include <rfb/Logger_file.h>
 
 using namespace rfb;
@@ -51,7 +51,7 @@ void Logger_File::write(int /*level*/, const char *logname, const char *message)
 
   if (!m_file) {
     if (!m_filename) return;
-    CharArray bakFilename(strlen(m_filename) + 1 + 4);
+    core::CharArray bakFilename(strlen(m_filename) + 1 + 4);
     sprintf(bakFilename.buf, "%s.bak", m_filename);
     remove(bakFilename.buf);
     rename(m_filename, bakFilename.buf);
@@ -93,7 +93,7 @@ void Logger_File::write(int /*level*/, const char *logname, const char *message)
 void Logger_File::setFilename(const char* filename)
 {
   closeFile();
-  m_filename = strDup(filename);
+  m_filename = core::strDup(filename);
 }
 
 void Logger_File::setFile(FILE* file)
@@ -109,7 +109,7 @@ void Logger_File::closeFile()
       fclose(m_file);
       m_file = 0;
     }
-    strFree(m_filename);
+    core::strFree(m_filename);
     m_filename = 0;
   }
 }

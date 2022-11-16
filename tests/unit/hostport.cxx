@@ -23,7 +23,7 @@
 #include <stdio.h>
 
 #include <network/TcpSocket.h>
-#include <rfb/util.h>
+#include <core/util.h>
 
 static void doTest(const char* hostAndPort,
                    const char* expectedHost, int expectedPort)
@@ -44,7 +44,7 @@ static void doTest(const char* hostAndPort,
     printf("\n");
     fflush(stdout);
 
-    rfb::strFree(host);
+    core::strFree(host);
 }
 
 int main(int /*argc*/, char** /*argv*/)

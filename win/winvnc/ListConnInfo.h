@@ -22,7 +22,7 @@
 
 #include <list>
 
-#include <rfb/util.h>
+#include <core/util.h>
 
 namespace winvnc {
 
@@ -53,7 +53,7 @@ namespace winvnc {
 
     void addInfo(void* Conn, char* IP, int Status) {
       conn.push_back(Conn);
-      IP_address.push_back(rfb::strDup(IP));
+      IP_address.push_back(core::strDup(IP));
       status.push_back(Status);
     }
 
@@ -61,16 +61,16 @@ namespace winvnc {
       buf[0] = *Ii;
       switch (*si) {
       case 0:
-        buf[1] = rfb::strDup("Full control");
+        buf[1] = core::strDup("Full control");
         break;
       case 1:
-        buf[1] = rfb::strDup("View only");
+        buf[1] = core::strDup("View only");
         break;
       case 2:
-        buf[1] = rfb::strDup("Stop updating");
+        buf[1] = core::strDup("Stop updating");
         break;
       default:
-        buf[1] = rfb::strDup("Unknown");
+        buf[1] = core::strDup("Unknown");
       }
     }
 

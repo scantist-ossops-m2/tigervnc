@@ -183,7 +183,7 @@ namespace rfb {
     ScreenSet screenLayout;
     unsigned int ledState;
 
-    CharArray name;
+    core::CharArray name;
 
     std::list<VNCSConnectionST*> clients;
     VNCSConnectionST* pointerClient;

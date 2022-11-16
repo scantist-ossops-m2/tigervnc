@@ -31,7 +31,7 @@
 
 #include <os/Mutex.h>
 
-#include <rfb/util.h>
+#include <core/util.h>
 #include <rfb/Configuration.h>
 #include <rfb/LogWriter.h>
 #include <rfb/Exception.h>
@@ -160,7 +160,7 @@ void Configuration::list(int width, int nameWidth) {
       if (column + (int)strlen(def_str) + 11 > width)
         fprintf(stderr,"\n%*s",nameWidth+4,"");
       fprintf(stderr," (default=%s)\n",def_str);
-      strFree(def_str);
+      core::strFree(def_str);
     } else {
       fprintf(stderr,"\n");
     }
@@ -315,11 +315,11 @@ void BoolParameter::setParam(bool b) {
 
 char*
 BoolParameter::getDefaultStr() const {
-  return strDup(def_value ? "1" : "0");
+  return core::strDup(def_value ? "1" : "0");
 }
 
 char* BoolParameter::getValueStr() const {
-  return strDup(value ? "1" : "0");
+  return core::strDup(value ? "1" : "0");
 }
 
 bool BoolParameter::isBool() const {
@@ -381,7 +381,7 @@ IntParameter::operator int() const {
 
 StringParameter::StringParameter(const char* name_, const char* desc_,
                                  const char* v, ConfigurationObject co)
-  : VoidParameter(name_, desc_, co), value(strDup(v)), def_value(strDup(v))
+  : VoidParameter(name_, desc_, co), value(core::strDup(v)), def_value(core::strDup(v))
 {
   if (!v) {
     vlog.error("Default value <null> for %s not allowed",name_);
@@ -390,8 +390,8 @@ StringParameter::StringParameter(const char* name_, const char* desc_,
 }
 
 StringParameter::~StringParameter() {
-  strFree(value);
-  strFree(def_value);
+  core::strFree(value);
+  core::strFree(def_value);
 }
 
 bool StringParameter::setParam(const char* v) {
@@ -400,18 +400,18 @@ bool StringParameter::setParam(const char* v) {
   if (!v)
     throw rfb::Exception("setParam(<null>) not allowed");
   vlog.debug("set %s(String) to %s", getName(), v);
-  CharArray oldValue(value);
-  value = strDup(v);
+  core::CharArray oldValue(value);
+  value = core::strDup(v);
   return value != 0;
 }
 
 char* StringParameter::getDefaultStr() const {
-  return strDup(def_value);
+  return core::strDup(def_value);
 }
 
 char* StringParameter::getValueStr() const {
   LOCK_CONFIG;
-  return strDup(value);
+  return core::strDup(value);
 }
 
 StringParameter::operator const char *() const {
@@ -444,7 +444,7 @@ bool BinaryParameter::setParam(const char* v) {
   vlog.debug("set %s(Binary) to %s", getName(), v);
   delete [] value;
   length = 0;
-  value = hexToBin(v, strlen(v));
+  value = core::hexToBin(v, strlen(v));
   if (value == NULL)
     return false;
   length = strlen(v)/2;
@@ -465,12 +465,12 @@ void BinaryParameter::setParam(const uint8_t* v, size_t len) {
 }
 
 char* BinaryParameter::getDefaultStr() const {
-  return binToHex(def_value, def_length);
+  return core::binToHex(def_value, def_length);
 }
 
 char* BinaryParameter::getValueStr() const {
   LOCK_CONFIG;
-  return binToHex(value, length);
+  return core::binToHex(value, length);
 }
 
 void BinaryParameter::getData(uint8_t** data_, size_t* length_) const {
