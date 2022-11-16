@@ -23,7 +23,7 @@
 
 #include <assert.h>
 #include <string.h>
-#include <rdr/types.h>
+#include <core/types.h>
 #include <rfb/Cursor.h>
 #include <rfb/LogWriter.h>
 #include <rfb/Exception.h>
@@ -32,7 +32,7 @@ using namespace rfb;
 
 static LogWriter vlog("Cursor");
 
-Cursor::Cursor(int width, int height, const Point& hotspot,
+Cursor::Cursor(int width, int height, const core::Point& hotspot,
                const uint8_t* data) :
   width_(width), height_(height), hotspot_(hotspot)
 {
@@ -128,7 +128,7 @@ static void dither(int width, int height, int32_t* data)
 uint8_t* Cursor::getBitmap() const
 {
   // First step is converting to luminance
-  rdr::S32Array luminance(width()*height());
+  core::S32Array luminance(width()*height());
   int32_t *lum_ptr = luminance.buf;
   const uint8_t *data_ptr = data;
   for (int y = 0; y < height(); y++) {
@@ -151,7 +151,7 @@ uint8_t* Cursor::getBitmap() const
   dither(width(), height(), luminance.buf);
 
   // Then conversion to a bit mask
-  rdr::U8Array source((width()+7)/8*height());
+  core::U8Array source((width()+7)/8*height());
   memset(source.buf, 0, (width()+7)/8*height());
   int maskBytesPerRow = (width() + 7) / 8;
   lum_ptr = luminance.buf;
@@ -173,7 +173,7 @@ uint8_t* Cursor::getBitmap() const
 uint8_t* Cursor::getMask() const
 {
   // First step is converting to integer array
-  rdr::S32Array alpha(width()*height());
+  core::S32Array alpha(width()*height());
   int32_t *alpha_ptr = alpha.buf;
   const uint8_t *data_ptr = data;
   for (int y = 0; y < height(); y++) {
@@ -187,7 +187,7 @@ uint8_t* Cursor::getMask() const
   dither(width(), height(), alpha.buf);
 
   // Then conversion to a bit mask
-  rdr::U8Array mask((width()+7)/8*height());
+  core::U8Array mask((width()+7)/8*height());
   memset(mask.buf, 0, (width()+7)/8*height());
   int maskBytesPerRow = (width() + 7) / 8;
   alpha_ptr = alpha.buf;
@@ -214,8 +214,8 @@ uint8_t* Cursor::getMask() const
 
 void Cursor::crop()
 {
-  Rect busy = Rect(0, 0, width_, height_);
-  busy = busy.intersect(Rect(hotspot_.x, hotspot_.y,
+  core::Rect busy = core::Rect(0, 0, width_, height_);
+  busy = busy.intersect(core::Rect(hotspot_.x, hotspot_.y,
                              hotspot_.x+1, hotspot_.y+1));
   int x, y;
   uint8_t *data_ptr = data;
@@ -254,9 +254,9 @@ RenderedCursor::RenderedCursor()
 {
 }
 
-const uint8_t* RenderedCursor::getBuffer(const Rect& _r, int* stride) const
+const uint8_t* RenderedCursor::getBuffer(const core::Rect& _r, int* stride) const
 {
-  Rect r;
+  core::Rect r;
 
   r = _r.translate(offset.negate());
   if (!r.enclosed_by(buffer.getRect()))
@@ -266,10 +266,10 @@ const uint8_t* RenderedCursor::getBuffer(const Rect& _r, int* stride) const
 }
 
 void RenderedCursor::update(PixelBuffer* framebuffer,
-                            Cursor* cursor, const Point& pos)
+                            Cursor* cursor, const core::Point& pos)
 {
-  Point rawOffset, diff;
-  Rect clippedRect;
+  core::Point rawOffset, diff;
+  core::Rect clippedRect;
 
   const uint8_t* data;
   int stride;
@@ -281,7 +281,7 @@ void RenderedCursor::update(PixelBuffer* framebuffer,
   setSize(framebuffer->width(), framebuffer->height());
 
   rawOffset = pos.subtract(cursor->hotspot());
-  clippedRect = Rect(0, 0, cursor->width(), cursor->height())
+  clippedRect = core::Rect(0, 0, cursor->width(), cursor->height())
                 .translate(rawOffset)
                 .intersect(framebuffer->getRect());
   offset = clippedRect.tl;
@@ -312,7 +312,7 @@ void RenderedCursor::update(PixelBuffer* framebuffer,
       else if (fg[3] == 0xff) {
         memcpy(rgb, fg, 3);
       } else {
-        buffer.getImage(bg, Rect(x, y, x+1, y+1));
+        buffer.getImage(bg, core::Rect(x, y, x+1, y+1));
         format.rgbFromBuffer(rgb, bg, 1);
         // FIXME: Gamma aware blending
         for (int i = 0;i < 3;i++) {
@@ -322,7 +322,7 @@ void RenderedCursor::update(PixelBuffer* framebuffer,
       }
 
       format.bufferFromRGB(bg, rgb, 1);
-      buffer.imageRect(Rect(x, y, x+1, y+1), bg);
+      buffer.imageRect(core::Rect(x, y, x+1, y+1), bg);
     }
   }
 }

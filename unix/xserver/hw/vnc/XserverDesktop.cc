@@ -56,6 +56,7 @@ extern "C" {
 void vncSetGlueContext(int screenIndex);
 }
 
+using namespace core;
 using namespace rfb;
 using namespace network;
 
@@ -274,7 +275,7 @@ void XserverDesktop::setCursorPos(int x, int y, bool warped)
   }
 }
 
-void XserverDesktop::add_changed(const rfb::Region &region)
+void XserverDesktop::add_changed(const core::Region &region)
 {
   try {
     server->add_changed(region);
@@ -283,7 +284,7 @@ void XserverDesktop::add_changed(const rfb::Region &region)
   }
 }
 
-void XserverDesktop::add_copied(const rfb::Region &dest, const rfb::Point &delta)
+void XserverDesktop::add_copied(const core::Region &dest, const core::Point &delta)
 {
   try {
     server->add_copied(dest, delta);
@@ -491,13 +492,13 @@ void XserverDesktop::handleClipboardData(const char* data_)
   vncHandleClipboardData(data_);
 }
 
-void XserverDesktop::grabRegion(const rfb::Region& region)
+void XserverDesktop::grabRegion(const core::Region& region)
 {
   if (shadowFramebuffer == NULL)
     return;
 
-  std::vector<rfb::Rect> rects;
-  std::vector<rfb::Rect>::iterator i;
+  std::vector<core::Rect> rects;
+  std::vector<core::Rect>::iterator i;
   region.get_rects(&rects);
   for (i = rects.begin(); i != rects.end(); i++) {
     uint8_t *buffer;

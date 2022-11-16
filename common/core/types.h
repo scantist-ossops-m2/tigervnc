@@ -16,12 +16,12 @@
  * USA.
  */
 
-#ifndef __RDR_TYPES_H__
-#define __RDR_TYPES_H__
+#ifndef __CORE_TYPES_H__
+#define __CORE_TYPES_H__
 
 #include <stdint.h>
 
-namespace rdr {
+namespace core {
 
   class U8Array {
   public:
@@ -66,6 +66,6 @@ namespace rdr {
     int32_t* buf;
   };
 
-} // end of namespace rdr
+} // end of namespace core
 
 #endif

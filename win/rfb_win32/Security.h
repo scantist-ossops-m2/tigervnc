@@ -24,7 +24,7 @@
 #ifndef __RFB_WIN32_SECURITY_H__
 #define __RFB_WIN32_SECURITY_H__
 
-#include <rdr/types.h>
+#include <core/types.h>
 #include <rfb_win32/LocalMem.h>
 #include <rfb_win32/TCharArray.h>
 #include <aclapi.h>
@@ -64,7 +64,7 @@ namespace rfb {
     };
 
     // Helper class for handling SIDs
-    struct Sid : rdr::U8Array {
+    struct Sid : core::U8Array {
       Sid() {}
       operator PSID() const {return (PSID)buf;}
       PSID takePSID() {PSID r = (PSID)buf; buf = 0; return r;}

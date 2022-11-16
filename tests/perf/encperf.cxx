@@ -98,11 +98,11 @@ public:
 
   virtual void initDone() {};
   virtual void resizeFramebuffer();
-  virtual void setCursor(int, int, const rfb::Point&, const uint8_t*);
-  virtual void setCursorPos(const rfb::Point&);
+  virtual void setCursor(int, int, const core::Point&, const uint8_t*);
+  virtual void setCursorPos(const core::Point&);
   virtual void framebufferUpdateStart();
   virtual void framebufferUpdateEnd();
-  virtual bool dataRect(const rfb::Rect&, int);
+  virtual bool dataRect(const core::Rect&, int);
   virtual void setColourMapEntries(int, int, uint16_t*);
   virtual void bell();
   virtual void serverCutText(const char*);
@@ -217,11 +217,11 @@ void CConn::resizeFramebuffer()
   setFramebuffer(pb);
 }
 
-void CConn::setCursor(int, int, const rfb::Point&, const uint8_t*)
+void CConn::setCursor(int, int, const core::Point&, const uint8_t*)
 {
 }
 
-void CConn::setCursorPos(const rfb::Point&)
+void CConn::setCursorPos(const core::Point&)
 {
 }
 
@@ -237,7 +237,7 @@ void CConn::framebufferUpdateEnd()
 {
   rfb::UpdateInfo ui;
   rfb::PixelBuffer* pb = getFramebuffer();
-  rfb::Region clip(pb->getRect());
+  core::Region clip(pb->getRect());
 
   CConnection::framebufferUpdateEnd();
 
@@ -254,13 +254,13 @@ void CConn::framebufferUpdateEnd()
   encodeTime += getCpuCounter();
 }
 
-bool CConn::dataRect(const rfb::Rect &r, int encoding)
+bool CConn::dataRect(const core::Rect &r, int encoding)
 {
   if (!CConnection::dataRect(r, encoding))
     return false;
 
   if (encoding != rfb::encodingCopyRect) // FIXME
-    updates.add_changed(rfb::Region(r));
+    updates.add_changed(core::Region(r));
 
   return true;
 }

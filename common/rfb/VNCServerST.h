@@ -95,11 +95,11 @@ namespace rfb {
     virtual void closeClients(const char* reason) {closeClients(reason, 0);}
     virtual SConnection* getConnection(network::Socket* sock);
 
-    virtual void add_changed(const Region &region);
-    virtual void add_copied(const Region &dest, const Point &delta);
-    virtual void setCursor(int width, int height, const Point& hotspot,
+    virtual void add_changed(const core::Region &region);
+    virtual void add_copied(const core::Region &dest, const core::Point &delta);
+    virtual void setCursor(int width, int height, const core::Point& hotspot,
                            const uint8_t* data);
-    virtual void setCursorPos(const Point& p, bool warped);
+    virtual void setCursorPos(const core::Point& p, bool warped);
     virtual void setName(const char* name_);
     virtual void setLEDState(unsigned state);
 
@@ -111,13 +111,13 @@ namespace rfb {
 
     const ScreenSet& getScreenLayout() const { return screenLayout; }
     const Cursor* getCursor() const { return cursor; }
-    const Point& getCursorPos() const { return cursorPos; }
+    const core::Point& getCursorPos() const { return cursorPos; }
     const char* getName() const { return name.buf; }
     unsigned getLEDState() const { return ledState; }
 
     // Event handlers
     void keyEvent(uint32_t keysym, uint32_t keycode, bool down);
-    void pointerEvent(VNCSConnectionST* client, const Point& pos, int buttonMask);
+    void pointerEvent(VNCSConnectionST* client, const core::Point& pos, int buttonMask);
 
     void handleClipboardRequest(VNCSConnectionST* client);
     void handleClipboardAnnounce(VNCSConnectionST* client, bool available);
@@ -146,7 +146,7 @@ namespace rfb {
 
     // Part of the framebuffer that has been modified but is not yet
     // ready to be sent to clients
-    Region getPendingRegion();
+    core::Region getPendingRegion();
 
     // getRenderedCursor() returns an up to date version of the server
     // side rendered cursor buffer
@@ -193,7 +193,7 @@ namespace rfb {
 
     ComparingUpdateTracker* comparer;
 
-    Point cursorPos;
+    core::Point cursorPos;
     Cursor* cursor;
     RenderedCursor renderedCursor;
     bool renderedCursorInvalid;

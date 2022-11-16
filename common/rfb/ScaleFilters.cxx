@@ -24,7 +24,7 @@
 #include <assert.h>
 #include <math.h>
 
-#include <rfb/Rect.h>
+#include <core/Rect.h>
 #include <rfb/ScaleFilters.h>
 
 using namespace rfb;

@@ -53,7 +53,7 @@ public:
   bool isRunning();
   virtual void queryConnection(network::Socket* sock,
                                const char* userName);
-  virtual void pointerEvent(const rfb::Point& pos, int buttonMask);
+  virtual void pointerEvent(const core::Point& pos, int buttonMask);
   KeyCode XkbKeysymToKeycode(Display* dpy, KeySym keysym);
   KeyCode addKeysym(Display* dpy, KeySym keysym);
   void deleteAddedKeysyms(Display* dpy);

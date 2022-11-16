@@ -40,7 +40,7 @@ namespace rfb {
       ~SDisplayCorePolling();
 
       // - Called by SDisplay to inform Core of the screen size
-      virtual void setScreenRect(const Rect& screenRect_);
+      virtual void setScreenRect(const core::Rect& screenRect_);
 
       // - Called by SDisplay to flush updates to the specified tracker
       virtual void flushUpdates();
@@ -58,7 +58,7 @@ namespace rfb {
       // - Background full screen polling fields
       IntervalTimer pollTimer;
       static const unsigned int pollTimerId;
-      Rect screenRect;
+      core::Rect screenRect;
       int pollInterval;
       int pollNextY;
       int pollIncrementY;

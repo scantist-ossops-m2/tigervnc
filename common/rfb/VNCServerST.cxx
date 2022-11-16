@@ -81,7 +81,7 @@ VNCServerST::VNCServerST(const char* name_, SDesktop* desktop_)
   : blHosts(&blacklist), desktop(desktop_), desktopStarted(false),
     blockCounter(0), pb(0), ledState(ledUnknown),
     name(strDup(name_)), pointerClient(0), clipboardClient(0),
-    comparer(0), cursor(new Cursor(0, 0, Point(), NULL)),
+    comparer(0), cursor(new Cursor(0, 0, core::Point(), NULL)),
     renderedCursorInvalid(false),
     keyRemapper(&KeyRemapper::defInstance),
     idleTimer(this), disconnectTimer(this), connectTimer(this),
@@ -298,7 +298,7 @@ void VNCServerST::setPixelBuffer(PixelBuffer* pb_)
 
   // Check that the screen layout is still valid
   if (pb_ && !layout.validate(pb_->width(), pb_->height())) {
-    Rect fbRect;
+    core::Rect fbRect;
     ScreenSet::iterator iter, iter_next;
 
     fbRect.setXYWH(0, 0, pb_->width(), pb_->height());
@@ -396,7 +396,7 @@ void VNCServerST::setName(const char* name_)
   }
 }
 
-void VNCServerST::add_changed(const Region& region)
+void VNCServerST::add_changed(const core::Region& region)
 {
   if (comparer == NULL)
     return;
@@ -405,7 +405,7 @@ void VNCServerST::add_changed(const Region& region)
   startFrameClock();
 }
 
-void VNCServerST::add_copied(const Region& dest, const Point& delta)
+void VNCServerST::add_copied(const core::Region& dest, const core::Point& delta)
 {
   if (comparer == NULL)
     return;
@@ -414,7 +414,7 @@ void VNCServerST::add_copied(const Region& dest, const Point& delta)
   startFrameClock();
 }
 
-void VNCServerST::setCursor(int width, int height, const Point& newHotspot,
+void VNCServerST::setCursor(int width, int height, const core::Point& newHotspot,
                             const uint8_t* data)
 {
   delete cursor;
@@ -431,7 +431,7 @@ void VNCServerST::setCursor(int width, int height, const Point& newHotspot,
   }
 }
 
-void VNCServerST::setCursorPos(const Point& pos, bool warped)
+void VNCServerST::setCursorPos(const core::Point& pos, bool warped)
 {
   if (!cursorPos.equals(pos)) {
     cursorPos = pos;
@@ -481,7 +481,7 @@ void VNCServerST::keyEvent(uint32_t keysym, uint32_t keycode, bool down)
 }
 
 void VNCServerST::pointerEvent(VNCSConnectionST* client,
-                               const Point& pos, int buttonMask)
+                               const core::Point& pos, int buttonMask)
 {
   if (rfb::Server::maxIdleTime)
     idleTimer.start(secsToMillis(rfb::Server::maxIdleTime));
@@ -790,7 +790,7 @@ int VNCServerST::msToNextUpdate()
 void VNCServerST::writeUpdate()
 {
   UpdateInfo ui;
-  Region toCheck;
+  core::Region toCheck;
 
   std::list<VNCSConnectionST*>::iterator ci, ci_next;
 
@@ -801,7 +801,7 @@ void VNCServerST::writeUpdate()
   toCheck = ui.changed.union_(ui.copied);
 
   if (needRenderedCursor()) {
-    Rect clippedCursorRect = Rect(0, 0, cursor->width(), cursor->height())
+    core::Rect clippedCursorRect = core::Rect(0, 0, cursor->width(), cursor->height())
                              .translate(cursorPos.subtract(cursor->hotspot()))
                              .intersect(pb->getRect());
 
@@ -832,7 +832,7 @@ void VNCServerST::writeUpdate()
 // checkUpdate() is called by clients to see if it is safe to read from
 // the framebuffer at this time.
 
-Region VNCServerST::getPendingRegion()
+core::Region VNCServerST::getPendingRegion()
 {
   UpdateInfo ui;
 
@@ -842,7 +842,7 @@ Region VNCServerST::getPendingRegion()
 
   // Block client from updating if there are pending updates
   if (comparer->is_empty())
-    return Region();
+    return core::Region();
 
   comparer->getUpdateInfo(&ui, pb->getRect());
 

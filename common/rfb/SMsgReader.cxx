@@ -25,7 +25,7 @@
 
 #include <rdr/InStream.h>
 #include <rdr/ZlibInStream.h>
-#include <rdr/types.h>
+#include <core/types.h>
 
 #include <rfb/msgTypes.h>
 #include <rfb/qemuTypes.h>
@@ -141,7 +141,7 @@ bool SMsgReader::readSetEncodings()
     return false;
   is->clearRestorePoint();
 
-  rdr::S32Array encodings(nEncodings);
+  core::S32Array encodings(nEncodings);
   for (int i = 0; i < nEncodings; i++)
     encodings.buf[i] = is->readU32();
 
@@ -200,7 +200,7 @@ bool SMsgReader::readFramebufferUpdateRequest()
   int y = is->readU16();
   int w = is->readU16();
   int h = is->readU16();
-  handler->framebufferUpdateRequest(Rect(x, y, x+w, y+h), inc);
+  handler->framebufferUpdateRequest(core::Rect(x, y, x+w, y+h), inc);
   return true;
 }
 
@@ -276,7 +276,7 @@ bool SMsgReader::readPointerEvent()
   int mask = is->readU8();
   int x = is->readU16();
   int y = is->readU16();
-  handler->pointerEvent(Point(x, y), mask);
+  handler->pointerEvent(core::Point(x, y), mask);
   return true;
 }
 

@@ -38,7 +38,7 @@ namespace rfb {
 
       struct Info {
         HCURSOR cursor;
-        Point position;
+        core::Point position;
         bool visible;
         Info() : cursor(0), visible(false) {}
         bool operator!=(const Info& info) {

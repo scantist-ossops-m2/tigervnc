@@ -28,7 +28,7 @@
 #include <rdr/InStream.h>
 #include <rdr/MemInStream.h>
 #include <rdr/OutStream.h>
-#include <rdr/types.h>
+#include <core/types.h>
 
 #include <rfb/ServerParams.h>
 #include <rfb/Exception.h>
@@ -49,7 +49,7 @@ TightDecoder::~TightDecoder()
 {
 }
 
-bool TightDecoder::readRect(const Rect& r, rdr::InStream* is,
+bool TightDecoder::readRect(const core::Rect& r, rdr::InStream* is,
                             const ServerParams& server, rdr::OutStream* os)
 {
   uint8_t comp_ctl;
@@ -190,10 +190,10 @@ bool TightDecoder::readRect(const Rect& r, rdr::InStream* is,
   return true;
 }
 
-bool TightDecoder::doRectsConflict(const Rect& /*rectA*/,
+bool TightDecoder::doRectsConflict(const core::Rect& /*rectA*/,
                                    const void* bufferA,
                                    size_t buflenA,
-                                   const Rect& /*rectB*/,
+                                   const core::Rect& /*rectB*/,
                                    const void* bufferB,
                                    size_t buflenB,
                                    const ServerParams& /*server*/)
@@ -218,7 +218,7 @@ bool TightDecoder::doRectsConflict(const Rect& /*rectA*/,
   return false;
 }
 
-void TightDecoder::decodeRect(const Rect& r, const void* buffer,
+void TightDecoder::decodeRect(const core::Rect& r, const void* buffer,
                               size_t buflen, const ServerParams& server,
                               ModifiablePixelBuffer* pb)
 {
@@ -309,7 +309,7 @@ void TightDecoder::decodeRect(const Rect& r, const void* buffer,
 
       if (pf.is888()) {
         size_t len = palSize * 3;
-        rdr::U8Array tightPalette(len);
+        core::U8Array tightPalette(len);
 
         assert(buflen >= len);
 
@@ -504,7 +504,7 @@ uint32_t TightDecoder::readCompact(rdr::InStream* is)
 void
 TightDecoder::FilterGradient24(const uint8_t *inbuf,
                                const PixelFormat& pf, uint32_t* outbuf,
-                               int stride, const Rect& r)
+                               int stride, const core::Rect& r)
 {
   int x, y, c;
   uint8_t prevRow[TIGHT_MAX_WIDTH*3];
@@ -550,7 +550,7 @@ TightDecoder::FilterGradient24(const uint8_t *inbuf,
 template<class T>
 void TightDecoder::FilterGradient(const uint8_t* inbuf,
                                   const PixelFormat& pf, T* outbuf,
-                                  int stride, const Rect& r)
+                                  int stride, const core::Rect& r)
 {
   int x, y, c;
   static uint8_t prevRow[TIGHT_MAX_WIDTH*3];
@@ -604,7 +604,7 @@ void TightDecoder::FilterGradient(const uint8_t* inbuf,
 template<class T>
 void TightDecoder::FilterPalette(const T* palette, int palSize,
                                  const uint8_t* inbuf, T* outbuf,
-                                 int stride, const Rect& r)
+                                 int stride, const core::Rect& r)
 {
   // Indexed color
   int x, h = r.height(), w = r.width(), b, pad = stride - w;

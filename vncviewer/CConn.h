@@ -59,11 +59,11 @@ public:
 
   void framebufferUpdateStart();
   void framebufferUpdateEnd();
-  bool dataRect(const rfb::Rect& r, int encoding);
+  bool dataRect(const core::Rect& r, int encoding);
 
-  void setCursor(int width, int height, const rfb::Point& hotspot,
+  void setCursor(int width, int height, const core::Point& hotspot,
                  const uint8_t* data);
-  void setCursorPos(const rfb::Point& pos);
+  void setCursorPos(const core::Point& pos);
 
   void fence(uint32_t flags, unsigned len, const char data[]);
 

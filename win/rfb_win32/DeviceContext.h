@@ -25,7 +25,7 @@
 
 #include <windows.h>
 #include <rfb/PixelFormat.h>
-#include <rfb/Rect.h>
+#include <core/Rect.h>
 #include <rfb_win32/TCharArray.h>
 
 namespace rfb {
@@ -41,8 +41,8 @@ namespace rfb {
       operator HDC() const {return dc;}
       PixelFormat getPF() const;
       static PixelFormat getPF(HDC dc);
-      Rect getClipBox() const;
-      static Rect getClipBox(HDC dc);
+      core::Rect getClipBox() const;
+      static core::Rect getClipBox(HDC dc);
     protected:
       HDC dc;
     };

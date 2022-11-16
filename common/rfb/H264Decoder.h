@@ -33,15 +33,15 @@ namespace rfb {
   public:
     H264Decoder();
     virtual ~H264Decoder();
-    virtual bool readRect(const Rect& r, rdr::InStream* is,
+    virtual bool readRect(const core::Rect& r, rdr::InStream* is,
                           const ServerParams& server, rdr::OutStream* os);
-    virtual void decodeRect(const Rect& r, const void* buffer,
+    virtual void decodeRect(const core::Rect& r, const void* buffer,
                             size_t buflen, const ServerParams& server,
                             ModifiablePixelBuffer* pb);
 
   private:
     void resetContexts();
-    H264DecoderContext* findContext(const Rect& r);
+    H264DecoderContext* findContext(const core::Rect& r);
 
     os::Mutex mutex;
     std::deque<H264DecoderContext*> contexts;

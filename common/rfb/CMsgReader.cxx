@@ -26,7 +26,7 @@
 
 #include <rdr/InStream.h>
 #include <rdr/ZlibInStream.h>
-#include <rdr/types.h>
+#include <core/types.h>
 
 #include <rfb/msgTypes.h>
 #include <rfb/clipboardTypes.h>
@@ -229,7 +229,7 @@ bool CMsgReader::readSetColourMapEntries()
     return false;
   is->clearRestorePoint();
 
-  rdr::U16Array rgbs(nColours * 3);
+  core::U16Array rgbs(nColours * 3);
   for (int i = 0; i < nColours * 3; i++)
     rgbs.buf[i] = is->readU16();
   handler->setColourMapEntries(firstColour, nColours, rgbs.buf);
@@ -456,7 +456,7 @@ bool CMsgReader::readFramebufferUpdate()
   return true;
 }
 
-bool CMsgReader::readRect(const Rect& r, int encoding)
+bool CMsgReader::readRect(const core::Rect& r, int encoding)
 {
   if ((r.br.x > handler->server.width()) ||
       (r.br.y > handler->server.height())) {
@@ -472,20 +472,20 @@ bool CMsgReader::readRect(const Rect& r, int encoding)
   return handler->dataRect(r, encoding);
 }
 
-bool CMsgReader::readSetXCursor(int width, int height, const Point& hotspot)
+bool CMsgReader::readSetXCursor(int width, int height, const core::Point& hotspot)
 {
   if (width > maxCursorSize || height > maxCursorSize)
     throw Exception("Too big cursor");
 
-  rdr::U8Array rgba(width*height*4);
+  core::U8Array rgba(width*height*4);
 
   if (width * height > 0) {
     uint8_t pr, pg, pb;
     uint8_t sr, sg, sb;
     int data_len = ((width+7)/8) * height;
     int mask_len = ((width+7)/8) * height;
-    rdr::U8Array data(data_len);
-    rdr::U8Array mask(mask_len);
+    core::U8Array data(data_len);
+    core::U8Array mask(mask_len);
 
     int x, y;
     uint8_t* out;
@@ -536,18 +536,18 @@ bool CMsgReader::readSetXCursor(int width, int height, const Point& hotspot)
   return true;
 }
 
-bool CMsgReader::readSetCursor(int width, int height, const Point& hotspot)
+bool CMsgReader::readSetCursor(int width, int height, const core::Point& hotspot)
 {
   if (width > maxCursorSize || height > maxCursorSize)
     throw Exception("Too big cursor");
 
   int data_len = width * height * (handler->server.pf().bpp/8);
   int mask_len = ((width+7)/8) * height;
-  rdr::U8Array data(data_len);
-  rdr::U8Array mask(mask_len);
+  core::U8Array data(data_len);
+  core::U8Array mask(mask_len);
 
   int x, y;
-  rdr::U8Array rgba(width*height*4);
+  core::U8Array rgba(width*height*4);
   uint8_t* in;
   uint8_t* out;
 
@@ -582,7 +582,7 @@ bool CMsgReader::readSetCursor(int width, int height, const Point& hotspot)
   return true;
 }
 
-bool CMsgReader::readSetCursorWithAlpha(int width, int height, const Point& hotspot)
+bool CMsgReader::readSetCursorWithAlpha(int width, int height, const core::Point& hotspot)
 {
   if (width > maxCursorSize || height > maxCursorSize)
     throw Exception("Too big cursor");
@@ -643,7 +643,7 @@ bool CMsgReader::readSetCursorWithAlpha(int width, int height, const Point& hots
   return true;
 }
 
-bool CMsgReader::readSetVMwareCursor(int width, int height, const Point& hotspot)
+bool CMsgReader::readSetVMwareCursor(int width, int height, const core::Point& hotspot)
 {
   if (width > maxCursorSize || height > maxCursorSize)
     throw Exception("Too big cursor");
@@ -660,10 +660,10 @@ bool CMsgReader::readSetVMwareCursor(int width, int height, const Point& hotspot
 
   if (type == 0) {
     int len = width * height * (handler->server.pf().bpp/8);
-    rdr::U8Array andMask(len);
-    rdr::U8Array xorMask(len);
+    core::U8Array andMask(len);
+    core::U8Array xorMask(len);
 
-    rdr::U8Array data(width*height*4);
+    core::U8Array data(width*height*4);
 
     uint8_t* andIn;
     uint8_t* xorIn;
@@ -729,7 +729,7 @@ bool CMsgReader::readSetVMwareCursor(int width, int height, const Point& hotspot
 
     handler->setCursor(width, height, hotspot, data.buf);
   } else if (type == 1) {
-    rdr::U8Array data(width*height*4);
+    core::U8Array data(width*height*4);
 
     if (!is->hasDataOrRestore(width*height*4))
       return false;

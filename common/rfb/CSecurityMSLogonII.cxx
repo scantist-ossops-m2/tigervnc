@@ -34,12 +34,12 @@
 #include <nettle/des.h>
 #include <nettle/cbc.h>
 #include <nettle/bignum.h>
+#include <core/types.h>
 #include <rfb/CSecurityMSLogonII.h>
 #include <rfb/CConnection.h>
 #include <rdr/InStream.h>
 #include <rdr/OutStream.h>
 #include <rdr/RandomStream.h>
-#include <rdr/types.h>
 #include <rfb/Exception.h>
 #include <os/os.h>
 
@@ -99,7 +99,7 @@ void CSecurityMSLogonII::writeCredentials()
   rdr::RandomStream rs;
 
   (CSecurity::upg)->getUserPasswd(isSecure(), &username.buf, &password.buf);
-  rdr::U8Array bBytes(8);
+  core::U8Array bBytes(8);
   if (!rs.hasData(8))
     throw ConnFailedException("failed to generate DH private key");
   rs.readBytes(bBytes.buf, 8);

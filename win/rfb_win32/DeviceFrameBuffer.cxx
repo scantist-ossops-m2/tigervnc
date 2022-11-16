@@ -27,13 +27,14 @@
 #endif
 
 #include <vector>
-#include <rdr/types.h>
+#include <core/types.h>
 #include <rfb_win32/DeviceFrameBuffer.h>
 #include <rfb_win32/DeviceContext.h>
 #include <rfb_win32/IconInfo.h>
 #include <rfb/VNCServer.h>
 #include <rfb/LogWriter.h>
 
+using namespace core;
 using namespace rfb;
 using namespace win32;
 
@@ -131,7 +132,7 @@ void DeviceFrameBuffer::setCursor(HCURSOR hCursor, VNCServer* server)
   try {
 
     int width, height;
-    rdr::U8Array buffer;
+    core::U8Array buffer;
 
     // - Get the size and other details about the cursor.
 
@@ -212,7 +213,7 @@ void DeviceFrameBuffer::setCursor(HCURSOR hCursor, VNCServer* server)
     } else {
       // B/W cursor
 
-      rdr::U8Array mask(maskInfo.bmWidthBytes * maskInfo.bmHeight);
+      core::U8Array mask(maskInfo.bmWidthBytes * maskInfo.bmHeight);
       uint8_t* andMask = mask.buf;
       uint8_t* xorMask = mask.buf + height * maskInfo.bmWidthBytes;
 
@@ -261,7 +262,7 @@ void DeviceFrameBuffer::setCursor(HCURSOR hCursor, VNCServer* server)
 
         // The buffer needs to be slightly larger to make sure there
         // is room for the outline pixels
-        rdr::U8Array outline((width + 2)*(height + 2)*4);
+        core::U8Array outline((width + 2)*(height + 2)*4);
         memset(outline.buf, 0, (width + 2)*(height + 2)*4);
 
         // Pass 1, outline everything

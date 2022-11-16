@@ -37,7 +37,7 @@
 #include <rfb/ServerCore.h>
 #include <rdr/HexOutStream.h>
 #include <rfb/LogWriter.h>
-#include <rfb/Region.h>
+#include <core/Region.h>
 #include <rfb/ledStates.h>
 #include <network/TcpSocket.h>
 #include <network/UnixSocket.h>
@@ -55,6 +55,7 @@ extern "C" {
 void vncSetGlueContext(int screenIndex);
 }
 
+using namespace core;
 using namespace rfb;
 
 static rfb::LogWriter vlog("vncext");

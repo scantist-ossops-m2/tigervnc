@@ -52,6 +52,7 @@ void vncSetGlueContext(Display *dpy, void *res);
 #include <x0vncserver/XPixelBuffer.h>
 
 using namespace std;
+using namespace core;
 using namespace rfb;
 
 extern const unsigned short code_map_qnum_to_xorgevdev[];
@@ -225,7 +226,7 @@ void XDesktop::poll() {
                       &x, &y, &wx, &wy, &mask)) {
       x -= geometry->offsetLeft();
       y -= geometry->offsetTop();
-      server->setCursorPos(rfb::Point(x, y), false);
+      server->setCursorPos(core::Point(x, y), false);
     }
   }
 }
@@ -866,7 +867,7 @@ bool XDesktop::handleGlobalEvent(XEvent* ev) {
       server->setPixelBuffer(pb, computeScreenLayout());
 
       // Mark entire screen as changed
-      server->add_changed(rfb::Region(Rect(0, 0, cev->width, cev->height)));
+      server->add_changed(core::Region(Rect(0, 0, cev->width, cev->height)));
     }
 
     return true;

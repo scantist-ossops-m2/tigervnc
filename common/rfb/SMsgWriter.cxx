@@ -27,7 +27,7 @@
 #include <rdr/OutStream.h>
 #include <rdr/MemOutStream.h>
 #include <rdr/ZlibOutStream.h>
-#include <rdr/types.h>
+#include <core/types.h>
 
 #include <rfb/msgTypes.h>
 #include <rfb/fenceTypes.h>
@@ -394,7 +394,7 @@ void SMsgWriter::writeFramebufferUpdateEnd()
   endMsg();
 }
 
-void SMsgWriter::writeCopyRect(const Rect& r, int srcX, int srcY)
+void SMsgWriter::writeCopyRect(const core::Rect& r, int srcX, int srcY)
 {
   startRect(r,encodingCopyRect);
   os->writeU16(srcX);
@@ -402,7 +402,7 @@ void SMsgWriter::writeCopyRect(const Rect& r, int srcX, int srcY)
   endRect();
 }
 
-void SMsgWriter::startRect(const Rect& r, int encoding)
+void SMsgWriter::startRect(const core::Rect& r, int encoding)
 {
   if (++nRectsInUpdate > nRectsInHeader && nRectsInHeader)
     throw Exception("SMsgWriter::startRect: nRects out of sync");
@@ -443,8 +443,8 @@ void SMsgWriter::writePseudoRects()
                                cursor.hotspot().x, cursor.hotspot().y,
                                cursor.getBuffer());
     } else if (client->supportsEncoding(pseudoEncodingCursor)) {
-      rdr::U8Array data(cursor.width()*cursor.height() * (client->pf().bpp/8));
-      rdr::U8Array mask(cursor.getMask());
+      core::U8Array data(cursor.width()*cursor.height() * (client->pf().bpp/8));
+      core::U8Array mask(cursor.getMask());
 
       const uint8_t* in;
       uint8_t* out;
@@ -461,8 +461,8 @@ void SMsgWriter::writePseudoRects()
                          cursor.hotspot().x, cursor.hotspot().y,
                          data.buf, mask.buf);
     } else if (client->supportsEncoding(pseudoEncodingXCursor)) {
-      rdr::U8Array bitmap(cursor.getBitmap());
-      rdr::U8Array mask(cursor.getMask());
+      core::U8Array bitmap(cursor.getBitmap());
+      core::U8Array mask(cursor.getMask());
 
       writeSetXCursorRect(cursor.width(), cursor.height(),
                           cursor.hotspot().x, cursor.hotspot().y,
@@ -475,7 +475,7 @@ void SMsgWriter::writePseudoRects()
   }
 
   if (needCursorPos) {
-    const Point& cursorPos = client->cursorPos();
+    const core::Point& cursorPos = client->cursorPos();
 
     if (client->supportsEncoding(pseudoEncodingVMwareCursorPosition)) {
       writeSetVMwareCursorPositionRect(cursorPos.x, cursorPos.y);

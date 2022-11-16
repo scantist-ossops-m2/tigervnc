@@ -34,12 +34,12 @@
 #include <nettle/aes.h>
 #include <nettle/md5.h>
 #include <nettle/bignum.h>
+#include <core/types.h>
 #include <rfb/CSecurityDH.h>
 #include <rfb/CConnection.h>
 #include <rdr/InStream.h>
 #include <rdr/OutStream.h>
 #include <rdr/RandomStream.h>
-#include <rdr/types.h>
 #include <rfb/Exception.h>
 #include <os/os.h>
 
@@ -94,8 +94,8 @@ bool CSecurityDH::readKey()
     return false;
   is->clearRestorePoint();
   mpz_set_ui(g, gen);
-  rdr::U8Array pBytes(keyLength);
-  rdr::U8Array ABytes(keyLength);
+  core::U8Array pBytes(keyLength);
+  core::U8Array ABytes(keyLength);
   is->readBytes(pBytes.buf, keyLength);
   is->readBytes(ABytes.buf, keyLength);
   nettle_mpz_set_str_256_u(p, keyLength, pBytes.buf);
@@ -110,7 +110,7 @@ void CSecurityDH::writeCredentials()
   rdr::RandomStream rs;
 
   (CSecurity::upg)->getUserPasswd(isSecure(), &username.buf, &password.buf);
-  rdr::U8Array bBytes(keyLength);
+  core::U8Array bBytes(keyLength);
   if (!rs.hasData(keyLength))
     throw ConnFailedException("failed to generate DH private key");
   rs.readBytes(bBytes.buf, keyLength);
@@ -118,8 +118,8 @@ void CSecurityDH::writeCredentials()
   mpz_powm(k, A, b, p);
   mpz_powm(B, g, b, p);
 
-  rdr::U8Array sharedSecret(keyLength);
-  rdr::U8Array BBytes(keyLength);
+  core::U8Array sharedSecret(keyLength);
+  core::U8Array BBytes(keyLength);
   nettle_mpz_get_str_256(keyLength, sharedSecret.buf, k);
   nettle_mpz_get_str_256(keyLength, BBytes.buf, B);
   uint8_t key[16];

@@ -19,6 +19,11 @@
 #ifndef __RFB_DECODER_H__
 #define __RFB_DECODER_H__
 
+namespace core {
+  class Region;
+  struct Rect;
+}
+
 namespace rdr {
   class InStream;
   class OutStream;
@@ -27,9 +32,6 @@ namespace rdr {
 namespace rfb {
   class ServerParams;
   class ModifiablePixelBuffer;
-  class Region;
-
-  struct Rect;
 
   enum DecoderFlags {
     // A constant for decoders that don't need anything special
@@ -52,7 +54,7 @@ namespace rfb {
     // InStream to the OutStream, possibly changing it along the way to
     // make it easier to decode. This function will always be called in
     // a serial manner on the main thread.
-    virtual bool readRect(const Rect& r, rdr::InStream* is,
+    virtual bool readRect(const core::Rect& r, rdr::InStream* is,
                           const ServerParams& server, rdr::OutStream* os)=0;
 
     // These functions will be called from any of the worker threads.
@@ -62,17 +64,17 @@ namespace rfb {
     // getAffectedRegion() returns the parts of the frame buffer will
     // be either read from or written do when decoding this rect. The
     // default implementation simply returns the given rectangle.
-    virtual void getAffectedRegion(const Rect& rect, const void* buffer,
+    virtual void getAffectedRegion(const core::Rect& rect, const void* buffer,
                                    size_t buflen, const ServerParams& server,
-                                   Region* region);
+                                   core::Region* region);
 
     // doesRectsConflict() determines if two rectangles must be decoded
     // in the order they were received. This will only be called if the
     // DecoderPartiallyOrdered flag has been set.
-    virtual bool doRectsConflict(const Rect& rectA,
+    virtual bool doRectsConflict(const core::Rect& rectA,
                                  const void* bufferA,
                                  size_t buflenA,
-                                 const Rect& rectB,
+                                 const core::Rect& rectB,
                                  const void* bufferB,
                                  size_t buflenB,
                                  const ServerParams& server);
@@ -81,7 +83,7 @@ namespace rfb {
     // given buffer, onto the ModifiablePixelBuffer. The PixelFormat of
     // the PixelBuffer might not match the ConnParams and it is up to
     // the decoder to do any necessary conversion.
-    virtual void decodeRect(const Rect& r, const void* buffer,
+    virtual void decodeRect(const core::Rect& r, const void* buffer,
                             size_t buflen, const ServerParams& server,
                             ModifiablePixelBuffer* pb)=0;
 

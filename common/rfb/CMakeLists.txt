@@ -1,6 +1,5 @@
 include_directories(${CMAKE_SOURCE_DIR}/common)
 include_directories(SYSTEM ${JPEG_INCLUDE_DIR})
-include_directories(SYSTEM ${PIXMAN_INCLUDE_DIRS})
 
 add_library(rfb STATIC
   Blacklist.cxx
@@ -39,7 +38,6 @@ add_library(rfb STATIC
   RREDecoder.cxx
   RawDecoder.cxx
   RawEncoder.cxx
-  Region.cxx
   SConnection.cxx
   SMsgHandler.cxx
   SMsgReader.cxx
@@ -66,9 +64,8 @@ add_library(rfb STATIC
   encodings.cxx
   util.cxx)
 
-target_link_libraries(rfb os rdr)
-target_link_libraries(rfb ${JPEG_LIBRARIES} ${PIXMAN_LIBRARIES})
-target_link_directories(rfb PUBLIC ${PIXMAN_LIBRARY_DIRS})
+target_link_libraries(rfb core os rdr)
+target_link_libraries(rfb ${JPEG_LIBRARIES})
 
 if(ENABLE_H264 AND NOT H264_LIBS STREQUAL "NONE")
   target_sources(rfb PRIVATE H264Decoder.cxx H264DecoderContext.cxx)

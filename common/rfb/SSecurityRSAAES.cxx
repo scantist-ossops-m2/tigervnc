@@ -39,7 +39,7 @@
 #include <rfb/Exception.h>
 #include <rdr/AESInStream.h>
 #include <rdr/AESOutStream.h>
-#include <rdr/types.h>
+#include <core/types.h>
 #if !defined(WIN32) && !defined(__APPLE__)
 #include <rfb/UnixPasswordValidator.h>
 #endif
@@ -157,14 +157,14 @@ void SSecurityRSAAES::loadPrivateKey()
     throw ConnFailedException("size of key file is zero or too big");
   }
   fseek(file, 0, SEEK_SET);
-  rdr::U8Array data(size);
+  core::U8Array data(size);
   if (fread(data.buf, 1, size, file) != size) {
     fclose(file);
     throw ConnFailedException("failed to read key");
   }
   fclose(file);
 
-  rdr::U8Array der;
+  core::U8Array der;
   size_t derSize;
   if (loadPEM(data.buf, size, "-----BEGIN RSA PRIVATE KEY-----\n",
               "-----END RSA PRIVATE KEY-----", &der.buf, &derSize)) {

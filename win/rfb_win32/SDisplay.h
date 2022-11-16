@@ -48,7 +48,7 @@ namespace rfb {
     class SDisplayCore {
     public:
       virtual ~SDisplayCore() {};
-      virtual void setScreenRect(const Rect& screenRect_) = 0;
+      virtual void setScreenRect(const core::Rect& screenRect_) = 0;
       virtual void flushUpdates() = 0;
       virtual const char* methodName() const = 0;
     };
@@ -79,7 +79,7 @@ namespace rfb {
       virtual void handleClipboardRequest();
       virtual void handleClipboardAnnounce(bool available);
       virtual void handleClipboardData(const char* data);
-      virtual void pointerEvent(const Point& pos, int buttonmask);
+      virtual void pointerEvent(const core::Point& pos, int buttonmask);
       virtual void keyEvent(uint32_t keysym, uint32_t keycode, bool down);
 
       // -=- Clipboard events
@@ -132,7 +132,7 @@ namespace rfb {
       DeviceContext* device;
 
       // -=- The coordinates of Window's entire virtual Screen
-      Rect screenRect;
+      core::Rect screenRect;
 
       // -=- All changes are collected in UN-CLIPPED Display coords and merged
       //     When they are to be flushed to the VNCServer, they are changed
@@ -161,8 +161,8 @@ namespace rfb {
       // Cursor
       WMCursor* cursor;
       WMCursor::Info old_cursor;
-      Region old_cursor_region;
-      Point cursor_renderpos;
+      core::Region old_cursor_region;
+      core::Point cursor_renderpos;
 
       // -=- Event signalled to trigger an update to be flushed
       Handle updateEvent;

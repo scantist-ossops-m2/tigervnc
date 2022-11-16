@@ -68,8 +68,8 @@ public:
   void setCursor(int width, int height, int hotX, int hotY,
                  const unsigned char *rgbaData);
   void setCursorPos(int x, int y, bool warped);
-  void add_changed(const rfb::Region &region);
-  void add_copied(const rfb::Region &dest, const rfb::Point &delta);
+  void add_changed(const core::Region &region);
+  void add_copied(const core::Region &dest, const core::Point &delta);
   void handleSocketEvent(int fd, bool read, bool write);
   void blockHandler(int* timeout);
   void addClient(network::Socket* sock, bool reverse);
@@ -93,7 +93,7 @@ public:
   virtual void terminate();
   virtual void queryConnection(network::Socket* sock,
                                const char* userName);
-  virtual void pointerEvent(const rfb::Point& pos, int buttonMask);
+  virtual void pointerEvent(const core::Point& pos, int buttonMask);
   virtual void keyEvent(uint32_t keysym, uint32_t keycode, bool down);
   virtual unsigned int setScreenLayout(int fb_width, int fb_height,
                                        const rfb::ScreenSet& layout);
@@ -102,7 +102,7 @@ public:
   virtual void handleClipboardData(const char* data);
 
   // rfb::PixelBuffer callbacks
-  virtual void grabRegion(const rfb::Region& r);
+  virtual void grabRegion(const core::Region& r);
 
 protected:
   bool handleListenerEvent(int fd,
@@ -129,6 +129,6 @@ private:
 
   OutputIdMap outputIdMap;
 
-  rfb::Point oldCursorPos;
+  core::Point oldCursorPos;
 };
 #endif

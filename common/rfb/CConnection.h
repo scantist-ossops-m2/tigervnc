@@ -107,12 +107,12 @@ namespace rfb {
                             const PixelFormat& pf,
                             const char* name);
 
-    virtual bool readAndDecodeRect(const Rect& r, int encoding,
+    virtual bool readAndDecodeRect(const core::Rect& r, int encoding,
                                    ModifiablePixelBuffer* pb);
 
     virtual void framebufferUpdateStart();
     virtual void framebufferUpdateEnd();
-    virtual bool dataRect(const Rect& r, int encoding);
+    virtual bool dataRect(const core::Rect& r, int encoding);
 
     virtual void serverCutText(const char* str);
 

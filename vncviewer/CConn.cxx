@@ -55,6 +55,7 @@
 #include "win32.h"
 #endif
 
+using namespace core;
 using namespace rdr;
 using namespace network;
 using namespace rfb;

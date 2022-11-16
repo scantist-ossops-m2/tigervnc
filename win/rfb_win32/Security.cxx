@@ -149,7 +149,7 @@ Sid::SYSTEM::SYSTEM() {
 Sid::FromToken::FromToken(HANDLE h) {
   DWORD required = 0;
   GetTokenInformation(h, TokenUser, 0, 0, &required);
-  rdr::U8Array tmp(required);
+  core::U8Array tmp(required);
   if (!GetTokenInformation(h, TokenUser, tmp.buf, required, &required))
     throw rdr::SystemException("GetTokenInformation", GetLastError());
   TOKEN_USER* tokenUser = (TOKEN_USER*)tmp.buf;

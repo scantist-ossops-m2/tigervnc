@@ -69,8 +69,8 @@ public:
 
   virtual void initDone();
   virtual void setPixelFormat(const rfb::PixelFormat& pf);
-  virtual void setCursor(int, int, const rfb::Point&, const uint8_t*);
-  virtual void setCursorPos(const rfb::Point&);
+  virtual void setCursor(int, int, const core::Point&, const uint8_t*);
+  virtual void setCursorPos(const core::Point&);
   virtual void framebufferUpdateStart();
   virtual void framebufferUpdateEnd();
   virtual void setColourMapEntries(int, int, uint16_t*);
@@ -145,11 +145,11 @@ void CConn::setPixelFormat(const rfb::PixelFormat& /*pf*/)
   CConnection::setPixelFormat(filePF);
 }
 
-void CConn::setCursor(int, int, const rfb::Point&, const uint8_t*)
+void CConn::setCursor(int, int, const core::Point&, const uint8_t*)
 {
 }
 
-void CConn::setCursorPos(const rfb::Point&)
+void CConn::setCursorPos(const core::Point&)
 {
 }
 

@@ -78,8 +78,8 @@ namespace rfb {
     const Cursor& cursor() const { return *cursor_; }
     void setCursor(const Cursor& cursor);
 
-    const Point& cursorPos() const { return cursorPos_; }
-    void setCursorPos(const Point& pos);
+    const core::Point& cursorPos() const { return cursorPos_; }
+    void setCursorPos(const core::Point& pos);
 
     bool supportsEncoding(int32_t encoding) const;
 
@@ -115,7 +115,7 @@ namespace rfb {
     PixelFormat pf_;
     char* name_;
     Cursor* cursor_;
-    Point cursorPos_;
+    core::Point cursorPos_;
     std::set<int32_t> encodings_;
     unsigned int ledState_;
     uint32_t clipFlags;

@@ -27,7 +27,7 @@
 #include <rfb/DecodeManager.h>
 #include <rfb/Decoder.h>
 #include <rfb/Exception.h>
-#include <rfb/Region.h>
+#include <core/Region.h>
 
 #include <rfb/LogWriter.h>
 
@@ -101,7 +101,7 @@ DecodeManager::~DecodeManager()
     delete decoders[i];
 }
 
-bool DecodeManager::decodeRect(const Rect& r, int encoding,
+bool DecodeManager::decodeRect(const core::Rect& r, int encoding,
                                ModifiablePixelBuffer* pb)
 {
   Decoder *decoder;
@@ -351,7 +351,7 @@ void DecodeManager::DecodeThread::worker()
 DecodeManager::QueueEntry* DecodeManager::DecodeThread::findEntry()
 {
   std::list<DecodeManager::QueueEntry*>::iterator iter;
-  Region lockedRegion;
+  core::Region lockedRegion;
 
   if (manager->workQueue.empty())
     return NULL;

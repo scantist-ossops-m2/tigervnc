@@ -39,7 +39,7 @@ ClientParams::ClientParams()
 {
   setName("");
 
-  cursor_ = new Cursor(0, 0, Point(), NULL);
+  cursor_ = new Cursor(0, 0, core::Point(), NULL);
 
   clipFlags = clipboardUTF8 | clipboardRTF | clipboardHTML |
               clipboardRequest | clipboardNotify | clipboardProvide;
@@ -90,7 +90,7 @@ void ClientParams::setCursor(const Cursor& other)
   cursor_ = new Cursor(other);
 }
 
-void ClientParams::setCursorPos(const Point& pos)
+void ClientParams::setCursorPos(const core::Point& pos)
 {
   cursorPos_ = pos;
 }
