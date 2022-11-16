@@ -5,6 +5,8 @@ add_library(os STATIC
   Thread.cxx
   os.cxx)
 
+target_link_libraries(os core)
+
 if(UNIX)
   target_link_libraries(os pthread)
 endif()

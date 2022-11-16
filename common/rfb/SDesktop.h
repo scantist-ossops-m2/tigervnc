@@ -41,7 +41,7 @@
 #include <rfb/PixelBuffer.h>
 #include <rfb/VNCServer.h>
 #include <rfb/InputHandler.h>
-#include <rfb/Exception.h>
+#include <core/Exception.h>
 #include <rfb/screenTypes.h>
 #include <core/util.h>
 

@@ -30,7 +30,7 @@ extern "C" {
 #include <rfb/d3des.h>
 }
 
-#include <rdr/Exception.h>
+#include <core/Exception.h>
 #include <rfb/Password.h>
 
 using namespace rfb;
@@ -48,7 +48,7 @@ PlainPasswd::PlainPasswd(size_t len) : core::CharArray(len) {
 
 PlainPasswd::PlainPasswd(const ObfuscatedPasswd& obfPwd) : core::CharArray(9) {
   if (obfPwd.length < 8)
-    throw rdr::Exception("bad obfuscated password length");
+    throw core::Exception("bad obfuscated password length");
   deskey(d3desObfuscationKey, DE1);
   des((uint8_t*)obfPwd.buf, (uint8_t*)buf);
   buf[8] = 0;

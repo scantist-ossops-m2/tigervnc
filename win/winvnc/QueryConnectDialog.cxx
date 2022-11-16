@@ -63,7 +63,7 @@ void QueryConnectDialog::worker() {
   countdown = timeout;
   try {
     if (desktopChangeRequired() && !changeDesktop())
-      throw rdr::Exception("changeDesktop failed");
+      throw core::Exception("changeDesktop failed");
     approve = Dialog::showDialog(MAKEINTRESOURCE(IDD_QUERY_CONNECT));
     server->queryConnectionComplete();
   } catch (...) {
@@ -77,7 +77,7 @@ void QueryConnectDialog::worker() {
 
 void QueryConnectDialog::initDialog() {
   if (!SetTimer(handle, 1, 1000, 0))
-    throw rdr::SystemException("SetTimer", GetLastError());
+    throw core::SystemException("SetTimer", GetLastError());
   setItemString(IDC_QUERY_HOST, TStr(peerIp.buf));
   if (!userName.buf)
     userName.buf = strDup("(anonymous)");

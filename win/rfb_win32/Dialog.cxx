@@ -28,7 +28,7 @@
 #include <rfb_win32/Dialog.h>
 #include <rfb_win32/TCharArray.h>
 #include <rfb/LogWriter.h>
-#include <rdr/Exception.h>
+#include <core/Exception.h>
 #include <rfb_win32/Win32Util.h>
 
 #ifdef _DIALOG_CAPTURE
@@ -67,7 +67,7 @@ bool Dialog::showDialog(const TCHAR* resource, HWND owner)
   INT_PTR result = DialogBoxParam(inst, resource, owner,
                                   staticDialogProc, (LPARAM)this);
   if (result<0)
-    throw rdr::SystemException("DialogBoxParam failed", GetLastError());
+    throw core::SystemException("DialogBoxParam failed", GetLastError());
   alreadyShowing = false;
   return (result == 1);
 }
@@ -80,7 +80,7 @@ int Dialog::getItemInt(int id) {
   BOOL trans;
   int result = GetDlgItemInt(handle, id, &trans, TRUE);
   if (!trans)
-    throw rdr::Exception("unable to read dialog Int");
+    throw core::Exception("unable to read dialog Int");
   return result;
 }
 TCHAR* Dialog::getItemString(int id) {
@@ -277,7 +277,7 @@ bool PropSheet::showPropSheet(HWND owner, bool showApply, bool showCtxtHelp, boo
 
     handle = (HWND)PropertySheet(&header);
     if ((handle == 0) || (handle == (HWND)-1))
-      throw rdr::SystemException("PropertySheet failed", GetLastError());
+      throw core::SystemException("PropertySheet failed", GetLastError());
     centerWindow(handle, owner);
     plog.info("created %p", handle);
 
@@ -350,7 +350,7 @@ bool PropSheet::showPropSheet(HWND owner, bool showApply, bool showCtxtHelp, boo
     delete [] hpages; hpages = 0;
 
     return true;
-  } catch (rdr::Exception&) {
+  } catch (core::Exception&) {
     alreadyShowing = false;
 
     std::list<PropSheetPage*>::iterator pspi;

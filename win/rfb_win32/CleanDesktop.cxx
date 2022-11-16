@@ -29,7 +29,7 @@
 #include <rfb_win32/CurrentUser.h>
 #include <rfb_win32/Registry.h>
 #include <rfb/LogWriter.h>
-#include <rdr/Exception.h>
+#include <core/Exception.h>
 #include <os/os.h>
 #include <set>
 
@@ -46,7 +46,7 @@ struct ActiveDesktop {
     HRESULT result = CoCreateInstance(CLSID_ActiveDesktop, NULL, CLSCTX_INPROC_SERVER,
                                       IID_IActiveDesktop, (PVOID*)&handle);
     if (result != S_OK)
-      throw rdr::SystemException("failed to contact Active Desktop", result);
+      throw core::SystemException("failed to contact Active Desktop", result);
   }
   ~ActiveDesktop() {
     if (handle)
@@ -175,7 +175,7 @@ void CleanDesktop::disableWallpaper() {
       ActiveDesktop ad;
       if (ad.enable(false))
         restoreActiveDesktop = true;
-    } catch (rdr::Exception& e) {
+    } catch (core::Exception& e) {
       vlog.error("%s", e.str());
     }
 
@@ -183,7 +183,7 @@ void CleanDesktop::disableWallpaper() {
     SysParamsInfo(SPI_SETDESKWALLPAPER, 0, (PVOID) "", SPIF_SENDCHANGE);
     restoreWallpaper = true;
 
-  } catch (rdr::Exception& e) {
+  } catch (core::Exception& e) {
     vlog.info("%s", e.str());
   }
 }
@@ -200,7 +200,7 @@ void CleanDesktop::enableWallpaper() {
         ActiveDesktop ad;
         ad.enable(true);
         restoreActiveDesktop = false;
-      } catch (rdr::Exception& e) {
+      } catch (core::Exception& e) {
         vlog.error("%s", e.str());
       }
     }
@@ -213,7 +213,7 @@ void CleanDesktop::enableWallpaper() {
       restoreWallpaper = false;
     }
 
-  } catch (rdr::Exception& e) {
+  } catch (core::Exception& e) {
     vlog.info("%s", e.str());
   }
 }
@@ -245,7 +245,7 @@ void CleanDesktop::disableEffects() {
     }
     restoreEffects = true;
 
-  } catch (rdr::Exception& e) {
+  } catch (core::Exception& e) {
     vlog.info("%s", e.str());
   }
 }
@@ -270,7 +270,7 @@ void CleanDesktop::enableEffects() {
       restoreEffects = false;
     }
 
-  } catch (rdr::Exception& e) {
+  } catch (core::Exception& e) {
     vlog.info("%s", e.str());
   }
 }

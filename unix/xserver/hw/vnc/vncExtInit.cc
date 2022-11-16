@@ -269,7 +269,7 @@ void vncExtensionInit(void)
 
       vncHooksInit(scr);
     }
-  } catch (rdr::Exception& e) {
+  } catch (core::Exception& e) {
     vncFatalError("vncExtInit: %s\n",e.str());
   }
 
@@ -283,7 +283,7 @@ void vncExtensionClose(void)
       delete desktop[scr];
       desktop[scr] = NULL;
     }
-  } catch (rdr::Exception& e) {
+  } catch (core::Exception& e) {
     vncFatalError("vncExtInit: %s\n",e.str());
   }
 }
@@ -343,7 +343,7 @@ int vncConnectClient(const char *addr)
   if (strlen(addr) == 0) {
     try {
       desktop[0]->disconnectClients();
-    } catch (rdr::Exception& e) {
+    } catch (core::Exception& e) {
       vlog.error("Disconnecting all clients: %s",e.str());
       return -1;
     }
@@ -359,7 +359,7 @@ int vncConnectClient(const char *addr)
     network::Socket* sock = new network::TcpSocket(host, port);
     delete [] host;
     desktop[0]->addClient(sock, true);
-  } catch (rdr::Exception& e) {
+  } catch (core::Exception& e) {
     vlog.error("Reverse connection: %s",e.str());
     return -1;
   }
@@ -456,7 +456,7 @@ void vncPostScreenResize(int scrIdx, int success, int width, int height)
       desktop[scrIdx]->setFramebuffer(width, height,
                                       vncFbptr[scrIdx],
                                       vncFbstride[scrIdx]);
-    } catch (rdr::Exception& e) {
+    } catch (core::Exception& e) {
       vncFatalError("vncPostScreenResize: %s\n", e.str());
     }
   }
@@ -473,7 +473,7 @@ void vncRefreshScreenLayout(int scrIdx)
 {
   try {
     desktop[scrIdx]->refreshScreenLayout();
-  } catch (rdr::Exception& e) {
+  } catch (core::Exception& e) {
     vncFatalError("vncRefreshScreenLayout: %s\n", e.str());
   }
 }

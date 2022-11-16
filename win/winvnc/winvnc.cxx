@@ -119,7 +119,7 @@ static void processParams(int argc, char** argv) {
         if (host.buf) {
           HWND hwnd = FindWindow(0, _T("winvnc::IPC_Interface"));
           if (!hwnd)
-            throw rdr::Exception("Unable to locate existing VNC Server.");
+            throw core::Exception("Unable to locate existing VNC Server.");
           COPYDATASTRUCT copyData;
           copyData.dwData = 1; // *** AddNewClient
           copyData.cbData = strlen(host.buf);
@@ -132,7 +132,7 @@ static void processParams(int argc, char** argv) {
         runServer = false;
         HWND hwnd = FindWindow(0, _T("winvnc::IPC_Interface"));
         if (!hwnd)
-          throw rdr::Exception("Unable to locate existing VNC Server.");
+          throw core::Exception("Unable to locate existing VNC Server.");
         COPYDATASTRUCT copyData;
         copyData.dwData = 2; // *** DisconnectClients
         copyData.lpData = 0;
@@ -177,13 +177,13 @@ static void processParams(int argc, char** argv) {
         // Try to clean up earlier services we've had
         try {
           rfb::win32::unregisterService("WinVNC4");
-        } catch (rdr::SystemException&) {
+        } catch (core::SystemException&) {
           // Do nothing as we might fail simply because there was no
           // service to remove
         }
         try {
           rfb::win32::unregisterService("TigerVNC Server");
-        } catch (rdr::SystemException&) {
+        } catch (core::SystemException&) {
         }
 
         if (rfb::win32::registerService(VNCServerService::Name,
@@ -228,7 +228,7 @@ static void processParams(int argc, char** argv) {
         break;
       }
 
-    } catch (rdr::Exception& e) {
+    } catch (core::Exception& e) {
       MsgBoxOrLog(e.str(), true);
     }
   }
@@ -284,7 +284,7 @@ int WINAPI WinMain(HINSTANCE /*inst*/, HINSTANCE /*prevInst*/, char* /*cmdLine*/
     }
 
     vlog.debug("WinVNC service destroyed");
-  } catch (rdr::Exception& e) {
+  } catch (core::Exception& e) {
     MsgBoxOrLog(e.str(), true);
   }
 

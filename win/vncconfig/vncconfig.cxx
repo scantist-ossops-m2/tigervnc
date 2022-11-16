@@ -127,7 +127,7 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE /*prev*/, char* /*cmdLine*/, int /*
 
         // Set the DACL, and don't allow the key to inherit its parent's DACL
         rootKey.setDACL(acl, false);
-      } catch (rdr::SystemException& e) {
+      } catch (core::SystemException& e) {
         // Something weird happens on NT 4.0 SP5 but I can't reproduce it on other
         // NT 4.0 service pack revisions.
         if (e.err == ERROR_INVALID_PARAMETER) {
@@ -171,7 +171,7 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE /*prev*/, char* /*cmdLine*/, int /*
 #else
       sheet.showPropSheet(0, true, false);
 #endif
-    } catch (rdr::SystemException& e) {
+    } catch (core::SystemException& e) {
       switch (e.err) {
       case ERROR_ACCESS_DENIED:
         MsgBox(0, _T("You do not have sufficient access rights to run the VNC Configuration applet"),
@@ -181,7 +181,7 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE /*prev*/, char* /*cmdLine*/, int /*
       throw;
     }
 
-  } catch (rdr::Exception& e) {
+  } catch (core::Exception& e) {
     MsgBox(NULL, TStr(e.str()), MB_ICONEXCLAMATION | MB_OK);
     return 1;
   }

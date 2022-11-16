@@ -144,7 +144,7 @@ void VNCServerST::addSocket(network::Socket* sock, bool outgoing)
       os.writeU32(strlen(reason));
       os.writeBytes(reason, strlen(reason));
       os.flush();
-    } catch (rdr::Exception&) {
+    } catch (core::Exception&) {
     }
     sock->shutdown();
     closingSockets.push_back(sock);
@@ -216,7 +216,7 @@ void VNCServerST::processSocketReadEvent(network::Socket* sock)
       return;
     }
   }
-  throw rdr::Exception("invalid Socket in VNCServerST");
+  throw core::Exception("invalid Socket in VNCServerST");
 }
 
 void VNCServerST::processSocketWriteEvent(network::Socket* sock)
@@ -229,7 +229,7 @@ void VNCServerST::processSocketWriteEvent(network::Socket* sock)
       return;
     }
   }
-  throw rdr::Exception("invalid Socket in VNCServerST");
+  throw core::Exception("invalid Socket in VNCServerST");
 }
 
 // VNCServer methods
@@ -267,13 +267,13 @@ void VNCServerST::setPixelBuffer(PixelBuffer* pb_, const ScreenSet& layout)
     screenLayout = ScreenSet();
 
     if (desktopStarted)
-      throw Exception("setPixelBuffer: null PixelBuffer when desktopStarted?");
+      throw core::Exception("setPixelBuffer: null PixelBuffer when desktopStarted?");
 
     return;
   }
 
   if (!layout.validate(pb->width(), pb->height()))
-    throw Exception("setPixelBuffer: invalid screen layout");
+    throw core::Exception("setPixelBuffer: invalid screen layout");
 
   screenLayout = layout;
 
@@ -326,9 +326,9 @@ void VNCServerST::setPixelBuffer(PixelBuffer* pb_)
 void VNCServerST::setScreenLayout(const ScreenSet& layout)
 {
   if (!pb)
-    throw Exception("setScreenLayout: new screen layout without a PixelBuffer");
+    throw core::Exception("setScreenLayout: new screen layout without a PixelBuffer");
   if (!layout.validate(pb->width(), pb->height()))
-    throw Exception("setScreenLayout: invalid screen layout");
+    throw core::Exception("setScreenLayout: invalid screen layout");
 
   screenLayout = layout;
 
@@ -366,7 +366,7 @@ void VNCServerST::sendClipboardData(const char* data)
   std::list<VNCSConnectionST*>::iterator ci, ci_next;
 
   if (strchr(data, '\r') != NULL)
-    throw Exception("Invalid carriage return in clipboard data");
+    throw core::Exception("Invalid carriage return in clipboard data");
 
   for (ci = clipboardRequestors.begin();
        ci != clipboardRequestors.end(); ci = ci_next) {
@@ -558,7 +558,7 @@ unsigned int VNCServerST::setDesktopSize(VNCSConnectionST* requester,
 
   // Sanity check
   if (screenLayout != layout)
-    throw Exception("Desktop configured a different screen layout than requested");
+    throw core::Exception("Desktop configured a different screen layout than requested");
 
   // Notify other clients
   for (ci=clients.begin();ci!=clients.end();ci=ci_next) {
@@ -712,7 +712,7 @@ void VNCServerST::startDesktop()
     slog.debug("starting desktop");
     desktop->start(this);
     if (!pb)
-      throw Exception("SDesktop::start() did not set a valid PixelBuffer");
+      throw core::Exception("SDesktop::start() did not set a valid PixelBuffer");
     desktopStarted = true;
     // The tracker might have accumulated changes whilst we were
     // stopped, so flush those out

@@ -39,7 +39,7 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include "vncExt.h"
-#include <rdr/Exception.h>
+#include <core/Exception.h>
 #include <rfb/Configuration.h>
 #include <rfb/Logger_stdio.h>
 #include <rfb/LogWriter.h>
@@ -327,12 +327,12 @@ int main(int argc, char** argv)
       FD_ZERO(&rfds);
       FD_SET(ConnectionNumber(dpy), &rfds);
       int n = select(FD_SETSIZE, &rfds, 0, 0, tvp);
-      if (n < 0) throw rdr::SystemException("select",errno);
+      if (n < 0) throw SystemException("select",errno);
     }
 
     XCloseDisplay(dpy);
 
-  } catch (rdr::Exception &e) {
+  } catch (core::Exception &e) {
     vlog.error("%s", e.str());
   }
 

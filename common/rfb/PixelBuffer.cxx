@@ -26,7 +26,7 @@
 #include <config.h>
 #endif
 
-#include <rfb/Exception.h>
+#include <core/Exception.h>
 #include <rfb/LogWriter.h>
 #include <rfb/PixelBuffer.h>
 
@@ -69,7 +69,7 @@ PixelBuffer::getImage(void* imageBuf, const core::Rect& r, int outStride) const
   const uint8_t* end;
 
   if (!r.enclosed_by(getRect()))
-    throw rfb::Exception("Source rect %dx%d at %d,%d exceeds framebuffer %dx%d",
+    throw core::Exception("Source rect %dx%d at %d,%d exceeds framebuffer %dx%d",
                          r.width(), r.height(),
                          r.tl.x, r.tl.y, width(), height());
 
@@ -105,7 +105,7 @@ void PixelBuffer::getImage(const PixelFormat& pf, void* imageBuf,
   }
 
   if (!r.enclosed_by(getRect()))
-    throw rfb::Exception("Source rect %dx%d at %d,%d exceeds framebuffer %dx%d",
+    throw core::Exception("Source rect %dx%d at %d,%d exceeds framebuffer %dx%d",
                          r.width(), r.height(),
                          r.tl.x, r.tl.y, width(), height());
 
@@ -121,9 +121,9 @@ void PixelBuffer::getImage(const PixelFormat& pf, void* imageBuf,
 void PixelBuffer::setSize(int width, int height)
 {
   if ((width < 0) || (width > maxPixelBufferWidth))
-    throw rfb::Exception("Invalid PixelBuffer width of %d pixels requested", width);
+    throw core::Exception("Invalid PixelBuffer width of %d pixels requested", width);
   if ((height < 0) || (height > maxPixelBufferHeight))
-    throw rfb::Exception("Invalid PixelBuffer height of %d pixels requested", height);
+    throw core::Exception("Invalid PixelBuffer height of %d pixels requested", height);
 
   width_ = width;
   height_ = height;
@@ -152,7 +152,7 @@ void ModifiablePixelBuffer::fillRect(const core::Rect& r, const void* pix)
   int w, h, b;
 
   if (!r.enclosed_by(getRect()))
-    throw rfb::Exception("Destination rect %dx%d at %d,%d exceeds framebuffer %dx%d",
+    throw core::Exception("Destination rect %dx%d at %d,%d exceeds framebuffer %dx%d",
                          r.width(), r.height(), r.tl.x, r.tl.y, width(), height());
 
   w = r.width();
@@ -202,7 +202,7 @@ void ModifiablePixelBuffer::imageRect(const core::Rect& r,
   uint8_t* end;
 
   if (!r.enclosed_by(getRect()))
-    throw rfb::Exception("Destination rect %dx%d at %d,%d exceeds framebuffer %dx%d",
+    throw core::Exception("Destination rect %dx%d at %d,%d exceeds framebuffer %dx%d",
                          r.width(), r.height(),
                          r.tl.x, r.tl.y, width(), height());
 
@@ -241,13 +241,13 @@ void ModifiablePixelBuffer::copyRect(const core::Rect &rect,
 
   drect = rect;
   if (!drect.enclosed_by(getRect()))
-    throw rfb::Exception("Destination rect %dx%d at %d,%d exceeds framebuffer %dx%d",
+    throw core::Exception("Destination rect %dx%d at %d,%d exceeds framebuffer %dx%d",
                          drect.width(), drect.height(),
                          drect.tl.x, drect.tl.y, width(), height());
 
   srect = drect.translate(move_by_delta.negate());
   if (!srect.enclosed_by(getRect()))
-    throw rfb::Exception("Source rect %dx%d at %d,%d exceeds framebuffer %dx%d",
+    throw core::Exception("Source rect %dx%d at %d,%d exceeds framebuffer %dx%d",
                          srect.width(), srect.height(),
                          srect.tl.x, srect.tl.y, width(), height());
 
@@ -302,7 +302,7 @@ void ModifiablePixelBuffer::imageRect(const PixelFormat& pf, const core::Rect &d
   int dstStride;
 
   if (!dest.enclosed_by(getRect()))
-    throw rfb::Exception("Destination rect %dx%d at %d,%d exceeds framebuffer %dx%d",
+    throw core::Exception("Destination rect %dx%d at %d,%d exceeds framebuffer %dx%d",
                          dest.width(), dest.height(),
                          dest.tl.x, dest.tl.y, width(), height());
 
@@ -331,7 +331,7 @@ FullFramePixelBuffer::~FullFramePixelBuffer() {}
 uint8_t* FullFramePixelBuffer::getBufferRW(const core::Rect& r, int* stride_)
 {
   if (!r.enclosed_by(getRect()))
-    throw rfb::Exception("Pixel buffer request %dx%d at %d,%d exceeds framebuffer %dx%d",
+    throw core::Exception("Pixel buffer request %dx%d at %d,%d exceeds framebuffer %dx%d",
                          r.width(), r.height(),
                          r.tl.x, r.tl.y, width(), height());
 
@@ -346,7 +346,7 @@ void FullFramePixelBuffer::commitBufferRW(const core::Rect& /*r*/)
 const uint8_t* FullFramePixelBuffer::getBuffer(const core::Rect& r, int* stride_) const
 {
   if (!r.enclosed_by(getRect()))
-    throw rfb::Exception("Pixel buffer request %dx%d at %d,%d exceeds framebuffer %dx%d",
+    throw core::Exception("Pixel buffer request %dx%d at %d,%d exceeds framebuffer %dx%d",
                          r.width(), r.height(),
                          r.tl.x, r.tl.y, width(), height());
 
@@ -358,13 +358,13 @@ void FullFramePixelBuffer::setBuffer(int width, int height,
                                      uint8_t* data_, int stride_)
 {
   if ((width < 0) || (width > maxPixelBufferWidth))
-    throw rfb::Exception("Invalid PixelBuffer width of %d pixels requested", width);
+    throw core::Exception("Invalid PixelBuffer width of %d pixels requested", width);
   if ((height < 0) || (height > maxPixelBufferHeight))
-    throw rfb::Exception("Invalid PixelBuffer height of %d pixels requested", height);
+    throw core::Exception("Invalid PixelBuffer height of %d pixels requested", height);
   if ((stride_ < 0) || (stride_ > maxPixelBufferStride) || (stride_ < width))
-    throw rfb::Exception("Invalid PixelBuffer stride of %d pixels requested", stride_);
+    throw core::Exception("Invalid PixelBuffer stride of %d pixels requested", stride_);
   if ((width != 0) && (height != 0) && (data_ == NULL))
-    throw rfb::Exception("PixelBuffer requested without a valid memory area");
+    throw core::Exception("PixelBuffer requested without a valid memory area");
 
   ModifiablePixelBuffer::setSize(width, height);
   stride = stride_;
@@ -374,7 +374,7 @@ void FullFramePixelBuffer::setBuffer(int width, int height,
 void FullFramePixelBuffer::setSize(int /*w*/, int /*h*/)
 {
   // setBuffer() should be used
-  throw rfb::Exception("Invalid call to FullFramePixelBuffer::setSize()");
+  throw core::Exception("Invalid call to FullFramePixelBuffer::setSize()");
 }
 
 // -=- Managed pixel buffer class

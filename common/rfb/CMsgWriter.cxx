@@ -31,7 +31,7 @@
 #include <rfb/fenceTypes.h>
 #include <rfb/qemuTypes.h>
 #include <rfb/clipboardTypes.h>
-#include <rfb/Exception.h>
+#include <core/Exception.h>
 #include <rfb/PixelFormat.h>
 #include <core/Rect.h>
 #include <rfb/ServerParams.h>
@@ -77,7 +77,7 @@ void CMsgWriter::writeSetDesktopSize(int width, int height,
                                      const ScreenSet& layout)
 {
   if (!server->supportsSetDesktopSize)
-    throw Exception("Server does not support SetDesktopSize");
+    throw core::Exception("Server does not support SetDesktopSize");
 
   startMsg(msgTypeSetDesktopSize);
   os->pad(1);
@@ -116,7 +116,7 @@ void CMsgWriter::writeEnableContinuousUpdates(bool enable,
                                               int x, int y, int w, int h)
 {
   if (!server->supportsContinuousUpdates)
-    throw Exception("Server does not support continuous updates");
+    throw core::Exception("Server does not support continuous updates");
 
   startMsg(msgTypeEnableContinuousUpdates);
 
@@ -133,11 +133,11 @@ void CMsgWriter::writeEnableContinuousUpdates(bool enable,
 void CMsgWriter::writeFence(uint32_t flags, unsigned len, const char data[])
 {
   if (!server->supportsFence)
-    throw Exception("Server does not support fences");
+    throw core::Exception("Server does not support fences");
   if (len > 64)
-    throw Exception("Too large fence payload");
+    throw core::Exception("Too large fence payload");
   if ((flags & ~fenceFlagsSupported) != 0)
-    throw Exception("Unknown fence flags");
+    throw core::Exception("Unknown fence flags");
 
   startMsg(msgTypeClientFence);
   os->pad(3);
@@ -194,7 +194,7 @@ void CMsgWriter::writeClientCutText(const char* str)
   size_t len;
 
   if (strchr(str, '\r') != NULL)
-    throw Exception("Invalid carriage return in clipboard data");
+    throw core::Exception("Invalid carriage return in clipboard data");
 
   len = strlen(str);
   startMsg(msgTypeClientCutText);
@@ -210,7 +210,7 @@ void CMsgWriter::writeClipboardCaps(uint32_t caps,
   size_t i, count;
 
   if (!(server->clipboardFlags() & clipboardCaps))
-    throw Exception("Server does not support clipboard \"caps\" action");
+    throw core::Exception("Server does not support clipboard \"caps\" action");
 
   count = 0;
   for (i = 0;i < 16;i++) {
@@ -236,7 +236,7 @@ void CMsgWriter::writeClipboardCaps(uint32_t caps,
 void CMsgWriter::writeClipboardRequest(uint32_t flags)
 {
   if (!(server->clipboardFlags() & clipboardRequest))
-    throw Exception("Server does not support clipboard \"request\" action");
+    throw core::Exception("Server does not support clipboard \"request\" action");
 
   startMsg(msgTypeClientCutText);
   os->pad(3);
@@ -248,7 +248,7 @@ void CMsgWriter::writeClipboardRequest(uint32_t flags)
 void CMsgWriter::writeClipboardPeek(uint32_t flags)
 {
   if (!(server->clipboardFlags() & clipboardPeek))
-    throw Exception("Server does not support clipboard \"peek\" action");
+    throw core::Exception("Server does not support clipboard \"peek\" action");
 
   startMsg(msgTypeClientCutText);
   os->pad(3);
@@ -260,7 +260,7 @@ void CMsgWriter::writeClipboardPeek(uint32_t flags)
 void CMsgWriter::writeClipboardNotify(uint32_t flags)
 {
   if (!(server->clipboardFlags() & clipboardNotify))
-    throw Exception("Server does not support clipboard \"notify\" action");
+    throw core::Exception("Server does not support clipboard \"notify\" action");
 
   startMsg(msgTypeClientCutText);
   os->pad(3);
@@ -279,7 +279,7 @@ void CMsgWriter::writeClipboardProvide(uint32_t flags,
   int i, count;
 
   if (!(server->clipboardFlags() & clipboardProvide))
-    throw Exception("Server does not support clipboard \"provide\" action");
+    throw core::Exception("Server does not support clipboard \"provide\" action");
 
   zos.setUnderlying(&mos);
 

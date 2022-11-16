@@ -29,7 +29,7 @@
 #include <rfb/CSecurityVeNCrypt.h>
 #include <rfb/CSecurityVncAuth.h>
 #include <rfb/CSecurityPlain.h>
-#include <rdr/Exception.h>
+#include <core/Exception.h>
 #include <rfb/LogWriter.h>
 #include <rfb/Security.h>
 #include <rfb/SSecurityNone.h>

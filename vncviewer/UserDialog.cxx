@@ -36,7 +36,7 @@
 
 #include <core/util.h>
 #include <rfb/Password.h>
-#include <rfb/Exception.h>
+#include <core/Exception.h>
 
 #include "fltk/layout.h"
 #include "fltk/util.h"
@@ -97,7 +97,7 @@ void UserDialog::getUserPasswd(bool secure, char** user, char** password)
 
     fp = fopen(passwordFileStr.buf, "rb");
     if (!fp)
-      throw rfb::Exception(_("Opening password file failed"));
+      throw core::Exception(_("Opening password file failed"));
 
     obfPwd.length = fread(obfPwd.buf, 1, obfPwd.length, fp);
     fclose(fp);
@@ -206,7 +206,7 @@ void UserDialog::getUserPasswd(bool secure, char** user, char** password)
   delete win;
 
   if (ret_val != 0)
-    throw rfb::Exception(_("Authentication cancelled"));
+    throw core::Exception(_("Authentication cancelled"));
 }
 
 bool UserDialog::showMsgBox(int flags, const char* title, const char* text)

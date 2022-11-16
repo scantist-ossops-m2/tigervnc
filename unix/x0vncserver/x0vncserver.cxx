@@ -392,7 +392,7 @@ int main(int argc, char** argv)
           vlog.debug("Interrupted select() system call");
           continue;
         } else {
-          throw rdr::SystemException("select", errno);
+          throw SystemException("select", errno);
         }
       }
 
@@ -433,7 +433,7 @@ int main(int argc, char** argv)
       }
     }
 
-  } catch (rdr::Exception &e) {
+  } catch (core::Exception &e) {
     vlog.error("%s", e.str());
     return 1;
   }

@@ -28,7 +28,7 @@
 #include <unistd.h>
 #endif
 
-#include <rdr/Exception.h>
+#include <core/Exception.h>
 
 #include <os/Mutex.h>
 #include <os/Thread.h>
@@ -66,7 +66,7 @@ void Thread::start()
 #ifdef WIN32
   *(HANDLE*)threadId = CreateThread(NULL, 0, startRoutine, this, 0, NULL);
   if (*(HANDLE*)threadId == NULL)
-    throw rdr::SystemException("Failed to create thread", GetLastError());
+    throw core::SystemException("Failed to create thread", GetLastError());
 #else
   int ret;
   sigset_t all, old;
@@ -76,14 +76,14 @@ void Thread::start()
   sigfillset(&all);
   ret = pthread_sigmask(SIG_SETMASK, &all, &old);
   if (ret != 0)
-    throw rdr::SystemException("Failed to mask signals", ret);
+    throw core::SystemException("Failed to mask signals", ret);
 
   ret = pthread_create((pthread_t*)threadId, NULL, startRoutine, this);
 
   pthread_sigmask(SIG_SETMASK, &old, NULL);
 
   if (ret != 0)
-    throw rdr::SystemException("Failed to create thread", ret);
+    throw core::SystemException("Failed to create thread", ret);
 #endif
 
   running = true;
@@ -99,13 +99,13 @@ void Thread::wait()
 
   ret = WaitForSingleObject(*(HANDLE*)threadId, INFINITE);
   if (ret != WAIT_OBJECT_0)
-    throw rdr::SystemException("Failed to join thread", GetLastError());
+    throw core::SystemException("Failed to join thread", GetLastError());
 #else
   int ret;
 
   ret = pthread_join(*(pthread_t*)threadId, NULL);
   if (ret != 0)
-    throw rdr::SystemException("Failed to join thread", ret);
+    throw core::SystemException("Failed to join thread", ret);
 #endif
 }
 

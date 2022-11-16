@@ -66,7 +66,6 @@
 #endif
 
 using namespace network;
-using namespace rdr;
 
 static rfb::LogWriter vlog("TcpSocket");
 
@@ -115,7 +114,7 @@ void network::getHostAndPort(const char* hi, char** host, int* port, int basePor
   const char* portStart;
 
   if (hi == NULL)
-    throw rdr::Exception("NULL host specified");
+    throw core::Exception("NULL host specified");
 
   // Trim leading whitespace
   while(isspace(*hi))
@@ -128,7 +127,7 @@ void network::getHostAndPort(const char* hi, char** host, int* port, int basePor
     hostStart = &hi[1];
     hostEnd = strchr(hostStart, ']');
     if (hostEnd == NULL)
-      throw rdr::Exception("unmatched [ in host");
+      throw core::Exception("unmatched [ in host");
 
     portStart = hostEnd + 1;
     if (isAllSpace(portStart))
@@ -172,14 +171,14 @@ void network::getHostAndPort(const char* hi, char** host, int* port, int basePor
     char* end;
 
     if (portStart[0] != ':')
-      throw rdr::Exception("invalid port specified");
+      throw core::Exception("invalid port specified");
 
     if (portStart[1] != ':')
       *port = strtol(portStart + 1, &end, 10);
     else
       *port = strtol(portStart + 2, &end, 10);
     if (*end != '\0' && ! isAllSpace(end))
-      throw rdr::Exception("invalid port specified");
+      throw core::Exception("invalid port specified");
 
     if ((portStart[1] != ':') && (*port < 100))
       *port += basePort;
@@ -290,7 +289,7 @@ TcpSocket::TcpSocket(const char *host, int port)
 
   if (sock == -1) {
     if (err == 0)
-      throw Exception("No useful address for host");
+      throw core::Exception("No useful address for host");
     else
       throw SocketException("unable to connect to socket", err);
   }
@@ -736,8 +735,8 @@ TcpFilter::Pattern TcpFilter::parsePattern(const char* p) {
     if (prefix_specified) {
       if (family == AF_INET &&
           core::strContains(pref.buf, '.')) {
-        throw Exception("mask no longer supported for filter, "
-                        "use prefix instead");
+        throw core::Exception("mask no longer supported for filter, "
+                              "use prefix instead");
       }
 
       pattern.prefixlen = (unsigned int) atoi(pref.buf);
@@ -750,7 +749,7 @@ TcpFilter::Pattern TcpFilter::parsePattern(const char* p) {
         pattern.prefixlen = 128;
         break;
       default:
-        throw Exception("unknown address family");
+        throw core::Exception("unknown address family");
       }
     }
   }
@@ -758,8 +757,8 @@ TcpFilter::Pattern TcpFilter::parsePattern(const char* p) {
   family = pattern.address.u.sa.sa_family;
 
   if (pattern.prefixlen > (family == AF_INET ? 32: 128))
-    throw Exception("invalid prefix length for filter address: %u",
-                    pattern.prefixlen);
+    throw core::Exception("invalid prefix length for filter address: %u",
+                          pattern.prefixlen);
 
   // Compute mask from address and prefix length
   memset (&pattern.mask, 0, sizeof (pattern.mask));
@@ -840,7 +839,7 @@ char* TcpFilter::patternToStr(const TcpFilter::Pattern& p) {
 }
 
 GAIException::GAIException(const char* s, int err)
-  : rdr::Exception("%s", s)
+  : core::Exception("%s", s)
 {
   strncat(str_, ": ", len-1-strlen(str_));
 #ifdef _WIN32

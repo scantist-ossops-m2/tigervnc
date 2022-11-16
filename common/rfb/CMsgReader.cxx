@@ -30,7 +30,7 @@
 
 #include <rfb/msgTypes.h>
 #include <rfb/clipboardTypes.h>
-#include <rfb/Exception.h>
+#include <core/Exception.h>
 #include <rfb/LogWriter.h>
 #include <core/util.h>
 #include <rfb/CMsgHandler.h>
@@ -113,7 +113,7 @@ bool CMsgReader::readMsg()
       ret = readEndOfContinuousUpdates();
       break;
     default:
-      throw Exception("Unknown message type %d", currentMsgType);
+      throw core::Exception("Unknown message type %d", currentMsgType);
     }
 
     if (ret)
@@ -291,7 +291,7 @@ bool CMsgReader::readExtendedClipboard(int32_t len)
     return false;
 
   if (len < 4)
-    throw Exception("Invalid extended clipboard message");
+    throw core::Exception("Invalid extended clipboard message");
   if (len > maxCutText) {
     vlog.error("Extended clipboard message too long (%d bytes) - ignoring", len);
     is->skip(len);
@@ -313,7 +313,7 @@ bool CMsgReader::readExtendedClipboard(int32_t len)
     }
 
     if (len < (int32_t)(4 + 4*num))
-      throw Exception("Invalid extended clipboard message");
+      throw core::Exception("Invalid extended clipboard message");
 
     num = 0;
     for (i = 0;i < 16;i++) {
@@ -338,7 +338,7 @@ bool CMsgReader::readExtendedClipboard(int32_t len)
         continue;
 
       if (!zis.hasData(4))
-        throw Exception("Extended clipboard decode error");
+        throw core::Exception("Extended clipboard decode error");
 
       lengths[num] = zis.readU32();
 
@@ -351,7 +351,7 @@ bool CMsgReader::readExtendedClipboard(int32_t len)
           size_t chunk;
 
           if (!zis.hasData(1))
-            throw Exception("Extended clipboard decode error");
+            throw core::Exception("Extended clipboard decode error");
 
           chunk = zis.avail();
           if (chunk > lengths[num])
@@ -367,7 +367,7 @@ bool CMsgReader::readExtendedClipboard(int32_t len)
       }
 
       if (!zis.hasData(lengths[num]))
-        throw Exception("Extended clipboard decode error");
+        throw core::Exception("Extended clipboard decode error");
 
       buffers[num] = new uint8_t[lengths[num]];
       zis.readBytes(buffers[num], lengths[num]);
@@ -397,7 +397,7 @@ bool CMsgReader::readExtendedClipboard(int32_t len)
       handler->handleClipboardNotify(flags);
       break;
     default:
-      throw Exception("Invalid extended clipboard action");
+      throw core::Exception("Invalid extended clipboard action");
     }
   }
 
@@ -463,7 +463,7 @@ bool CMsgReader::readRect(const core::Rect& r, int encoding)
     vlog.error("Rect too big: %dx%d at %d,%d exceeds %dx%d",
 	    r.width(), r.height(), r.tl.x, r.tl.y,
             handler->server.width(), handler->server.height());
-    throw Exception("Rect too big");
+    throw core::Exception("Rect too big");
   }
 
   if (r.is_empty())
@@ -475,7 +475,7 @@ bool CMsgReader::readRect(const core::Rect& r, int encoding)
 bool CMsgReader::readSetXCursor(int width, int height, const core::Point& hotspot)
 {
   if (width > maxCursorSize || height > maxCursorSize)
-    throw Exception("Too big cursor");
+    throw core::Exception("Too big cursor");
 
   core::U8Array rgba(width*height*4);
 
@@ -539,7 +539,7 @@ bool CMsgReader::readSetXCursor(int width, int height, const core::Point& hotspo
 bool CMsgReader::readSetCursor(int width, int height, const core::Point& hotspot)
 {
   if (width > maxCursorSize || height > maxCursorSize)
-    throw Exception("Too big cursor");
+    throw core::Exception("Too big cursor");
 
   int data_len = width * height * (handler->server.pf().bpp/8);
   int mask_len = ((width+7)/8) * height;
@@ -585,7 +585,7 @@ bool CMsgReader::readSetCursor(int width, int height, const core::Point& hotspot
 bool CMsgReader::readSetCursorWithAlpha(int width, int height, const core::Point& hotspot)
 {
   if (width > maxCursorSize || height > maxCursorSize)
-    throw Exception("Too big cursor");
+    throw core::Exception("Too big cursor");
 
   const PixelFormat rgbaPF(32, 32, false, true, 255, 255, 255, 16, 8, 0);
   ManagedPixelBuffer pb(rgbaPF, width, height);
@@ -646,7 +646,7 @@ bool CMsgReader::readSetCursorWithAlpha(int width, int height, const core::Point
 bool CMsgReader::readSetVMwareCursor(int width, int height, const core::Point& hotspot)
 {
   if (width > maxCursorSize || height > maxCursorSize)
-    throw Exception("Too big cursor");
+    throw core::Exception("Too big cursor");
 
   uint8_t type;
 
@@ -740,7 +740,7 @@ bool CMsgReader::readSetVMwareCursor(int width, int height, const core::Point& h
 
     handler->setCursor(width, height, hotspot, data.buf);
   } else {
-    throw Exception("Unknown cursor type");
+    throw core::Exception("Unknown cursor type");
   }
 
   return true;

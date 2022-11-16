@@ -34,7 +34,7 @@
 #include "parameters.h"
 
 #include <os/os.h>
-#include <rfb/Exception.h>
+#include <core/Exception.h>
 #include <rfb/LogWriter.h>
 #include <rfb/SecurityClient.h>
 
@@ -48,6 +48,7 @@
 
 #include "i18n.h"
 
+using namespace core;
 using namespace rfb;
 using namespace std;
 
@@ -318,7 +319,7 @@ static void setKeyString(const char *_name, const char *_value, HKEY* hKey) {
 
   LONG res = RegSetValueExW(*hKey, name, 0, REG_SZ, (BYTE*)&value, (wcslen(value)+1)*2);
   if (res != ERROR_SUCCESS)
-    throw rdr::SystemException("RegSetValueExW", res);
+    throw SystemException("RegSetValueExW", res);
 }
 
 
@@ -334,7 +335,7 @@ static void setKeyInt(const char *_name, const int _value, HKEY* hKey) {
 
   LONG res = RegSetValueExW(*hKey, name, 0, REG_DWORD, (BYTE*)&value, sizeof(DWORD));
   if (res != ERROR_SUCCESS)
-    throw rdr::SystemException("RegSetValueExW", res);
+    throw SystemException("RegSetValueExW", res);
 }
 
 
@@ -355,7 +356,7 @@ static bool getKeyString(const char* _name, char* dest, size_t destSize, HKEY* h
   if (res != ERROR_SUCCESS){
     delete [] value;
     if (res != ERROR_FILE_NOT_FOUND)
-      throw rdr::SystemException("RegQueryValueExW", res);
+      throw SystemException("RegQueryValueExW", res);
     // The value does not exist, defaults will be used.
     return false;
   }
@@ -392,7 +393,7 @@ static bool getKeyInt(const char* _name, int* dest, HKEY* hKey) {
   LONG res = RegQueryValueExW(*hKey, name, 0, NULL, (LPBYTE)&value, &dwordsize);
   if (res != ERROR_SUCCESS){
     if (res != ERROR_FILE_NOT_FOUND)
-      throw rdr::SystemException("RegQueryValueExW", res);
+      throw SystemException("RegQueryValueExW", res);
     // The value does not exist, defaults will be used.
     return false;
   }
@@ -412,7 +413,7 @@ static void removeValue(const char* _name, HKEY* hKey) {
   LONG res = RegDeleteValueW(*hKey, name);
   if (res != ERROR_SUCCESS) {
     if (res != ERROR_FILE_NOT_FOUND)
-      throw rdr::SystemException("RegDeleteValueW", res);
+      throw SystemException("RegDeleteValueW", res);
     // The value does not exist, no need to remove it.
     return;
   }
@@ -426,7 +427,7 @@ void saveHistoryToRegKey(const vector<string>& serverHistory) {
                              &hKey, NULL);
 
   if (res != ERROR_SUCCESS)
-    throw rdr::SystemException(_("Failed to create registry key"), res);
+    throw SystemException(_("Failed to create registry key"), res);
 
   size_t index = 0;
   assert(SERVER_HISTORY_SIZE < 100);
@@ -445,7 +446,7 @@ void saveHistoryToRegKey(const vector<string>& serverHistory) {
 
   res = RegCloseKey(hKey);
   if (res != ERROR_SUCCESS)
-    throw rdr::SystemException(_("Failed to close registry key"), res);
+    throw SystemException(_("Failed to close registry key"), res);
 }
 
 static void saveToReg(const char* servername) {
@@ -457,7 +458,7 @@ static void saveToReg(const char* servername) {
                              REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL,
                              &hKey, NULL);
   if (res != ERROR_SUCCESS)
-    throw rdr::SystemException(_("Failed to create registry key"), res);
+    throw SystemException(_("Failed to create registry key"), res);
 
   try {
     setKeyString("ServerName", servername, &hKey);
@@ -500,7 +501,7 @@ static void saveToReg(const char* servername) {
 
   res = RegCloseKey(hKey);
   if (res != ERROR_SUCCESS)
-    throw rdr::SystemException(_("Failed to close registry key"), res);
+    throw SystemException(_("Failed to close registry key"), res);
 }
 
 void loadHistoryFromRegKey(vector<string>& serverHistory) {
@@ -515,7 +516,7 @@ void loadHistoryFromRegKey(vector<string>& serverHistory) {
       return;
     }
 
-    throw rdr::SystemException(_("Failed to open registry key"), res);
+    throw SystemException(_("Failed to open registry key"), res);
   }
 
   size_t index;
@@ -542,7 +543,7 @@ void loadHistoryFromRegKey(vector<string>& serverHistory) {
 
   res = RegCloseKey(hKey);
   if (res != ERROR_SUCCESS)
-    throw rdr::SystemException(_("Failed to close registry key"), res);
+    throw SystemException(_("Failed to close registry key"), res);
 }
 
 static void getParametersFromReg(VoidParameter* parameters[],
@@ -587,7 +588,7 @@ static char* loadFromReg() {
       return NULL;
     }
 
-    throw rdr::SystemException(_("Failed to open registry key"), res);
+    throw SystemException(_("Failed to open registry key"), res);
   }
 
   const size_t buffersize = 256;
@@ -609,7 +610,7 @@ static char* loadFromReg() {
 
   res = RegCloseKey(hKey);
   if (res != ERROR_SUCCESS)
-    throw rdr::SystemException(_("Failed to close registry key"), res);
+    throw SystemException(_("Failed to close registry key"), res);
 
   return servername;
 }

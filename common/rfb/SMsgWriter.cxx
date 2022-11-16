@@ -32,7 +32,7 @@
 #include <rfb/msgTypes.h>
 #include <rfb/fenceTypes.h>
 #include <rfb/clipboardTypes.h>
-#include <rfb/Exception.h>
+#include <core/Exception.h>
 #include <rfb/ClientParams.h>
 #include <rfb/UpdateTracker.h>
 #include <rfb/Encoder.h>
@@ -96,7 +96,7 @@ void SMsgWriter::writeServerCutText(const char* str)
   size_t len;
 
   if (strchr(str, '\r') != NULL)
-    throw Exception("Invalid carriage return in clipboard data");
+    throw core::Exception("Invalid carriage return in clipboard data");
 
   len = strlen(str);
   startMsg(msgTypeServerCutText);
@@ -112,7 +112,7 @@ void SMsgWriter::writeClipboardCaps(uint32_t caps,
   size_t i, count;
 
   if (!client->supportsEncoding(pseudoEncodingExtendedClipboard))
-    throw Exception("Client does not support extended clipboard");
+    throw core::Exception("Client does not support extended clipboard");
 
   count = 0;
   for (i = 0;i < 16;i++) {
@@ -138,9 +138,9 @@ void SMsgWriter::writeClipboardCaps(uint32_t caps,
 void SMsgWriter::writeClipboardRequest(uint32_t flags)
 {
   if (!client->supportsEncoding(pseudoEncodingExtendedClipboard))
-    throw Exception("Client does not support extended clipboard");
+    throw core::Exception("Client does not support extended clipboard");
   if (!(client->clipboardFlags() & clipboardRequest))
-    throw Exception("Client does not support clipboard \"request\" action");
+    throw core::Exception("Client does not support clipboard \"request\" action");
 
   startMsg(msgTypeServerCutText);
   os->pad(3);
@@ -152,9 +152,9 @@ void SMsgWriter::writeClipboardRequest(uint32_t flags)
 void SMsgWriter::writeClipboardPeek(uint32_t flags)
 {
   if (!client->supportsEncoding(pseudoEncodingExtendedClipboard))
-    throw Exception("Client does not support extended clipboard");
+    throw core::Exception("Client does not support extended clipboard");
   if (!(client->clipboardFlags() & clipboardPeek))
-    throw Exception("Client does not support clipboard \"peek\" action");
+    throw core::Exception("Client does not support clipboard \"peek\" action");
 
   startMsg(msgTypeServerCutText);
   os->pad(3);
@@ -166,9 +166,9 @@ void SMsgWriter::writeClipboardPeek(uint32_t flags)
 void SMsgWriter::writeClipboardNotify(uint32_t flags)
 {
   if (!client->supportsEncoding(pseudoEncodingExtendedClipboard))
-    throw Exception("Client does not support extended clipboard");
+    throw core::Exception("Client does not support extended clipboard");
   if (!(client->clipboardFlags() & clipboardNotify))
-    throw Exception("Client does not support clipboard \"notify\" action");
+    throw core::Exception("Client does not support clipboard \"notify\" action");
 
   startMsg(msgTypeServerCutText);
   os->pad(3);
@@ -187,9 +187,9 @@ void SMsgWriter::writeClipboardProvide(uint32_t flags,
   int i, count;
 
   if (!client->supportsEncoding(pseudoEncodingExtendedClipboard))
-    throw Exception("Client does not support extended clipboard");
+    throw core::Exception("Client does not support extended clipboard");
   if (!(client->clipboardFlags() & clipboardProvide))
-    throw Exception("Client does not support clipboard \"provide\" action");
+    throw core::Exception("Client does not support clipboard \"provide\" action");
 
   zos.setUnderlying(&mos);
 
@@ -215,11 +215,11 @@ void SMsgWriter::writeClipboardProvide(uint32_t flags,
 void SMsgWriter::writeFence(uint32_t flags, unsigned len, const char data[])
 {
   if (!client->supportsEncoding(pseudoEncodingFence))
-    throw Exception("Client does not support fences");
+    throw core::Exception("Client does not support fences");
   if (len > 64)
-    throw Exception("Too large fence payload");
+    throw core::Exception("Too large fence payload");
   if ((flags & ~fenceFlagsSupported) != 0)
-    throw Exception("Unknown fence flags");
+    throw core::Exception("Unknown fence flags");
 
   startMsg(msgTypeServerFence);
   os->pad(3);
@@ -237,7 +237,7 @@ void SMsgWriter::writeFence(uint32_t flags, unsigned len, const char data[])
 void SMsgWriter::writeEndOfContinuousUpdates()
 {
   if (!client->supportsEncoding(pseudoEncodingContinuousUpdates))
-    throw Exception("Client does not support continuous updates");
+    throw core::Exception("Client does not support continuous updates");
 
   startMsg(msgTypeEndOfContinuousUpdates);
   endMsg();
@@ -249,7 +249,7 @@ void SMsgWriter::writeDesktopSize(uint16_t reason, uint16_t result)
 
   if (!client->supportsEncoding(pseudoEncodingDesktopSize) &&
       !client->supportsEncoding(pseudoEncodingExtendedDesktopSize))
-    throw Exception("Client does not support desktop size changes");
+    throw core::Exception("Client does not support desktop size changes");
 
   msg.reason = reason;
   msg.result = result;
@@ -260,7 +260,7 @@ void SMsgWriter::writeDesktopSize(uint16_t reason, uint16_t result)
 void SMsgWriter::writeSetDesktopName()
 {
   if (!client->supportsEncoding(pseudoEncodingDesktopName))
-    throw Exception("Client does not support desktop name changes");
+    throw core::Exception("Client does not support desktop name changes");
 
   needSetDesktopName = true;
 }
@@ -271,7 +271,7 @@ void SMsgWriter::writeCursor()
       !client->supportsEncoding(pseudoEncodingXCursor) &&
       !client->supportsEncoding(pseudoEncodingCursorWithAlpha) &&
       !client->supportsEncoding(pseudoEncodingVMwareCursor))
-    throw Exception("Client does not support local cursor");
+    throw core::Exception("Client does not support local cursor");
 
   needCursor = true;
 }
@@ -279,7 +279,7 @@ void SMsgWriter::writeCursor()
 void SMsgWriter::writeCursorPos()
 {
   if (!client->supportsEncoding(pseudoEncodingVMwareCursorPosition))
-    throw Exception("Client does not support cursor position");
+    throw core::Exception("Client does not support cursor position");
 
   needCursorPos = true;
 }
@@ -288,9 +288,9 @@ void SMsgWriter::writeLEDState()
 {
   if (!client->supportsEncoding(pseudoEncodingLEDState) &&
       !client->supportsEncoding(pseudoEncodingVMwareLEDState))
-    throw Exception("Client does not support LED state");
+    throw core::Exception("Client does not support LED state");
   if (client->ledState() == ledUnknown)
-    throw Exception("Server has not specified LED state");
+    throw core::Exception("Server has not specified LED state");
 
   needLEDState = true;
 }
@@ -298,7 +298,7 @@ void SMsgWriter::writeLEDState()
 void SMsgWriter::writeQEMUKeyEvent()
 {
   if (!client->supportsEncoding(pseudoEncodingQEMUKeyEvent))
-    throw Exception("Client does not support QEMU key events");
+    throw core::Exception("Client does not support QEMU key events");
 
   needQEMUKeyEvent = true;
 }
@@ -379,7 +379,7 @@ void SMsgWriter::writeFramebufferUpdateStart(int nRects)
 void SMsgWriter::writeFramebufferUpdateEnd()
 {
   if (nRectsInUpdate != nRectsInHeader && nRectsInHeader)
-    throw Exception("SMsgWriter::writeFramebufferUpdateEnd: "
+    throw core::Exception("SMsgWriter::writeFramebufferUpdateEnd: "
                     "nRects out of sync");
 
   if (nRectsInHeader == 0) {
@@ -405,7 +405,7 @@ void SMsgWriter::writeCopyRect(const core::Rect& r, int srcX, int srcY)
 void SMsgWriter::startRect(const core::Rect& r, int encoding)
 {
   if (++nRectsInUpdate > nRectsInHeader && nRectsInHeader)
-    throw Exception("SMsgWriter::startRect: nRects out of sync");
+    throw core::Exception("SMsgWriter::startRect: nRects out of sync");
 
   os->writeS16(r.tl.x);
   os->writeS16(r.tl.y);
@@ -468,7 +468,7 @@ void SMsgWriter::writePseudoRects()
                           cursor.hotspot().x, cursor.hotspot().y,
                           bitmap.buf, mask.buf);
     } else {
-      throw Exception("Client does not support local cursor");
+      throw core::Exception("Client does not support local cursor");
     }
 
     needCursor = false;
@@ -480,7 +480,7 @@ void SMsgWriter::writePseudoRects()
     if (client->supportsEncoding(pseudoEncodingVMwareCursorPosition)) {
       writeSetVMwareCursorPositionRect(cursorPos.x, cursorPos.y);
     } else {
-      throw Exception("Client does not support cursor position");
+      throw core::Exception("Client does not support cursor position");
     }
 
     needCursorPos = false;
@@ -518,7 +518,7 @@ void SMsgWriter::writeNoDataRects()
       // more after this
       writeSetDesktopSizeRect(client->width(), client->height());
     } else {
-      throw Exception("Client does not support desktop size changes");
+      throw core::Exception("Client does not support desktop size changes");
     }
 
     extendedDesktopSizeMsgs.clear();
@@ -528,9 +528,9 @@ void SMsgWriter::writeNoDataRects()
 void SMsgWriter::writeSetDesktopSizeRect(int width, int height)
 {
   if (!client->supportsEncoding(pseudoEncodingDesktopSize))
-    throw Exception("Client does not support desktop resize");
+    throw core::Exception("Client does not support desktop resize");
   if (++nRectsInUpdate > nRectsInHeader && nRectsInHeader)
-    throw Exception("SMsgWriter::writeSetDesktopSizeRect: nRects out of sync");
+    throw core::Exception("SMsgWriter::writeSetDesktopSizeRect: nRects out of sync");
 
   os->writeS16(0);
   os->writeS16(0);
@@ -548,9 +548,9 @@ void SMsgWriter::writeExtendedDesktopSizeRect(uint16_t reason,
   ScreenSet::const_iterator si;
 
   if (!client->supportsEncoding(pseudoEncodingExtendedDesktopSize))
-    throw Exception("Client does not support extended desktop resize");
+    throw core::Exception("Client does not support extended desktop resize");
   if (++nRectsInUpdate > nRectsInHeader && nRectsInHeader)
-    throw Exception("SMsgWriter::writeExtendedDesktopSizeRect: nRects out of sync");
+    throw core::Exception("SMsgWriter::writeExtendedDesktopSizeRect: nRects out of sync");
 
   os->writeU16(reason);
   os->writeU16(result);
@@ -574,9 +574,9 @@ void SMsgWriter::writeExtendedDesktopSizeRect(uint16_t reason,
 void SMsgWriter::writeSetDesktopNameRect(const char *name)
 {
   if (!client->supportsEncoding(pseudoEncodingDesktopName))
-    throw Exception("Client does not support desktop rename");
+    throw core::Exception("Client does not support desktop rename");
   if (++nRectsInUpdate > nRectsInHeader && nRectsInHeader)
-    throw Exception("SMsgWriter::writeSetDesktopNameRect: nRects out of sync");
+    throw core::Exception("SMsgWriter::writeSetDesktopNameRect: nRects out of sync");
 
   os->writeS16(0);
   os->writeS16(0);
@@ -592,9 +592,9 @@ void SMsgWriter::writeSetCursorRect(int width, int height,
                                     const void* data, const void* mask)
 {
   if (!client->supportsEncoding(pseudoEncodingCursor))
-    throw Exception("Client does not support local cursors");
+    throw core::Exception("Client does not support local cursors");
   if (++nRectsInUpdate > nRectsInHeader && nRectsInHeader)
-    throw Exception("SMsgWriter::writeSetCursorRect: nRects out of sync");
+    throw core::Exception("SMsgWriter::writeSetCursorRect: nRects out of sync");
 
   os->writeS16(hotspotX);
   os->writeS16(hotspotY);
@@ -610,9 +610,9 @@ void SMsgWriter::writeSetXCursorRect(int width, int height,
                                      const void* data, const void* mask)
 {
   if (!client->supportsEncoding(pseudoEncodingXCursor))
-    throw Exception("Client does not support local cursors");
+    throw core::Exception("Client does not support local cursors");
   if (++nRectsInUpdate > nRectsInHeader && nRectsInHeader)
-    throw Exception("SMsgWriter::writeSetXCursorRect: nRects out of sync");
+    throw core::Exception("SMsgWriter::writeSetXCursorRect: nRects out of sync");
 
   os->writeS16(hotspotX);
   os->writeS16(hotspotY);
@@ -636,9 +636,9 @@ void SMsgWriter::writeSetCursorWithAlphaRect(int width, int height,
                                              const uint8_t* data)
 {
   if (!client->supportsEncoding(pseudoEncodingCursorWithAlpha))
-    throw Exception("Client does not support local cursors");
+    throw core::Exception("Client does not support local cursors");
   if (++nRectsInUpdate > nRectsInHeader && nRectsInHeader)
-    throw Exception("SMsgWriter::writeSetCursorWithAlphaRect: nRects out of sync");
+    throw core::Exception("SMsgWriter::writeSetCursorWithAlphaRect: nRects out of sync");
 
   os->writeS16(hotspotX);
   os->writeS16(hotspotY);
@@ -664,9 +664,9 @@ void SMsgWriter::writeSetVMwareCursorRect(int width, int height,
                                           const uint8_t* data)
 {
   if (!client->supportsEncoding(pseudoEncodingVMwareCursor))
-    throw Exception("Client does not support local cursors");
+    throw core::Exception("Client does not support local cursors");
   if (++nRectsInUpdate > nRectsInHeader && nRectsInHeader)
-    throw Exception("SMsgWriter::writeSetVMwareCursorRect: nRects out of sync");
+    throw core::Exception("SMsgWriter::writeSetVMwareCursorRect: nRects out of sync");
 
   os->writeS16(hotspotX);
   os->writeS16(hotspotY);
@@ -684,9 +684,9 @@ void SMsgWriter::writeSetVMwareCursorRect(int width, int height,
 void SMsgWriter::writeSetVMwareCursorPositionRect(int hotspotX, int hotspotY)
 {
   if (!client->supportsEncoding(pseudoEncodingVMwareCursorPosition))
-    throw Exception("Client does not support cursor position");
+    throw core::Exception("Client does not support cursor position");
   if (++nRectsInUpdate > nRectsInHeader && nRectsInHeader)
-    throw Exception("SMsgWriter::writeSetVMwareCursorRect: nRects out of sync");
+    throw core::Exception("SMsgWriter::writeSetVMwareCursorRect: nRects out of sync");
 
   os->writeS16(hotspotX);
   os->writeS16(hotspotY);
@@ -699,11 +699,11 @@ void SMsgWriter::writeLEDStateRect(uint8_t state)
 {
   if (!client->supportsEncoding(pseudoEncodingLEDState) &&
       !client->supportsEncoding(pseudoEncodingVMwareLEDState))
-    throw Exception("Client does not support LED state updates");
+    throw core::Exception("Client does not support LED state updates");
   if (client->ledState() == ledUnknown)
-    throw Exception("Server does not support LED state updates");
+    throw core::Exception("Server does not support LED state updates");
   if (++nRectsInUpdate > nRectsInHeader && nRectsInHeader)
-    throw Exception("SMsgWriter::writeLEDStateRect: nRects out of sync");
+    throw core::Exception("SMsgWriter::writeLEDStateRect: nRects out of sync");
 
   os->writeS16(0);
   os->writeS16(0);
@@ -721,9 +721,9 @@ void SMsgWriter::writeLEDStateRect(uint8_t state)
 void SMsgWriter::writeQEMUKeyEventRect()
 {
   if (!client->supportsEncoding(pseudoEncodingQEMUKeyEvent))
-    throw Exception("Client does not support QEMU extended key events");
+    throw core::Exception("Client does not support QEMU extended key events");
   if (++nRectsInUpdate > nRectsInHeader && nRectsInHeader)
-    throw Exception("SMsgWriter::writeQEMUKeyEventRect: nRects out of sync");
+    throw core::Exception("SMsgWriter::writeQEMUKeyEventRect: nRects out of sync");
 
   os->writeS16(0);
   os->writeS16(0);

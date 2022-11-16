@@ -2,6 +2,7 @@ include_directories(${CMAKE_SOURCE_DIR}/common)
 include_directories(SYSTEM ${PIXMAN_INCLUDE_DIRS})
 
 add_library(core STATIC
+  Exception.cxx
   Region.cxx
   util.cxx)
 

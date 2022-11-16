@@ -54,7 +54,7 @@ RegKey::RegKey() : key(0), freeKey(false), valueNameBufLen(0) {}
 RegKey::RegKey(const HKEY k) : key(0), freeKey(false), valueNameBufLen(0) {
   LONG result = RegOpenKeyEx(k, 0, 0, KEY_ALL_ACCESS, &key);
   if (result != ERROR_SUCCESS)
-    throw rdr::SystemException("RegOpenKeyEx(HKEY)", result);
+    throw core::SystemException("RegOpenKeyEx(HKEY)", result);
   vlog.debug("duplicated %p to %p", k, key);
   freeKey = true;
 }
@@ -62,7 +62,7 @@ RegKey::RegKey(const HKEY k) : key(0), freeKey(false), valueNameBufLen(0) {
 RegKey::RegKey(const RegKey& k) : key(0), freeKey(false), valueNameBufLen(0) {
   LONG result = RegOpenKeyEx(k.key, 0, 0, KEY_ALL_ACCESS, &key);
   if (result != ERROR_SUCCESS)
-    throw rdr::SystemException("RegOpenKeyEx(RegKey&)", result);
+    throw core::SystemException("RegOpenKeyEx(RegKey&)", result);
   vlog.debug("duplicated %p to %p", k.key, key);
   freeKey = true;
 }
@@ -85,7 +85,7 @@ bool RegKey::createKey(const RegKey& root, const TCHAR* name) {
   LONG result = RegCreateKey(root.key, name, &key);
   if (result != ERROR_SUCCESS) {
     vlog.error("RegCreateKey(%p, %s): %lx", root.key, name, result);
-    throw rdr::SystemException("RegCreateKeyEx", result);
+    throw core::SystemException("RegCreateKeyEx", result);
   }
   vlog.debug("createKey(%p,%s) = %p", root.key, (const char*)CStr(name), key);
   freeKey = true;
@@ -96,7 +96,7 @@ void RegKey::openKey(const RegKey& root, const TCHAR* name, bool readOnly) {
   close();
   LONG result = RegOpenKeyEx(root.key, name, 0, readOnly ? KEY_READ : KEY_ALL_ACCESS, &key);
   if (result != ERROR_SUCCESS)
-    throw rdr::SystemException("RegOpenKeyEx (open)", result);
+    throw core::SystemException("RegOpenKeyEx (open)", result);
   vlog.debug("openKey(%p,%s,%s) = %p", root.key, (const char*)CStr(name),
 	         readOnly ? "ro" : "rw", key);
   freeKey = true;
@@ -108,7 +108,7 @@ void RegKey::setDACL(const PACL acl, bool inherit) {
     DACL_SECURITY_INFORMATION |
     (inherit ? UNPROTECTED_DACL_SECURITY_INFORMATION : PROTECTED_DACL_SECURITY_INFORMATION),
     0, 0, acl, 0)) != ERROR_SUCCESS)
-    throw rdr::SystemException("RegKey::setDACL failed", result);
+    throw core::SystemException("RegKey::setDACL failed", result);
 }
 
 void RegKey::close() {
@@ -122,19 +122,19 @@ void RegKey::close() {
 void RegKey::deleteKey(const TCHAR* name) const {
   LONG result = RegDeleteKey(key, name);
   if (result != ERROR_SUCCESS)
-    throw rdr::SystemException("RegDeleteKey", result);
+    throw core::SystemException("RegDeleteKey", result);
 }
 
 void RegKey::deleteValue(const TCHAR* name) const {
   LONG result = RegDeleteValue(key, name);
   if (result != ERROR_SUCCESS)
-    throw rdr::SystemException("RegDeleteValue", result);
+    throw core::SystemException("RegDeleteValue", result);
 }
 
 void RegKey::awaitChange(bool watchSubTree, DWORD filter, HANDLE event) const {
   LONG result = RegNotifyChangeKeyValue(key, watchSubTree, filter, event, event != 0);
   if (result != ERROR_SUCCESS)
-    throw rdr::SystemException("RegNotifyChangeKeyValue", result);
+    throw core::SystemException("RegNotifyChangeKeyValue", result);
 }
 
 
@@ -143,22 +143,22 @@ RegKey::operator HKEY() const {return key;}
 
 void RegKey::setExpandString(const TCHAR* valname, const TCHAR* value) const {
   LONG result = RegSetValueEx(key, valname, 0, REG_EXPAND_SZ, (const BYTE*)value, (_tcslen(value)+1)*sizeof(TCHAR));
-  if (result != ERROR_SUCCESS) throw rdr::SystemException("setExpandString", result);
+  if (result != ERROR_SUCCESS) throw core::SystemException("setExpandString", result);
 }
 
 void RegKey::setString(const TCHAR* valname, const TCHAR* value) const {
   LONG result = RegSetValueEx(key, valname, 0, REG_SZ, (const BYTE*)value, (_tcslen(value)+1)*sizeof(TCHAR));
-  if (result != ERROR_SUCCESS) throw rdr::SystemException("setString", result);
+  if (result != ERROR_SUCCESS) throw core::SystemException("setString", result);
 }
 
 void RegKey::setBinary(const TCHAR* valname, const void* value, size_t length) const {
   LONG result = RegSetValueEx(key, valname, 0, REG_BINARY, (const BYTE*)value, length);
-  if (result != ERROR_SUCCESS) throw rdr::SystemException("setBinary", result);
+  if (result != ERROR_SUCCESS) throw core::SystemException("setBinary", result);
 }
 
 void RegKey::setInt(const TCHAR* valname, int value) const {
   LONG result = RegSetValueEx(key, valname, 0, REG_DWORD, (const BYTE*)&value, sizeof(value));
-  if (result != ERROR_SUCCESS) throw rdr::SystemException("setInt", result);
+  if (result != ERROR_SUCCESS) throw core::SystemException("setInt", result);
 }
 
 void RegKey::setBool(const TCHAR* valname, bool value) const {
@@ -169,7 +169,7 @@ TCHAR* RegKey::getString(const TCHAR* valname) const {return getRepresentation(v
 TCHAR* RegKey::getString(const TCHAR* valname, const TCHAR* def) const {
   try {
     return getString(valname);
-  } catch(rdr::Exception&) {
+  } catch(core::Exception&) {
     return tstrDup(def);
   }
 }
@@ -180,12 +180,12 @@ void RegKey::getBinary(const TCHAR* valname, void** data, size_t* length) const 
   *data = hexToBin(cstr, strlen(cstr));
   *length = strlen(cstr)/2;
   if (*data == NULL)
-    throw rdr::Exception("getBinary failed");
+    throw core::Exception("getBinary failed");
 }
 void RegKey::getBinary(const TCHAR* valname, void** data, size_t* length, void* def, size_t deflen) const {
   try {
     getBinary(valname, data, length);
-  } catch(rdr::Exception&) {
+  } catch(core::Exception&) {
     if (deflen) {
       *data = new char[deflen];
       memcpy(*data, def, deflen);
@@ -202,7 +202,7 @@ int RegKey::getInt(const TCHAR* valname) const {
 int RegKey::getInt(const TCHAR* valname, int def) const {
   try {
     return getInt(valname);
-  } catch(rdr::Exception&) {
+  } catch(core::Exception&) {
     return def;
   }
 }
@@ -228,11 +228,11 @@ TCHAR* RegKey::getRepresentation(const TCHAR* valname) const {
   DWORD type, length;
   LONG result = RegQueryValueEx(key, valname, 0, &type, 0, &length);
   if (result != ERROR_SUCCESS)
-    throw rdr::SystemException("get registry value length", result);
+    throw core::SystemException("get registry value length", result);
   CharArray data(length);
   result = RegQueryValueEx(key, valname, 0, &type, (BYTE*)data.buf, &length);
   if (result != ERROR_SUCCESS)
-    throw rdr::SystemException("get registry value", result);
+    throw core::SystemException("get registry value", result);
 
   switch (type) {
   case REG_BINARY:
@@ -258,18 +258,18 @@ TCHAR* RegKey::getRepresentation(const TCHAR* valname) const {
       TCharArray str(terminateData(data.buf, length));
       DWORD required = ExpandEnvironmentStrings(str.buf, 0, 0);
       if (required==0)
-        throw rdr::SystemException("ExpandEnvironmentStrings", GetLastError());
+        throw core::SystemException("ExpandEnvironmentStrings", GetLastError());
       TCharArray result(required);
       length = ExpandEnvironmentStrings(str.buf, result.buf, required);
       if (required<length)
-        throw rdr::Exception("unable to expand environment strings");
+        throw core::Exception("unable to expand environment strings");
       return result.takeBuf();
     } else {
       return tstrDup(_T(""));
     }
     }
   default:
-    throw rdr::Exception("unsupported registry type");
+    throw core::Exception("unsupported registry type");
   }
 }
 
@@ -277,7 +277,7 @@ bool RegKey::isValue(const TCHAR* valname) const {
   try {
     TCharArray tmp(getRepresentation(valname));
     return true;
-  } catch(rdr::Exception&) {
+  } catch(core::Exception&) {
     return false;
   }
 }
@@ -286,7 +286,7 @@ const TCHAR* RegKey::getValueName(int i) {
   DWORD maxValueNameLen;
   LONG result = RegQueryInfoKey(key, 0, 0, 0, 0, 0, 0, 0, &maxValueNameLen, 0, 0, 0);
   if (result != ERROR_SUCCESS)
-    throw rdr::SystemException("RegQueryInfoKey", result);
+    throw core::SystemException("RegQueryInfoKey", result);
   if (valueNameBufLen < maxValueNameLen + 1) {
     valueNameBufLen = maxValueNameLen + 1;
     delete [] valueName.buf;
@@ -296,7 +296,7 @@ const TCHAR* RegKey::getValueName(int i) {
   result = RegEnumValue(key, i, valueName.buf, &length, NULL, 0, 0, 0);
   if (result == ERROR_NO_MORE_ITEMS) return 0;
   if (result != ERROR_SUCCESS)
-    throw rdr::SystemException("RegEnumValue", result);
+    throw core::SystemException("RegEnumValue", result);
   return valueName.buf;
 }
 
@@ -304,7 +304,7 @@ const TCHAR* RegKey::getKeyName(int i) {
   DWORD maxValueNameLen;
   LONG result = RegQueryInfoKey(key, 0, 0, 0, 0, &maxValueNameLen, 0, 0, 0, 0, 0, 0);
   if (result != ERROR_SUCCESS)
-    throw rdr::SystemException("RegQueryInfoKey", result);
+    throw core::SystemException("RegQueryInfoKey", result);
   if (valueNameBufLen < maxValueNameLen + 1) {
     valueNameBufLen = maxValueNameLen + 1;
     delete [] valueName.buf;
@@ -314,6 +314,6 @@ const TCHAR* RegKey::getKeyName(int i) {
   result = RegEnumKeyEx(key, i, valueName.buf, &length, NULL, 0, 0, 0);
   if (result == ERROR_NO_MORE_ITEMS) return 0;
   if (result != ERROR_SUCCESS)
-    throw rdr::SystemException("RegEnumKey", result);
+    throw core::SystemException("RegEnumKey", result);
   return valueName.buf;
 }

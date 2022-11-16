@@ -21,7 +21,7 @@
 #endif
 
 #include <rfb_win32/EventManager.h>
-#include <rdr/Exception.h>
+#include <core/Exception.h>
 #include <rfb/LogWriter.h>
 
 using namespace rfb;
@@ -57,7 +57,7 @@ void EventManager::removeEvent(HANDLE event) {
       return;
     }
   }
-  throw rdr::Exception("Event not registered");
+  throw core::Exception("Event not registered");
 }
 
 

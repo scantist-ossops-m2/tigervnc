@@ -23,7 +23,7 @@
 #include <tchar.h>
 #include <rfb_win32/MonitorInfo.h>
 #include <rfb_win32/Win32Util.h>
-#include <rdr/Exception.h>
+#include <core/Exception.h>
 #include <rfb/LogWriter.h>
 
 #ifndef min
@@ -45,7 +45,7 @@ static void fillMonitorInfo(HMONITOR monitor, MONITORINFOEXA* mi) {
   memset(mi, 0, sizeof(MONITORINFOEXA));
   mi->cbSize = sizeof(MONITORINFOEXA);
   if (!GetMonitorInfo(monitor, mi))
-    throw rdr::SystemException("failed to GetMonitorInfo", GetLastError());
+    throw core::SystemException("failed to GetMonitorInfo", GetLastError());
   vlog.debug("monitor is %ld,%ld-%ld,%ld", mi->rcMonitor.left, mi->rcMonitor.top, mi->rcMonitor.right, mi->rcMonitor.bottom);
   vlog.debug("work area is %ld,%ld-%ld,%ld", mi->rcWork.left, mi->rcWork.top, mi->rcWork.right, mi->rcWork.bottom);
   vlog.debug("device is \"%s\"", mi->szDevice);
@@ -58,7 +58,7 @@ MonitorInfo::MonitorInfo(HWND window) {
 
   HMONITOR monitor = MonitorFromWindow(window, MONITOR_DEFAULTTONEAREST);
   if (!monitor)
-    throw rdr::SystemException("failed to get monitor", GetLastError());
+    throw core::SystemException("failed to get monitor", GetLastError());
   fillMonitorInfo(monitor, this);
 }
 
@@ -68,7 +68,7 @@ MonitorInfo::MonitorInfo(const RECT& r) {
 
   HMONITOR monitor = MonitorFromRect(&r, MONITOR_DEFAULTTONEAREST);
   if (!monitor)
-    throw rdr::SystemException("failed to get monitor", GetLastError());
+    throw core::SystemException("failed to get monitor", GetLastError());
   fillMonitorInfo(monitor, this);
 }
 

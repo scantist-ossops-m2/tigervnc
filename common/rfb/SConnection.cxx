@@ -103,14 +103,14 @@ bool SConnection::processMsg()
   case RFBSTATE_INITIALISATION:   return processInitMsg();         break;
   case RFBSTATE_NORMAL:           return reader_->readMsg();       break;
   case RFBSTATE_QUERYING:
-    throw Exception("SConnection::processMsg: bogus data from client while "
+    throw core::Exception("SConnection::processMsg: bogus data from client while "
                     "querying");
   case RFBSTATE_CLOSING:
-    throw Exception("SConnection::processMsg: called while closing");
+    throw core::Exception("SConnection::processMsg: called while closing");
   case RFBSTATE_UNINITIALISED:
-    throw Exception("SConnection::processMsg: not initialised yet?");
+    throw core::Exception("SConnection::processMsg: not initialised yet?");
   default:
-    throw Exception("SConnection::processMsg: invalid state");
+    throw core::Exception("SConnection::processMsg: invalid state");
   }
 }
 
@@ -131,7 +131,7 @@ bool SConnection::processVersionMsg()
   if (sscanf(verStr, "RFB %03d.%03d\n",
              &majorVersion, &minorVersion) != 2) {
     state_ = RFBSTATE_INVALID;
-    throw Exception("reading version failed: not an RFB client?");
+    throw core::Exception("reading version failed: not an RFB client?");
   }
 
   client.setVersion(majorVersion, minorVersion);
@@ -223,7 +223,7 @@ void SConnection::processSecurityType(int secType)
   for (i=secTypes.begin(); i!=secTypes.end(); i++)
     if (*i == secType) break;
   if (i == secTypes.end())
-    throw Exception("Requested security type not available");
+    throw core::Exception("Requested security type not available");
 
   vlog.info("Client requests security type %s(%d)",
             secTypeName(secType),secType);
@@ -231,7 +231,7 @@ void SConnection::processSecurityType(int secType)
   try {
     state_ = RFBSTATE_SECURITY;
     ssecurity = security.GetSSecurity(this, secType);
-  } catch (rdr::Exception& e) {
+  } catch (core::Exception& e) {
     throwConnFailedException("%s", e.str());
   }
 }
@@ -301,7 +301,7 @@ bool SConnection::handleAuthFailureTimeout(Timer* /*t*/)
       os->writeBytes(reason, strlen(reason));
     }
     os->flush();
-  } catch (rdr::Exception& e) {
+  } catch (core::Exception& e) {
     close(e.str());
     return false;
   }
@@ -460,7 +460,7 @@ void SConnection::queryConnection(const char* /*userName*/)
 void SConnection::approveConnection(bool accept, const char* reason)
 {
   if (state_ != RFBSTATE_QUERYING)
-    throw Exception("SConnection::approveConnection: invalid state");
+    throw core::Exception("SConnection::approveConnection: invalid state");
 
   if (!client.beforeVersion(3,8) || ssecurity->getType() != secTypeNone) {
     if (accept) {

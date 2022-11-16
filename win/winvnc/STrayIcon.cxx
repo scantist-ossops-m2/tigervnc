@@ -160,7 +160,7 @@ public:
           if (isServiceProcess()) {
             try {
               rfb::win32::stopService(VNCServerService::Name);
-            } catch (rdr::Exception& e) {
+            } catch (core::Exception& e) {
               MsgBox(0, TStr(e.str()), MB_ICONERROR | MB_OK);
             }
           } else {

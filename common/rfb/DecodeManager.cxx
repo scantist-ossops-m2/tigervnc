@@ -26,12 +26,12 @@
 #include <rfb/CConnection.h>
 #include <rfb/DecodeManager.h>
 #include <rfb/Decoder.h>
-#include <rfb/Exception.h>
+#include <core/Exception.h>
 #include <core/Region.h>
 
 #include <rfb/LogWriter.h>
 
-#include <rdr/Exception.h>
+#include <core/Exception.h>
 #include <rdr/MemOutStream.h>
 
 #include <os/Mutex.h>
@@ -114,14 +114,14 @@ bool DecodeManager::decodeRect(const core::Rect& r, int encoding,
 
   if (!Decoder::supported(encoding)) {
     vlog.error("Unknown encoding %d", encoding);
-    throw rdr::Exception("Unknown encoding");
+    throw core::Exception("Unknown encoding");
   }
 
   if (!decoders[encoding]) {
     decoders[encoding] = Decoder::createDecoder(encoding);
     if (!decoders[encoding]) {
       vlog.error("Unknown encoding %d", encoding);
-      throw rdr::Exception("Unknown encoding");
+      throw core::Exception("Unknown encoding");
     }
   }
 
@@ -148,8 +148,8 @@ bool DecodeManager::decodeRect(const core::Rect& r, int encoding,
   try {
     if (!decoder->readRect(r, conn->getInStream(), conn->server, bufferStream))
       return false;
-  } catch (rdr::Exception& e) {
-    throw Exception("Error reading rect: %s", e.str());
+  } catch (core::Exception& e) {
+    throw core::Exception("Error reading rect: %s", e.str());
   }
 
   stats[encoding].rects++;
@@ -246,14 +246,14 @@ void DecodeManager::logStats()
   vlog.info("         %s (1:%g ratio)", a, ratio);
 }
 
-void DecodeManager::setThreadException(const rdr::Exception& e)
+void DecodeManager::setThreadException(const core::Exception& e)
 {
   os::AutoMutex a(queueMutex);
 
   if (threadException != NULL)
     return;
 
-  threadException = new rdr::Exception("Exception on worker thread: %s", e.str());
+  threadException = new core::Exception("Exception on worker thread: %s", e.str());
 }
 
 void DecodeManager::throwThreadException()
@@ -263,7 +263,7 @@ void DecodeManager::throwThreadException()
   if (threadException == NULL)
     return;
 
-  rdr::Exception e(*threadException);
+  core::Exception e(*threadException);
 
   delete threadException;
   threadException = NULL;
@@ -324,7 +324,7 @@ void DecodeManager::DecodeThread::worker()
       entry->decoder->decodeRect(entry->rect, entry->bufferStream->data(),
                                  entry->bufferStream->length(),
                                  *entry->server, entry->pb);
-    } catch (rdr::Exception& e) {
+    } catch (core::Exception& e) {
       manager->setThreadException(e);
     } catch(...) {
       assert(false);
