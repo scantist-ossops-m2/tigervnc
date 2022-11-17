@@ -29,7 +29,7 @@
 
 #include <rfb/SMsgHandler.h>
 #include <rfb/SecurityServer.h>
-#include <rfb/Timer.h>
+#include <core/Timer.h>
 
 namespace rfb {
 
@@ -243,7 +243,7 @@ namespace rfb {
     bool processSecurityFailure();
     bool processInitMsg();
 
-    bool handleAuthFailureTimeout(Timer* t);
+    bool handleAuthFailureTimeout(core::Timer* t);
 
     int defaultMajorVersion, defaultMinorVersion;
 
@@ -256,7 +256,7 @@ namespace rfb {
     SecurityServer security;
     SSecurity* ssecurity;
 
-    MethodTimer<SConnection> authFailureTimer;
+    core::MethodTimer<SConnection> authFailureTimer;
     core::CharArray authFailureMsg;
 
     stateEnum state_;

@@ -32,13 +32,13 @@
 #include <rfb/Congestion.h>
 #include <rfb/EncodeManager.h>
 #include <rfb/SConnection.h>
-#include <rfb/Timer.h>
+#include <core/Timer.h>
 
 namespace rfb {
   class VNCServerST;
 
   class VNCSConnectionST : private SConnection,
-                           public Timer::Callback {
+                           public core::Timer::Callback {
   public:
     VNCSConnectionST(VNCServerST* server_, network::Socket* s, bool reverse);
     virtual ~VNCSConnectionST();
@@ -140,7 +140,7 @@ namespace rfb {
     virtual void supportsLEDState();
 
     // Timer callbacks
-    virtual bool handleTimeout(Timer* t);
+    virtual bool handleTimeout(core::Timer* t);
 
     // Internal methods
 
@@ -177,8 +177,8 @@ namespace rfb {
     char *fenceData;
 
     Congestion congestion;
-    Timer congestionTimer;
-    Timer losslessTimer;
+    core::Timer congestionTimer;
+    core::Timer losslessTimer;
 
     VNCServerST* server;
     SimpleUpdateTracker updates;
@@ -191,7 +191,7 @@ namespace rfb {
 
     std::map<uint32_t, uint32_t> pressedKeys;
 
-    Timer idleTimer;
+    core::Timer idleTimer;
 
     time_t pointerEventTime;
     core::Point pointerEventPos;

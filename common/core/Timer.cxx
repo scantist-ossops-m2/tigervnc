@@ -26,14 +26,14 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-#include <rfb/Timer.h>
+#include <core/Timer.h>
 #include <core/util.h>
 #include <core/LogWriter.h>
 
-using namespace rfb;
+using namespace core;
 
 #ifndef __NO_DEFINE_VLOG__
-static core::LogWriter vlog("Timer");
+static LogWriter vlog("Timer");
 #endif
 
 

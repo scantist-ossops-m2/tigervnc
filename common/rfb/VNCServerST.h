@@ -30,7 +30,7 @@
 #include <rfb/VNCServer.h>
 #include <rfb/Blacklist.h>
 #include <rfb/Cursor.h>
-#include <rfb/Timer.h>
+#include <core/Timer.h>
 #include <rfb/ScreenSet.h>
 
 namespace rfb {
@@ -42,7 +42,7 @@ namespace rfb {
   class KeyRemapper;
 
   class VNCServerST : public VNCServer,
-                      public Timer::Callback {
+                      public core::Timer::Callback {
   public:
     // -=- Constructors
 
@@ -155,7 +155,7 @@ namespace rfb {
   protected:
 
     // Timer callbacks
-    virtual bool handleTimeout(Timer* t);
+    virtual bool handleTimeout(core::Timer* t);
 
     // - Internal methods
 
@@ -200,11 +200,11 @@ namespace rfb {
 
     KeyRemapper* keyRemapper;
 
-    Timer idleTimer;
-    Timer disconnectTimer;
-    Timer connectTimer;
+    core::Timer idleTimer;
+    core::Timer disconnectTimer;
+    core::Timer connectTimer;
 
-    Timer frameTimer;
+    core::Timer frameTimer;
   };
 
 };

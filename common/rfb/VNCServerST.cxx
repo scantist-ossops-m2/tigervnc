@@ -616,7 +616,7 @@ SConnection* VNCServerST::getConnection(network::Socket* sock) {
   return 0;
 }
 
-bool VNCServerST::handleTimeout(Timer* t)
+bool VNCServerST::handleTimeout(core::Timer* t)
 {
   if (t == &frameTimer) {
     // We keep running until we go a full interval without any updates

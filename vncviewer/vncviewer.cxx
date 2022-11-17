@@ -54,7 +54,7 @@
 #include <rfb/CSecurityTLS.h>
 #endif
 #include <core/LogWriter.h>
-#include <rfb/Timer.h>
+#include <core/Timer.h>
 #include <core/Exception.h>
 #include <network/TcpSocket.h>
 #include <os/os.h>

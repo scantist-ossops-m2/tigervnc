@@ -34,7 +34,7 @@
 #include <core/util.h>
 #include <rfb/screenTypes.h>
 #include <rfb/fenceTypes.h>
-#include <rfb/Timer.h>
+#include <core/Timer.h>
 #include <network/TcpSocket.h>
 #ifndef WIN32
 #include <network/UnixSocket.h>

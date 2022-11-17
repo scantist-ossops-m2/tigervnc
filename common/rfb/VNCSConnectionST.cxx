@@ -790,7 +790,7 @@ void VNCSConnectionST::supportsLEDState()
   writer()->writeLEDState();
 }
 
-bool VNCSConnectionST::handleTimeout(Timer* t)
+bool VNCSConnectionST::handleTimeout(core::Timer* t)
 {
   try {
     if ((t == &congestionTimer) ||

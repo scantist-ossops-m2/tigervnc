@@ -34,7 +34,7 @@
 #include <rfb/SDesktop.h>
 #include <rfb/PixelBuffer.h>
 #include <core/Configuration.h>
-#include <rfb/Timer.h>
+#include <core/Timer.h>
 #include <unixcommon.h>
 #include "vncInput.h"
 
@@ -45,7 +45,7 @@ namespace rfb {
 namespace network { class SocketListener; class Socket; class SocketServer; }
 
 class XserverDesktop : public rfb::SDesktop, public rfb::FullFramePixelBuffer,
-                       public rfb::Timer::Callback {
+                       public core::Timer::Callback {
 public:
 
   XserverDesktop(int screenIndex,
@@ -112,7 +112,7 @@ protected:
                          network::SocketServer* sockserv,
                          bool read, bool write);
 
-  virtual bool handleTimeout(rfb::Timer* t);
+  virtual bool handleTimeout(core::Timer* t);
 
 private:
 
@@ -125,7 +125,7 @@ private:
   network::Socket* queryConnectSocket;
   core::CharArray queryConnectAddress;
   core::CharArray queryConnectUsername;
-  rfb::Timer queryConnectTimer;
+  core::Timer queryConnectTimer;
 
   OutputIdMap outputIdMap;
 

@@ -47,7 +47,6 @@ add_library(rfb STATIC
   SSecurityVncAuth.cxx
   SSecurityVeNCrypt.cxx
   ScaleFilters.cxx
-  Timer.cxx
   TightDecoder.cxx
   TightEncoder.cxx
   TightJPEGEncoder.cxx
