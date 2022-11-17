@@ -175,7 +175,10 @@ TCHAR* RegKey::getString(const TCHAR* valname, const TCHAR* def) const {
 
 void RegKey::getBinary(const TCHAR* valname, void** data, size_t* length) const {
   TCharArray hex(getRepresentation(valname));
-  if (!rdr::HexInStream::hexStrToBin(CStr(hex.buf), (char**)data, length))
+  const char* cstr = CStr(hex.buf);
+  *data = hexToBin(cstr, strlen(cstr));
+  *length = strlen(cstr)/2;
+  if (*data == NULL)
     throw rdr::Exception("getBinary failed");
 }
 void RegKey::getBinary(const TCHAR* valname, void** data, size_t* length, void* def, size_t deflen) const {
@@ -233,7 +236,7 @@ TCHAR* RegKey::getRepresentation(const TCHAR* valname) const {
   switch (type) {
   case REG_BINARY:
     {
-      TCharArray hex(rdr::HexOutStream::binToHexStr(data.buf, length));
+      TCharArray hex(binToHex((const uint8_t*)data.buf, length));
       return hex.takeBuf();
     }
   case REG_SZ:
