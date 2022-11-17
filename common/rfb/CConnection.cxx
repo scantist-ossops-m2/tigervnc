@@ -37,14 +37,14 @@
 #include <rfb/CConnection.h>
 #include <core/util.h>
 
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 
 #include <rdr/InStream.h>
 #include <rdr/OutStream.h>
 
 using namespace rfb;
 
-static LogWriter vlog("CConnection");
+static core::LogWriter vlog("CConnection");
 
 CConnection::CConnection()
   : csecurity(0),

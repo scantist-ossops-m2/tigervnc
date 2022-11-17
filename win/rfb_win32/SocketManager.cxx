@@ -24,7 +24,7 @@
 
 #include <winsock2.h>
 #include <list>
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 #include <rfb/Timer.h>
 #include <rfb_win32/SocketManager.h>
 

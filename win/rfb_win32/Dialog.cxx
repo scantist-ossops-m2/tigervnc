@@ -27,7 +27,7 @@
 
 #include <rfb_win32/Dialog.h>
 #include <rfb_win32/TCharArray.h>
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 #include <core/Exception.h>
 #include <rfb_win32/Win32Util.h>
 

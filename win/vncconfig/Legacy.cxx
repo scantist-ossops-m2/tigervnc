@@ -18,7 +18,7 @@
 
 #include <vncconfig/Legacy.h>
 
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 #include <rfb/Password.h>
 #include <rfb_win32/CurrentUser.h>
 

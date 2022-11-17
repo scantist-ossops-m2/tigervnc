@@ -25,7 +25,7 @@
 
 #include <rfb_win32/MsgWindow.h>
 #include <rfb_win32/WMShatter.h>
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 #include <core/Exception.h>
 #include <malloc.h>
 #include <tchar.h>

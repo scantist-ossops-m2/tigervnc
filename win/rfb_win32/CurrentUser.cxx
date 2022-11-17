@@ -23,7 +23,7 @@
 #endif
 
 #include <stdlib.h>
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 #include <rfb_win32/CurrentUser.h>
 #include <rfb_win32/Service.h>
 #include <lmcons.h>

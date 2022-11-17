@@ -57,7 +57,7 @@
 
 #include <rfb/ComparingUpdateTracker.h>
 #include <rfb/KeyRemapper.h>
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 #include <rfb/Security.h>
 #include <rfb/ServerCore.h>
 #include <rfb/VNCServerST.h>
@@ -65,11 +65,10 @@
 #include <core/util.h>
 #include <rfb/ledStates.h>
 
-
 using namespace rfb;
 
-static LogWriter slog("VNCServerST");
-static LogWriter connectionsLog("Connections");
+static core::LogWriter slog("VNCServerST");
+static core::LogWriter connectionsLog("Connections");
 
 //
 // -=- VNCServerST Implementation

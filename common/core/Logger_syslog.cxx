@@ -27,10 +27,10 @@
 #include <syslog.h>
 
 #include <core/util.h>
-#include <rfb/Logger_syslog.h>
-#include <rfb/LogWriter.h>
+#include <core/Logger_syslog.h>
+#include <core/LogWriter.h>
 
-using namespace rfb;
+using namespace core;
 
 
 Logger_Syslog::Logger_Syslog(const char* loggerName)
@@ -63,6 +63,6 @@ void Logger_Syslog::write(int level, const char *logname, const char *message)
 
 static Logger_Syslog logger("syslog");
 
-void rfb::initSyslogLogger() {
+void core::initSyslogLogger() {
   logger.registerLogger();
 }

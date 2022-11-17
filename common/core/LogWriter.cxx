@@ -24,15 +24,14 @@
 
 #include <string.h>
 
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 #include <core/Configuration.h>
 #include <core/util.h>
 #include <stdlib.h>
 
-rfb::LogParameter rfb::logParams;
+using namespace core;
 
-using namespace rfb;
-
+LogParameter core::logParams;
 
 LogWriter::LogWriter(const char* name) : m_name(name), m_level(0), m_log(0), m_next(log_writers) {
   log_writers = this;
@@ -76,9 +75,9 @@ LogWriter::getLogWriter(const char* name) {
 }
 
 bool LogWriter::setLogParams(const char* params) {
-  core::CharArray logwriterName, loggerName, logLevel;
-  if (!core::strSplit(params, ':', &logwriterName.buf, &loggerName.buf) ||
-    !core::strSplit(loggerName.buf, ':', &loggerName.buf, &logLevel.buf)) {
+  CharArray logwriterName, loggerName, logLevel;
+  if (!strSplit(params, ':', &logwriterName.buf, &loggerName.buf) ||
+    !strSplit(loggerName.buf, ':', &loggerName.buf, &logLevel.buf)) {
     fprintf(stderr,"failed to parse log params:%s\n",params);
     return false;
   }
@@ -122,10 +121,10 @@ bool LogParameter::setParam(const char* v) {
   if (immutable) return true;
   LogWriter::setLogParams("*::0");
   StringParameter::setParam(v);
-  core::CharArray logParam;
-  core::CharArray params(getData());
+  CharArray logParam;
+  CharArray params(getData());
   while (params.buf) {
-    core::strSplit(params.buf, ',', &logParam.buf, &params.buf);
+    strSplit(params.buf, ',', &logParam.buf, &params.buf);
     if (strlen(logParam.buf) && !LogWriter::setLogParams(logParam.buf))
       return false;
   }

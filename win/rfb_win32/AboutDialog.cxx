@@ -23,7 +23,7 @@
 #include <rfb_win32/AboutDialog.h>
 #include <rfb_win32/Win32Util.h>
 #include <rfb_win32/TCharArray.h>
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 
 using namespace core;
 using namespace rfb;

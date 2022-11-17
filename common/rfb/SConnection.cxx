@@ -37,11 +37,11 @@
 #include <rfb/EncodeManager.h>
 #include <rfb/SSecurity.h>
 
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 
 using namespace rfb;
 
-static LogWriter vlog("SConnection");
+static core::LogWriter vlog("SConnection");
 
 // AccessRights values
 const SConnection::AccessRights SConnection::AccessView           = 0x0001;

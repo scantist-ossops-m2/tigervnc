@@ -36,7 +36,7 @@
 
 #include <rfb/CSecurityTLS.h>
 #include <rfb/CConnection.h>
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 #include <rfb/Exception.h>
 #include <rfb/UserMsgBox.h>
 #include <rdr/TLSInStream.h>
@@ -71,7 +71,7 @@ core::StringParameter CSecurityTLS::X509CRL("X509CRL", "X509 CRL file",
                                      homedirfn("x509_crl.pem"),
                                      core::ConfViewer);
 
-static LogWriter vlog("TLS");
+static core::LogWriter vlog("TLS");
 
 static const char* homedirfn(const char* fn)
 {

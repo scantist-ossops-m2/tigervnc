@@ -29,7 +29,7 @@
 #include <core/Exception.h>
 #include <core/Region.h>
 
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 
 #include <core/Exception.h>
 #include <rdr/MemOutStream.h>
@@ -38,7 +38,7 @@
 
 using namespace rfb;
 
-static LogWriter vlog("DecodeManager");
+static core::LogWriter vlog("DecodeManager");
 
 DecodeManager::DecodeManager(CConnection *conn) :
   conn(conn), threadException(NULL)

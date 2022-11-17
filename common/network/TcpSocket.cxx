@@ -41,7 +41,7 @@
 #include <ctype.h>
 
 #include <network/TcpSocket.h>
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 #include <core/Configuration.h>
 
 #ifdef WIN32
@@ -67,7 +67,7 @@
 
 using namespace network;
 
-static rfb::LogWriter vlog("TcpSocket");
+static core::LogWriter vlog("TcpSocket");
 
 static core::BoolParameter UseIPv4("UseIPv4", "Use IPv4 for incoming and outgoing connections.", true);
 static core::BoolParameter UseIPv6("UseIPv6", "Use IPv6 for incoming and outgoing connections.", true);

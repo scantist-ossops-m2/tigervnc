@@ -25,7 +25,7 @@
 #include <malloc.h>
 
 #include <rfb_win32/RegConfig.h>
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 #include <core/util.h>
 //#include <rdr/HexOutStream.h>
 

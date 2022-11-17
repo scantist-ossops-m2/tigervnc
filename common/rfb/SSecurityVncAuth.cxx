@@ -30,7 +30,7 @@
 #include <rfb/SConnection.h>
 #include <rfb/Password.h>
 #include <core/Configuration.h>
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 #include <core/util.h>
 #include <rfb/Exception.h>
 #include <string.h>
@@ -42,7 +42,7 @@ extern "C" {
 
 using namespace rfb;
 
-static LogWriter vlog("SVncAuth");
+static core::LogWriter vlog("SVncAuth");
 
 core::StringParameter SSecurityVncAuth::vncAuthPasswdFile
 ("PasswordFile", "Password file for VNC authentication", "", core::ConfServer);

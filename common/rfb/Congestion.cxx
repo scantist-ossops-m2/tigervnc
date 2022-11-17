@@ -49,7 +49,7 @@
 #endif
 
 #include <rfb/Congestion.h>
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 #include <core/util.h>
 
 // Debug output on what the congestion control is up to
@@ -77,7 +77,7 @@ static inline bool isAfter(unsigned a, unsigned b) {
   return a != b && a - b <= UINT_MAX / 2;
 }
 
-static LogWriter vlog("Congestion");
+static core::LogWriter vlog("Congestion");
 
 Congestion::Congestion() :
     lastPosition(0), extraBuffer(0),

@@ -30,7 +30,7 @@
 #include <rfb/CSecurityVncAuth.h>
 #include <rfb/CSecurityPlain.h>
 #include <core/Exception.h>
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 #include <rfb/Security.h>
 #include <rfb/SSecurityNone.h>
 #include <rfb/SSecurityStack.h>
@@ -47,7 +47,7 @@ using namespace rdr;
 using namespace rfb;
 using namespace std;
 
-static LogWriter vlog("Security");
+static core::LogWriter vlog("Security");
 
 #ifdef HAVE_GNUTLS
 core::StringParameter Security::GnuTLSPriority("GnuTLSPriority",

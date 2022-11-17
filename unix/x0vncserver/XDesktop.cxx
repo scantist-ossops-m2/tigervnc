@@ -26,7 +26,7 @@
 #include <signal.h>
 #include <unistd.h>
 
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 
 #include <x0vncserver/XDesktop.h>
 
@@ -71,7 +71,7 @@ IntParameter queryConnectTimeout("QueryConnectTimeout",
                                  "rejecting the connection",
                                  10);
 
-static rfb::LogWriter vlog("XDesktop");
+static core::LogWriter vlog("XDesktop");
 
 // order is important as it must match RFB extension
 static const char * ledNames[XDESKTOP_N_LEDS] = {

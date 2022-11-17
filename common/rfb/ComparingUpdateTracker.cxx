@@ -25,12 +25,12 @@
 #include <vector>
 
 #include <core/Exception.h>
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 #include <rfb/ComparingUpdateTracker.h>
 
 using namespace rfb;
 
-static LogWriter vlog("ComparingUpdateTracker");
+static core::LogWriter vlog("ComparingUpdateTracker");
 
 ComparingUpdateTracker::ComparingUpdateTracker(PixelBuffer* buffer)
   : fb(buffer), oldFb(fb->getPF(), 0, 0), firstCompare(true),

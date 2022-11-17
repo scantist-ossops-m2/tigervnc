@@ -31,14 +31,14 @@
 #include <rdr/OutStream.h>
 #include <rfb/CConnection.h>
 #include <rfb/CSecurityVeNCrypt.h>
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 #include <list>
 
 using namespace rfb;
 using namespace rdr;
 using namespace std;
 
-static LogWriter vlog("CVeNCrypt");
+static core::LogWriter vlog("CVeNCrypt");
 
 CSecurityVeNCrypt::CSecurityVeNCrypt(CConnection* cc, SecurityClient* sec)
   : CSecurity(cc), csecurity(NULL), security(sec)

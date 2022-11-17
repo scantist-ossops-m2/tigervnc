@@ -28,9 +28,9 @@
 #include <os/Mutex.h>
 
 #include <core/util.h>
-#include <rfb/Logger_file.h>
+#include <core/Logger_file.h>
 
-using namespace rfb;
+using namespace core;
 
 Logger_File::Logger_File(const char* loggerName)
   : Logger(loggerName), indent(13), width(79), m_filename(0), m_file(0),
@@ -51,7 +51,7 @@ void Logger_File::write(int /*level*/, const char *logname, const char *message)
 
   if (!m_file) {
     if (!m_filename) return;
-    core::CharArray bakFilename(strlen(m_filename) + 1 + 4);
+    CharArray bakFilename(strlen(m_filename) + 1 + 4);
     sprintf(bakFilename.buf, "%s.bak", m_filename);
     remove(bakFilename.buf);
     rename(m_filename, bakFilename.buf);
@@ -93,7 +93,7 @@ void Logger_File::write(int /*level*/, const char *logname, const char *message)
 void Logger_File::setFilename(const char* filename)
 {
   closeFile();
-  m_filename = core::strDup(filename);
+  m_filename = strDup(filename);
 }
 
 void Logger_File::setFile(FILE* file)
@@ -109,14 +109,14 @@ void Logger_File::closeFile()
       fclose(m_file);
       m_file = 0;
     }
-    core::strFree(m_filename);
+    strFree(m_filename);
     m_filename = 0;
   }
 }
 
 static Logger_File logger("file");
 
-bool rfb::initFileLogger(const char* filename) {
+bool core::initFileLogger(const char* filename) {
   logger.setFilename(filename);
   logger.registerLogger();
   return true;

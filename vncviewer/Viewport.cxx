@@ -26,7 +26,7 @@
 #include <string.h>
 
 #include <rfb/CMsgWriter.h>
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 #include <core/Exception.h>
 #include <rfb/ledStates.h>
 
@@ -102,7 +102,7 @@ using namespace core;
 using namespace rfb;
 using namespace rdr;
 
-static rfb::LogWriter vlog("Viewport");
+static core::LogWriter vlog("Viewport");
 
 // Menu constants
 

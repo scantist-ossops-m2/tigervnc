@@ -21,12 +21,12 @@
 #endif
 
 #include <rfb_win32/TsSessions.h>
-#include <rfb/LogWriter.h>
+#include <core/LogWriter.h>
 #include <core/Exception.h>
 #include <tchar.h>
 #include <wtsapi32.h>
 
-static rfb::LogWriter vlog("TsSessions");
+static core::LogWriter vlog("TsSessions");
 
 namespace rfb {
 namespace win32 {
