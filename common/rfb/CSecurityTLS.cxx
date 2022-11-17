@@ -64,12 +64,12 @@ using namespace rfb;
 
 static const char* homedirfn(const char* fn);
 
-StringParameter CSecurityTLS::X509CA("X509CA", "X509 CA certificate",
+core::StringParameter CSecurityTLS::X509CA("X509CA", "X509 CA certificate",
                                      homedirfn("x509_ca.pem"),
-                                     ConfViewer);
-StringParameter CSecurityTLS::X509CRL("X509CRL", "X509 CRL file",
+                                     core::ConfViewer);
+core::StringParameter CSecurityTLS::X509CRL("X509CRL", "X509 CRL file",
                                      homedirfn("x509_crl.pem"),
-                                     ConfViewer);
+                                     core::ConfViewer);
 
 static LogWriter vlog("TLS");
 

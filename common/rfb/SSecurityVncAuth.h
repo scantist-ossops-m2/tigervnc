@@ -26,7 +26,7 @@
 
 #include <stdint.h>
 
-#include <rfb/Configuration.h>
+#include <core/Configuration.h>
 #include <rfb/Password.h>
 #include <rfb/SSecurity.h>
 #include <rfb/Security.h>
@@ -42,12 +42,12 @@ namespace rfb {
     virtual ~VncAuthPasswdGetter() { }
   };
 
-  class VncAuthPasswdParameter : public VncAuthPasswdGetter, BinaryParameter {
+  class VncAuthPasswdParameter : public VncAuthPasswdGetter, core::BinaryParameter {
   public:
-    VncAuthPasswdParameter(const char* name, const char* desc, StringParameter* passwdFile_);
+    VncAuthPasswdParameter(const char* name, const char* desc, core::StringParameter* passwdFile_);
     virtual void getVncAuthPasswd(PlainPasswd *password, PlainPasswd *readOnlyPassword);
   protected:
-    StringParameter* passwdFile;
+    core::StringParameter* passwdFile;
   };
 
   class SSecurityVncAuth : public SSecurity {
@@ -57,7 +57,7 @@ namespace rfb {
     virtual int getType() const {return secTypeVncAuth;}
     virtual const char* getUserName() const {return 0;}
     virtual SConnection::AccessRights getAccessRights() const { return accessRights; }
-    static StringParameter vncAuthPasswdFile;
+    static core::StringParameter vncAuthPasswdFile;
     static VncAuthPasswdParameter vncAuthPasswd;
   private:
     bool verifyResponse(const PlainPasswd &password);

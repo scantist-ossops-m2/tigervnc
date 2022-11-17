@@ -31,7 +31,7 @@
 #include <time.h>
 #include <map>
 
-#include <rfb/Configuration.h>
+#include <core/Configuration.h>
 #include <core/util.h>
 
 namespace rfb {

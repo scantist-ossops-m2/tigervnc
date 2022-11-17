@@ -32,7 +32,7 @@
 #include <os/Mutex.h>
 
 #include <core/util.h>
-#include <rfb/Configuration.h>
+#include <core/Configuration.h>
 #include <rfb/LogWriter.h>
 #include <core/Exception.h>
 
@@ -41,9 +41,9 @@
 #include <rdr/HexOutStream.h>
 #include <rdr/HexInStream.h>
 
-using namespace rfb;
+using namespace core;
 
-static LogWriter vlog("Config");
+static rfb::LogWriter vlog("Config");
 
 
 // -=- The Global/server/viewer Configuration objects
@@ -160,7 +160,7 @@ void Configuration::list(int width, int nameWidth) {
       if (column + (int)strlen(def_str) + 11 > width)
         fprintf(stderr,"\n%*s",nameWidth+4,"");
       fprintf(stderr," (default=%s)\n",def_str);
-      core::strFree(def_str);
+      strFree(def_str);
     } else {
       fprintf(stderr,"\n");
     }
@@ -315,11 +315,11 @@ void BoolParameter::setParam(bool b) {
 
 char*
 BoolParameter::getDefaultStr() const {
-  return core::strDup(def_value ? "1" : "0");
+  return strDup(def_value ? "1" : "0");
 }
 
 char* BoolParameter::getValueStr() const {
-  return core::strDup(value ? "1" : "0");
+  return strDup(value ? "1" : "0");
 }
 
 bool BoolParameter::isBool() const {
@@ -381,37 +381,37 @@ IntParameter::operator int() const {
 
 StringParameter::StringParameter(const char* name_, const char* desc_,
                                  const char* v, ConfigurationObject co)
-  : VoidParameter(name_, desc_, co), value(core::strDup(v)), def_value(core::strDup(v))
+  : VoidParameter(name_, desc_, co), value(strDup(v)), def_value(strDup(v))
 {
   if (!v) {
     vlog.error("Default value <null> for %s not allowed",name_);
-    throw core::Exception("Default value <null> not allowed");
+    throw Exception("Default value <null> not allowed");
   }
 }
 
 StringParameter::~StringParameter() {
-  core::strFree(value);
-  core::strFree(def_value);
+  strFree(value);
+  strFree(def_value);
 }
 
 bool StringParameter::setParam(const char* v) {
   LOCK_CONFIG;
   if (immutable) return true;
   if (!v)
-    throw core::Exception("setParam(<null>) not allowed");
+    throw Exception("setParam(<null>) not allowed");
   vlog.debug("set %s(String) to %s", getName(), v);
-  core::CharArray oldValue(value);
-  value = core::strDup(v);
+  CharArray oldValue(value);
+  value = strDup(v);
   return value != 0;
 }
 
 char* StringParameter::getDefaultStr() const {
-  return core::strDup(def_value);
+  return strDup(def_value);
 }
 
 char* StringParameter::getValueStr() const {
   LOCK_CONFIG;
-  return core::strDup(value);
+  return strDup(value);
 }
 
 StringParameter::operator const char *() const {

@@ -49,8 +49,8 @@ namespace rfb {
     virtual const char* getUserName() const {return 0;}
     virtual int getType() const { return anon ? secTypeTLSNone : secTypeX509None;}
 
-    static StringParameter X509_CertFile;
-    static StringParameter X509_KeyFile;
+    static core::StringParameter X509_CertFile;
+    static core::StringParameter X509_KeyFile;
 
   protected:
     void shutdown();

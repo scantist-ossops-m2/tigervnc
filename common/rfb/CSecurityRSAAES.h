@@ -43,7 +43,7 @@ namespace rfb {
     virtual int getType() const { return secType; }
     virtual bool isSecure() const { return secType == secTypeRA256; }
 
-    static IntParameter RSAKeyLength;
+    static core::IntParameter RSAKeyLength;
 
   private:
     void cleanup();

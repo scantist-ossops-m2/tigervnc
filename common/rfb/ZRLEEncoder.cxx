@@ -27,11 +27,11 @@
 #include <rfb/Palette.h>
 #include <rfb/SConnection.h>
 #include <rfb/ZRLEEncoder.h>
-#include <rfb/Configuration.h>
+#include <core/Configuration.h>
 
 using namespace rfb;
 
-IntParameter zlibLevel("ZlibLevel","Zlib compression level",-1);
+core::IntParameter zlibLevel("ZlibLevel","Zlib compression level",-1);
 
 ZRLEEncoder::ZRLEEncoder(SConnection* conn)
   : Encoder(conn, encodingZRLE, EncoderPlain, 127),

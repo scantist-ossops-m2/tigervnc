@@ -34,7 +34,7 @@
 #endif
 #include <rfb/Password.h>
 
-static rfb::BoolParameter queryOnlyIfLoggedOn("QueryOnlyIfLoggedOn",
+static core::BoolParameter queryOnlyIfLoggedOn("QueryOnlyIfLoggedOn",
   "Only prompt for a local user to accept incoming connections if there is a user logged on", false);
 
 namespace rfb {

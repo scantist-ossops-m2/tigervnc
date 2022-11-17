@@ -40,14 +40,14 @@
 // NB: NO LOCKING is performed when linking Configurations to groups
 //     or when adding Parameters to Configurations.
 
-#ifndef __RFB_CONFIGURATION_H__
-#define __RFB_CONFIGURATION_H__
+#ifndef __CORE_CONFIGURATION_H__
+#define __CORE_CONFIGURATION_H__
 
 #include <core/util.h>
 
 namespace os { class Mutex; }
 
-namespace rfb {
+namespace core {
   class VoidParameter;
   struct ParameterIterator;
 
@@ -59,7 +59,7 @@ namespace rfb {
   class Configuration {
   public:
     // - Create a new Configuration object
-    Configuration(const char* name_) : name(core::strDup(name_)), head(0), _next(0) {}
+    Configuration(const char* name_) : name(strDup(name_)), head(0), _next(0) {}
 
     // - Return the buffer containing the Configuration's name
     const char* getName() const { return name.buf; }
@@ -128,7 +128,7 @@ namespace rfb {
     friend struct ParameterIterator;
 
     // Name for this Configuration
-    core::CharArray name;
+    CharArray name;
 
     // - Pointer to first Parameter in this group
     VoidParameter* head;
@@ -297,4 +297,4 @@ namespace rfb {
 
 };
 
-#endif // __RFB_CONFIGURATION_H__
+#endif // __CORE_CONFIGURATION_H__

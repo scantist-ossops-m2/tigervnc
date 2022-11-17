@@ -2,11 +2,12 @@ include_directories(${CMAKE_SOURCE_DIR}/common)
 include_directories(SYSTEM ${PIXMAN_INCLUDE_DIRS})
 
 add_library(core STATIC
+  Configuration.cxx
   Exception.cxx
   Region.cxx
   util.cxx)
 
-target_link_libraries(core rfb)
+target_link_libraries(core os rfb)
 target_link_libraries(core ${PIXMAN_LIBRARIES})
 target_link_directories(core PUBLIC ${PIXMAN_LIBRARY_DIRS})
 
