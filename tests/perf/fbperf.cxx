@@ -29,7 +29,7 @@
 #include <FL/x.H>
 
 #include <core/Exception.h>
-#include <core/util.h>
+#include <core/time.h>
 
 #include "../vncviewer/PlatformPixelBuffer.h"
 

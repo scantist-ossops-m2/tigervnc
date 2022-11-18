@@ -26,6 +26,7 @@
 #include <list>
 #include <core/LogWriter.h>
 #include <core/Timer.h>
+#include <core/time.h>
 #include <rfb_win32/SocketManager.h>
 
 using namespace core;

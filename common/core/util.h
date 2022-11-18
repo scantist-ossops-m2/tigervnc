@@ -24,11 +24,8 @@
 #ifndef __CORE_UTIL_H__
 #define __CORE_UTIL_H__
 
-#include <limits.h>
 #include <string.h>
 #include <stdint.h>
-
-struct timeval;
 
 namespace core {
 
@@ -101,31 +98,8 @@ namespace core {
   char* utf16ToUTF8(const wchar_t* src, size_t units = (size_t)-1);
   wchar_t* utf8ToUTF16(const char* src, size_t bytes = (size_t)-1);
 
-  // HELPER functions for timeout handling
-
-  // soonestTimeout() is a function to help work out the soonest of several
-  //   timeouts.
-  inline void soonestTimeout(int* timeout, int newTimeout) {
-    if (newTimeout && (!*timeout || newTimeout < *timeout))
-      *timeout = newTimeout;
-  }
-
-  // secsToMillis() turns seconds into milliseconds, capping the value so it
-  //   can't wrap round and become -ve
-  inline int secsToMillis(int secs) {
-    return (secs < 0 || secs > (INT_MAX/1000) ? INT_MAX : secs * 1000);
-  }
-
-  // Returns time elapsed between two moments in milliseconds.
-  unsigned msBetween(const struct timeval *first,
-                     const struct timeval *second);
-
-  // Returns time elapsed since given moment in milliseconds.
-  unsigned msSince(const struct timeval *then);
-
-  // Returns true if first happened before seconds
-  bool isBefore(const struct timeval *first,
-                const struct timeval *second);
+  // Convert a value to a string using the correct prefix to reduce
+  // the length of the string
 
   size_t siPrefix(long long value, const char *unit,
                   char *buffer, size_t maxlen, int precision=6);

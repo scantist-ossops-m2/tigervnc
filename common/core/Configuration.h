@@ -43,6 +43,8 @@
 #ifndef __CORE_CONFIGURATION_H__
 #define __CORE_CONFIGURATION_H__
 
+#include <limits.h>
+
 #include <core/util.h>
 
 namespace os { class Mutex; }
