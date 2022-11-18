@@ -45,6 +45,7 @@
 
 #include <limits.h>
 
+#include <core/Object.h>
 #include <core/string.h>
 
 namespace os { class Mutex; }
@@ -58,7 +59,7 @@ namespace core {
   // -=- Configuration
   //     Class used to access parameters.
 
-  class Configuration {
+  class Configuration : public Object {
   public:
     // - Create a new Configuration object
     Configuration(const char* name_) : name(strDup(name_)), head(0), _next(0) {}
@@ -161,7 +162,7 @@ namespace core {
   // -=- VoidParameter
   //     Configuration parameter base-class.
 
-  class VoidParameter {
+  class VoidParameter : public Object {
   public:
     VoidParameter(const char* name_, const char* desc_, ConfigurationObject co=ConfGlobal);
     virtual  ~VoidParameter();

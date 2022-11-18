@@ -24,6 +24,7 @@
 #ifndef __RFB_CCONNECTION_H__
 #define __RFB_CCONNECTION_H__
 
+#include <core/Object.h>
 #include <rfb/CMsgHandler.h>
 #include <rfb/DecodeManager.h>
 #include <rfb/SecurityClient.h>
@@ -36,7 +37,7 @@ namespace rfb {
   class CSecurity;
   class IdentityVerifier;
 
-  class CConnection : public CMsgHandler {
+  class CConnection : public core::Object, public CMsgHandler {
   public:
 
     CConnection();
