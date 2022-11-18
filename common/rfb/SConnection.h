@@ -243,7 +243,7 @@ namespace rfb {
     bool processSecurityFailure();
     bool processInitMsg();
 
-    bool handleAuthFailureTimeout(core::Timer* t);
+    void handleAuthFailureTimeout(core::Timer* t);
 
     int defaultMajorVersion, defaultMinorVersion;
 

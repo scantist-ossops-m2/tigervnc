@@ -44,7 +44,7 @@ class GestureHandler : public core::Object,
   private:
     bool hasDetectedGesture();
 
-    virtual bool handleTimeout(core::Timer* t);
+    virtual void handleTimeout(core::Timer* t);
     void longpressTimeout();
     void twoTouchTimeout();
 

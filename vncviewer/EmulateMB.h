@@ -32,7 +32,7 @@ public:
 protected:
   virtual void sendPointerEvent(const core::Point& pos, int buttonMask)=0;
 
-  virtual bool handleTimeout(core::Timer *t);
+  virtual void handleTimeout(core::Timer *t);
 
 private:
   void sendAction(const core::Point& pos, int buttonMask, int action);

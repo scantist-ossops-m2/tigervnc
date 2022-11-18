@@ -300,7 +300,7 @@ void EncodeManager::writeLosslessRefresh(const core::Region& req, const PixelBuf
            core::Region(), core::Point(), pb, renderedCursor);
 }
 
-bool EncodeManager::handleTimeout(core::Timer* t)
+void EncodeManager::handleTimeout(core::Timer* t)
 {
   if (t == &recentChangeTimer) {
     // Any lossy region that wasn't recently updated can
@@ -310,10 +310,8 @@ bool EncodeManager::handleTimeout(core::Timer* t)
 
     // Will there be more to do? (i.e. do we need another round)
     if (!lossyRegion.subtract(pendingRefreshRegion).is_empty())
-      return true;
+      t->repeat();
   }
-
-  return false;
 }
 
 void EncodeManager::doUpdate(bool allowLossy, const core::Region& changed_,

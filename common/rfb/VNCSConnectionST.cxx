@@ -792,7 +792,7 @@ void VNCSConnectionST::supportsLEDState()
   writer()->writeLEDState();
 }
 
-bool VNCSConnectionST::handleTimeout(core::Timer* t)
+void VNCSConnectionST::handleTimeout(core::Timer* t)
 {
   try {
     if ((t == &congestionTimer) ||
@@ -804,8 +804,6 @@ bool VNCSConnectionST::handleTimeout(core::Timer* t)
 
   if (t == &idleTimer)
     close("Idle timeout");
-
-  return false;
 }
 
 bool VNCSConnectionST::isShiftPressed()

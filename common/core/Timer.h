@@ -53,7 +53,7 @@ namespace core {
       //   running, causing another timeout after the appropriate
       //   interval.
       //   If the handler returns false then the Timer is cancelled.
-      virtual bool handleTimeout(Timer* t) = 0;
+      virtual void handleTimeout(Timer* t) = 0;
 
       virtual ~Callback() {}
     };
@@ -77,6 +77,12 @@ namespace core {
     //   of milliseconds. If the timer is already active then it will
     //   be implicitly cancelled and re-started.
     void start(int timeoutMs_);
+
+    // repeat()
+    //   Restarts the timer in a way that repeats that last timeout.
+    //   This allows you to have a periodic timer without the risk of
+    //   accumulating drift caused by processing delays.
+    void repeat();
 
     // stop()
     //   Cancels the timer.
@@ -115,14 +121,14 @@ namespace core {
   template<class T> class MethodTimer
     : public Timer, public Timer::Callback {
   public:
-    MethodTimer(T* obj_, bool (T::*cb_)(Timer*))
+    MethodTimer(T* obj_, void (T::*cb_)(Timer*))
       : Timer(this), obj(obj_), cb(cb_) {}
 
-    virtual bool handleTimeout(Timer* t) { return (obj->*cb)(t); }
+    virtual void handleTimeout(Timer* t) { (obj->*cb)(t); }
 
   private:
     T* obj;
-    bool (T::*cb)(Timer*);
+    void (T::*cb)(Timer*);
   };
 
 };

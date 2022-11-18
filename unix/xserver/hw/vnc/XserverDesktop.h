@@ -115,7 +115,7 @@ protected:
                          network::SocketServer* sockserv,
                          bool read, bool write);
 
-  virtual bool handleTimeout(core::Timer* t);
+  virtual void handleTimeout(core::Timer* t);
 
 private:
 

@@ -323,14 +323,12 @@ bool GestureHandler::hasDetectedGesture()
   return true;
 }
 
-bool GestureHandler::handleTimeout(core::Timer* t)
+void GestureHandler::handleTimeout(core::Timer* t)
 {
   if (t == &longpressTimer)
     longpressTimeout();
   else if (t == &twoTouchTimer)
     twoTouchTimeout();
-
-  return false;
 }
 
 void GestureHandler::longpressTimeout()

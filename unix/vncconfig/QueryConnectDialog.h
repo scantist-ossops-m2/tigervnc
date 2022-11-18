@@ -43,7 +43,7 @@ class QueryConnectDialog : public TXDialog, public TXEventHandler,
   void handleEvent(TXWindow*, XEvent* ) { }
   void deleteWindow(TXWindow*);
   void buttonActivate(TXButton* b);
-  bool handleTimeout(core::Timer* t);
+  void handleTimeout(core::Timer* t);
  private:
   void refreshTimeout();
   TXLabel addressLbl, address, userLbl, user, timeoutLbl, timeout;

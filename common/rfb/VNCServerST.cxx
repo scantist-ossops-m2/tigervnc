@@ -616,22 +616,20 @@ SConnection* VNCServerST::getConnection(network::Socket* sock) {
   return 0;
 }
 
-bool VNCServerST::handleTimeout(core::Timer* t)
+void VNCServerST::handleTimeout(core::Timer* t)
 {
   if (t == &frameTimer) {
     // We keep running until we go a full interval without any updates
     if (comparer->is_empty())
-      return false;
+      return;
 
     writeUpdate();
 
     // If this is the first iteration then we need to adjust the timeout
-    if (frameTimer.getTimeoutMs() != 1000/rfb::Server::frameRate) {
+    if (frameTimer.getTimeoutMs() != 1000/rfb::Server::frameRate)
       frameTimer.start(1000/rfb::Server::frameRate);
-      return false;
-    }
-
-    return true;
+    else
+      frameTimer.repeat();
   } else if (t == &idleTimer) {
     slog.info("MaxIdleTime reached, exiting");
     desktop->terminate();
@@ -642,8 +640,6 @@ bool VNCServerST::handleTimeout(core::Timer* t)
     slog.info("MaxConnectionTime reached, exiting");
     desktop->terminate();
   }
-
-  return false;
 }
 
 void VNCServerST::queryConnection(VNCSConnectionST* client,

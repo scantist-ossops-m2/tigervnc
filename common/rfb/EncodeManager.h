@@ -66,7 +66,7 @@ namespace rfb {
                               size_t maxUpdateSize);
 
   protected:
-    virtual bool handleTimeout(core::Timer* t);
+    virtual void handleTimeout(core::Timer* t);
 
     void doUpdate(bool allowLossy, const core::Region& changed,
                   const core::Region& copied, const core::Point& copy_delta,

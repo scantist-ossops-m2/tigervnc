@@ -47,31 +47,14 @@ int Timer::checkTimeouts() {
   gettimeofday(&start, 0);
   while (pending.front()->isBefore(start)) {
     Timer* timer;
-    timeval before;
 
     timer = pending.front();
     pending.pop_front();
 
-    gettimeofday(&before, 0);
-    if (timer->cb->handleTimeout(timer)) {
-      timeval now;
+    timer->cb->handleTimeout(timer);
 
-      gettimeofday(&now, 0);
-
-      timer->dueTime = addMillis(timer->dueTime, timer->timeoutMs);
-      if (timer->isBefore(now)) {
-        // Time has jumped forwards, or we're not getting enough
-        // CPU time for the timers
-
-        timer->dueTime = addMillis(before, timer->timeoutMs);
-        if (timer->isBefore(now))
-          timer->dueTime = now;
-      }
-
-      insertTimer(timer);
-    } else if (pending.empty()) {
+    if (pending.empty())
       return -1;
-    }
   }
   return getNextTimeout();
 }
@@ -116,6 +99,21 @@ void Timer::start(int timeoutMs_) {
   stop();
   timeoutMs = timeoutMs_;
   dueTime = addMillis(now, timeoutMs);
+  insertTimer(this);
+}
+
+void Timer::repeat() {
+  timeval now;
+
+  gettimeofday(&now, 0);
+
+  dueTime = addMillis(dueTime, timeoutMs);
+  if (isBefore(now)) {
+    // Time has jumped forwards, or we're not getting enough
+    // CPU time for the timers
+    dueTime = now;
+  }
+
   insertTimer(this);
 }
 
