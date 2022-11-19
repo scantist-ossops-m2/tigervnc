@@ -47,8 +47,7 @@ namespace network { class SocketListener; class Socket; class SocketServer; }
 
 class XserverDesktop : public core::Object,
                        public rfb::SDesktop,
-                       public rfb::FullFramePixelBuffer,
-                       public core::Timer::Callback {
+                       public rfb::FullFramePixelBuffer {
 public:
 
   XserverDesktop(int screenIndex,
@@ -115,7 +114,7 @@ protected:
                          network::SocketServer* sockserv,
                          bool read, bool write);
 
-  virtual void handleTimeout(core::Timer* t);
+  void queryTimeout(core::Timer*, const char*);
 
 private:
 

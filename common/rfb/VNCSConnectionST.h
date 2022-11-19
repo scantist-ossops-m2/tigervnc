@@ -37,8 +37,11 @@
 namespace rfb {
   class VNCServerST;
 
-  class VNCSConnectionST : private SConnection,
-                           public core::Timer::Callback {
+  class VNCSConnectionST : private SConnection {
+  public:
+    // Let Object bypass our private inheritance to do its magic
+    friend class core::Object;
+
   public:
     VNCSConnectionST(VNCServerST* server_, network::Socket* s, bool reverse);
     virtual ~VNCSConnectionST();
@@ -140,7 +143,8 @@ namespace rfb {
     virtual void supportsLEDState();
 
     // Timer callbacks
-    virtual void handleTimeout(core::Timer* t);
+    void updateTimeout(core::Timer*, const char*);
+    void idleTimeout(core::Timer*, const char*);
 
     // Internal methods
 

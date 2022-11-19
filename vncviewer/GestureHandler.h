@@ -28,8 +28,7 @@
 
 #include "GestureEvent.h"
 
-class GestureHandler : public core::Object,
-                       public core::Timer::Callback {
+class GestureHandler : public core::Object {
   public:
     GestureHandler();
     virtual ~GestureHandler();
@@ -44,9 +43,8 @@ class GestureHandler : public core::Object,
   private:
     bool hasDetectedGesture();
 
-    virtual void handleTimeout(core::Timer* t);
-    void longpressTimeout();
-    void twoTouchTimeout();
+    void longpressTimeout(core::Timer*, const char*);
+    void twoTouchTimeout(core::Timer*, const char*);
 
     void pushEvent(GestureEventType t);
     GestureEventGesture stateToGesture(unsigned char state);

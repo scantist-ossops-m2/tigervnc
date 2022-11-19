@@ -33,8 +33,7 @@ class QueryResultCallback {
 };
 
 class QueryConnectDialog : public TXDialog, public TXEventHandler,
-                           public TXButtonCallback,
-                           public core::Timer::Callback
+                           public TXButtonCallback
 {
  public:
   QueryConnectDialog(Display* dpy, const char* address_,
@@ -43,7 +42,7 @@ class QueryConnectDialog : public TXDialog, public TXEventHandler,
   void handleEvent(TXWindow*, XEvent* ) { }
   void deleteWindow(TXWindow*);
   void buttonActivate(TXButton* b);
-  void handleTimeout(core::Timer* t);
+  void queryTimeout(core::Timer*, const char*);
  private:
   void refreshTimeout();
   TXLabel addressLbl, address, userLbl, user, timeoutLbl, timeout;

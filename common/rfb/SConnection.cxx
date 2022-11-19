@@ -58,11 +58,13 @@ const SConnection::AccessRights SConnection::AccessFull           = 0xffff;
 SConnection::SConnection()
   : readyForSetColourMapEntries(false),
     is(0), os(0), reader_(0), writer_(0), ssecurity(0),
-    authFailureTimer(this, &SConnection::handleAuthFailureTimeout),
     state_(RFBSTATE_UNINITIALISED), preferredEncoding(encodingRaw),
     accessRights(0x0000), clientClipboard(NULL), hasLocalClipboard(false),
     unsolicitedClipboardAttempt(false)
 {
+  authFailureTimer.connectSignal("timer", this,
+                                 &SConnection::authFailureTimeout);
+
   defaultMajorVersion = 3;
   defaultMinorVersion = 8;
   if (rfb::Server::protocol3_3)
@@ -286,10 +288,10 @@ bool SConnection::processInitMsg()
   return reader_->readClientInit();
 }
 
-void SConnection::handleAuthFailureTimeout(core::Timer* /*t*/)
+void SConnection::authFailureTimeout(core::Timer*, const char*)
 {
   if (state_ != RFBSTATE_SECURITY_FAILURE) {
-    close("SConnection::handleAuthFailureTimeout: invalid state");
+    close("SConnection::authFailureTimeout: invalid state");
     return;
   }
 

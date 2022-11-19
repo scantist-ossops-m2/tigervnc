@@ -41,8 +41,7 @@ namespace rfb {
   class PixelBuffer;
   class KeyRemapper;
 
-  class VNCServerST : public VNCServer,
-                      public core::Timer::Callback {
+  class VNCServerST : public VNCServer {
   public:
     // -=- Constructors
 
@@ -155,7 +154,10 @@ namespace rfb {
   protected:
 
     // Timer callbacks
-    virtual void handleTimeout(core::Timer* t);
+    void frameTimeout(core::Timer*, const char*);
+    void idleTimeout(core::Timer*, const char*);
+    void disconnectTimeout(core::Timer*, const char*);
+    void connectTimeout(core::Timer*, const char*);
 
     // - Internal methods
 

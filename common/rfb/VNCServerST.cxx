@@ -82,11 +82,18 @@ VNCServerST::VNCServerST(const char* name_, SDesktop* desktop_)
     name(core::strDup(name_)), pointerClient(0), clipboardClient(0),
     comparer(0), cursor(new Cursor(0, 0, core::Point(), NULL)),
     renderedCursorInvalid(false),
-    keyRemapper(&KeyRemapper::defInstance),
-    idleTimer(this), disconnectTimer(this), connectTimer(this),
-    frameTimer(this)
+    keyRemapper(&KeyRemapper::defInstance)
 {
   slog.debug("creating single-threaded server %s", name.buf);
+
+  idleTimer.connectSignal("timer", this,
+                          &VNCServerST::idleTimeout);
+  disconnectTimer.connectSignal("timer", this,
+                                &VNCServerST::disconnectTimeout);
+  connectTimer.connectSignal("timer", this,
+                             &VNCServerST::connectTimeout);
+  frameTimer.connectSignal("timer", this,
+                           &VNCServerST::frameTimeout);
 
   // FIXME: Do we really want to kick off these right away?
   if (rfb::Server::maxIdleTime)
@@ -616,30 +623,37 @@ SConnection* VNCServerST::getConnection(network::Socket* sock) {
   return 0;
 }
 
-void VNCServerST::handleTimeout(core::Timer* t)
+void VNCServerST::frameTimeout(core::Timer*, const char*)
 {
-  if (t == &frameTimer) {
-    // We keep running until we go a full interval without any updates
-    if (comparer->is_empty())
-      return;
+  // We keep running until we go a full interval without any updates
+  if (comparer->is_empty())
+    return;
 
-    writeUpdate();
+  writeUpdate();
 
-    // If this is the first iteration then we need to adjust the timeout
-    if (frameTimer.getTimeoutMs() != 1000/rfb::Server::frameRate)
-      frameTimer.start(1000/rfb::Server::frameRate);
-    else
-      frameTimer.repeat();
-  } else if (t == &idleTimer) {
-    slog.info("MaxIdleTime reached, exiting");
-    desktop->terminate();
-  } else if (t == &disconnectTimer) {
-    slog.info("MaxDisconnectionTime reached, exiting");
-    desktop->terminate();
-  } else if (t == &connectTimer) {
-    slog.info("MaxConnectionTime reached, exiting");
-    desktop->terminate();
-  }
+  // If this is the first iteration then we need to adjust the timeout
+  if (frameTimer.getTimeoutMs() != 1000/rfb::Server::frameRate)
+    frameTimer.start(1000/rfb::Server::frameRate);
+  else
+    frameTimer.repeat();
+}
+
+void VNCServerST::idleTimeout(core::Timer*, const char*)
+{
+  slog.info("MaxIdleTime reached, exiting");
+  desktop->terminate();
+}
+
+void VNCServerST::disconnectTimeout(core::Timer*, const char*)
+{
+  slog.info("MaxDisconnectionTime reached, exiting");
+  desktop->terminate();
+}
+
+void VNCServerST::connectTimeout(core::Timer*, const char*)
+{
+  slog.info("MaxConnectionTime reached, exiting");
+  desktop->terminate();
 }
 
 void VNCServerST::queryConnection(VNCSConnectionST* client,
