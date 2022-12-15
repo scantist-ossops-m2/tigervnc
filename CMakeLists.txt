@@ -29,7 +29,7 @@ include(CMakeMacroLibtoolFile)
 include(cmake/TargetLinkDirectories.cmake)
 
 project(tigervnc)
-set(VERSION 1.13.1)
+set(VERSION 1.13.80)
 
 # The RC version must always be four comma-separated numbers
 string(REPLACE . , RCVERSION "${VERSION}.0")
