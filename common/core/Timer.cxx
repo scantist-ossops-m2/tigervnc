@@ -98,7 +98,12 @@ int Timer::checkTimeouts() {
 int Timer::getNextTimeout() {
   timeval now;
   gettimeofday(&now, 0);
+
+  if (pending.empty())
+    return -1;
+
   int toWait = pending.front()->getRemainingMs();
+
   if (toWait > pending.front()->timeoutMs) {
     if (toWait - pending.front()->timeoutMs < 1000) {
       vlog.info("gettimeofday is broken...");
@@ -109,6 +114,7 @@ int Timer::getNextTimeout() {
     pending.front()->dueTime = now;
     toWait = 0;
   }
+
   return toWait;
 }
 
