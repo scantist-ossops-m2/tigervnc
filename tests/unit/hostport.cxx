@@ -44,7 +44,7 @@ static void doTest(const char* hostAndPort,
     fflush(stdout);
 }
 
-int main(int argc, char** argv)
+int main(int /*argc*/, char** /*argv*/)
 {
     doTest(":5", "localhost", 5905);
 
