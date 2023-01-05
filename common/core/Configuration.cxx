@@ -210,6 +210,8 @@ VoidParameter::VoidParameter(const char* name_, const char* desc_,
   conf->head = this;
 
   mutex = new os::Mutex();
+
+  registerSignal("config");
 }
 
 VoidParameter::~VoidParameter() {
@@ -310,6 +312,7 @@ void BoolParameter::setParam(bool b) {
   if (immutable) return;
   value = b;
   vlog.debug("set %s(Bool) to %d", getName(), value);
+  emitSignal("config");
 }
 
 char*
@@ -351,6 +354,7 @@ IntParameter::setParam(int v) {
   if (v < minValue || v > maxValue)
     return false;
   value = v;
+  emitSignal("config");
   return true;
 }
 
@@ -389,13 +393,16 @@ StringParameter::~StringParameter() {
 }
 
 bool StringParameter::setParam(const char* v) {
-  LOCK_CONFIG;
   if (immutable) return true;
   if (!v)
     throw Exception("setParam(<null>) not allowed");
   vlog.debug("set %s(String) to %s", getName(), v);
-  CharArray oldValue(value);
-  value = strDup(v);
+  {
+    LOCK_CONFIG;
+    CharArray oldValue(value);
+    value = strDup(v);
+  }
+  emitSignal("config");
   return value != 0;
 }
 
@@ -443,16 +450,19 @@ bool BinaryParameter::setParam(const char* v) {
 }
 
 void BinaryParameter::setParam(const uint8_t* v, size_t len) {
-  LOCK_CONFIG;
   if (immutable) return; 
   vlog.debug("set %s(Binary)", getName());
-  delete [] value; value = 0;
-  if (len) {
-    assert(v);
-    value = new uint8_t[len];
-    length = len;
-    memcpy(value, v, len);
+  {
+    LOCK_CONFIG;
+    delete [] value; value = 0;
+    if (len) {
+      assert(v);
+      value = new uint8_t[len];
+      length = len;
+      memcpy(value, v, len);
+    }
   }
+  emitSignal("config");
 }
 
 char* BinaryParameter::getDefaultStr() const {
