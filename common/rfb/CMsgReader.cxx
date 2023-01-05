@@ -32,7 +32,7 @@
 #include <rfb/clipboardTypes.h>
 #include <core/Exception.h>
 #include <core/LogWriter.h>
-#include <core/util.h>
+#include <core/string.h>
 #include <rfb/CMsgHandler.h>
 #include <rfb/CMsgReader.h>
 

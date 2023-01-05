@@ -29,7 +29,7 @@
 #include <algorithm>
 
 #include "TXWindow.h"
-#include <core/util.h>
+#include <core/string.h>
 
 // TXButtonCallback's buttonActivate() method is called when a button is
 // activated.

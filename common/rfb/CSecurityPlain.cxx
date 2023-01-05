@@ -24,7 +24,7 @@
 #include <rfb/CConnection.h>
 #include <rfb/CSecurityPlain.h>
 #include <rfb/UserPasswdGetter.h>
-#include <core/util.h>
+#include <core/string.h>
 
 #include <rdr/OutStream.h>
 

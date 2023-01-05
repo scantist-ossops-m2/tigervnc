@@ -22,7 +22,7 @@
 
 #include <string.h>
 #include <rfb/encodings.h>
-#include <core/util.h>
+#include <core/string.h>
 
 int rfb::encodingNum(const char* name)
 {

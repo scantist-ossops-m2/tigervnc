@@ -26,7 +26,7 @@
 #include <string.h>
 #include <syslog.h>
 
-#include <core/util.h>
+#include <core/string.h>
 #include <core/Logger_syslog.h>
 #include <core/LogWriter.h>
 

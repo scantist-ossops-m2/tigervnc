@@ -31,7 +31,7 @@
 #include <rfb/Password.h>
 #include <core/Configuration.h>
 #include <core/LogWriter.h>
-#include <core/util.h>
+#include <core/string.h>
 #include <rfb/Exception.h>
 #include <string.h>
 #include <stdio.h>

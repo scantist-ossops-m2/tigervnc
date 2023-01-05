@@ -23,7 +23,7 @@
 #include <rfb/SConnection.h>
 #include <rfb/SSecurity.h>
 #include <rfb/SSecurityVeNCrypt.h>
-#include <core/util.h>
+#include <core/string.h>
 #include <core/Configuration.h>
 
 namespace rfb {

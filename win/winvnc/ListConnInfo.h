@@ -22,7 +22,7 @@
 
 #include <list>
 
-#include <core/util.h>
+#include <core/string.h>
 
 namespace winvnc {
 

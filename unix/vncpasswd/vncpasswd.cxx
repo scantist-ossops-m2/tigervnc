@@ -30,7 +30,7 @@
 #include <unistd.h>
 #include <os/os.h>
 #include <rfb/Password.h>
-#include <core/util.h>
+#include <core/string.h>
 
 #include <termios.h>
 

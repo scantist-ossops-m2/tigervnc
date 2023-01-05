@@ -27,7 +27,7 @@
 
 #include <os/Mutex.h>
 
-#include <core/util.h>
+#include <core/string.h>
 #include <core/Logger_file.h>
 
 using namespace core;

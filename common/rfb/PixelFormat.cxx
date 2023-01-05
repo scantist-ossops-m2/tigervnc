@@ -30,7 +30,7 @@
 #include <rdr/OutStream.h>
 #include <core/Exception.h>
 #include <rfb/PixelFormat.h>
-#include <core/util.h>
+#include <core/string.h>
 
 #ifdef _WIN32
 #define strcasecmp _stricmp

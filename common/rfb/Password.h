@@ -18,7 +18,7 @@
 #ifndef __RFB_PASSWORD_H__
 #define __RFB_PASSWORD_H__
 
-#include <core/util.h>
+#include <core/string.h>
 
 namespace rfb {
 

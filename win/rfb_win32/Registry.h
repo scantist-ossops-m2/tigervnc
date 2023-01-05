@@ -24,7 +24,7 @@
 
 #include <windows.h>
 #include <rfb_win32/Security.h>
-#include <core/util.h>
+#include <core/string.h>
 
 namespace rfb {
 

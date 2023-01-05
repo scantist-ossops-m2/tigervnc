@@ -45,7 +45,7 @@
 
 #include <limits.h>
 
-#include <core/util.h>
+#include <core/string.h>
 
 namespace os { class Mutex; }
 

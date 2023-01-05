@@ -41,7 +41,7 @@
 #include <rfb/CSecurityTLS.h>
 #include <rfb/SSecurityTLS.h>
 #endif
-#include <core/util.h>
+#include <core/string.h>
 
 using namespace rdr;
 using namespace rfb;

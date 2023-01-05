@@ -23,7 +23,7 @@
 #include <stdio.h>
 
 #include <network/TcpSocket.h>
-#include <core/util.h>
+#include <core/string.h>
 
 static void doTest(const char* hostAndPort,
                    const char* expectedHost, int expectedPort)

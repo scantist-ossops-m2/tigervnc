@@ -34,7 +34,7 @@
 #include <FL/Fl_Return_Button.H>
 #include <FL/Fl_Pixmap.H>
 
-#include <core/util.h>
+#include <core/string.h>
 #include <rfb/Password.h>
 #include <core/Exception.h>
 

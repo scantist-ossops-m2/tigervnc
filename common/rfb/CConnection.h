@@ -27,7 +27,7 @@
 #include <rfb/CMsgHandler.h>
 #include <rfb/DecodeManager.h>
 #include <rfb/SecurityClient.h>
-#include <core/util.h>
+#include <core/string.h>
 
 namespace rfb {
 

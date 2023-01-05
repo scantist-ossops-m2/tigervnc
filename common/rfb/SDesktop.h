@@ -43,7 +43,7 @@
 #include <rfb/InputHandler.h>
 #include <core/Exception.h>
 #include <rfb/screenTypes.h>
-#include <core/util.h>
+#include <core/string.h>
 
 namespace network { class Socket; }
 

@@ -26,7 +26,7 @@
 
 #include <rfb_win32/RegConfig.h>
 #include <core/LogWriter.h>
-#include <core/util.h>
+#include <core/string.h>
 //#include <rdr/HexOutStream.h>
 
 using namespace core;

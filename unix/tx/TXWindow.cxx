@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <vector>
-#include <core/util.h>
+#include <core/string.h>
 
 std::list<TXWindow*> windows;
 

@@ -31,7 +31,7 @@
 #include <rfb/qemuTypes.h>
 #include <rfb/clipboardTypes.h>
 #include <core/Exception.h>
-#include <core/util.h>
+#include <core/string.h>
 #include <rfb/SMsgHandler.h>
 #include <rfb/SMsgReader.h>
 #include <core/Configuration.h>

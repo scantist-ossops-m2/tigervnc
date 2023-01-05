@@ -32,7 +32,7 @@
 #include <map>
 
 #include <core/Configuration.h>
-#include <core/util.h>
+#include <core/string.h>
 
 namespace rfb {
 

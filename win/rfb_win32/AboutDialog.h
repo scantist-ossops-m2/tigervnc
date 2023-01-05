@@ -22,7 +22,7 @@
 #define __RFB_WIN32_ABOUT_DIALOG_H__
 
 #include <rfb_win32/Dialog.h>
-#include <core/util.h>
+#include <core/string.h>
 
 extern const char* buildTime;
 

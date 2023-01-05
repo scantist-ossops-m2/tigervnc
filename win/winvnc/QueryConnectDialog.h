@@ -22,7 +22,7 @@
 #define __WINVNC_QUERY_CONNECT_DIALOG_H__
 
 #include <rfb_win32/Dialog.h>
-#include <core/util.h>
+#include <core/string.h>
 
 namespace os { class Thread; }
 

@@ -42,7 +42,7 @@
 
 #include <windows.h>
 #include <tchar.h>
-#include <core/util.h>
+#include <core/string.h>
 #include <rfb/Password.h>
 
 namespace core {
