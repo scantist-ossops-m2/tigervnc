@@ -77,12 +77,10 @@ private:
 
   void resizeFramebuffer();
 
-  void updateEncoding();
-  void updateCompressLevel();
-  void updateQualityLevel();
-  void updatePixelFormat();
-
-  static void handleOptions(void *data);
+  void updateEncoding(core::VoidParameter* =NULL, const char* ="");
+  void updateCompressLevel(core::VoidParameter* =NULL, const char* ="");
+  void updateQualityLevel(core::VoidParameter* =NULL, const char* ="");
+  void updatePixelFormat(core::VoidParameter* =NULL, const char* ="");
 
   static void handleUpdateTimeout(void *data);
 
