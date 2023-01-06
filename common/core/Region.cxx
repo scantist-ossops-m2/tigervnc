@@ -101,8 +101,12 @@ core::Region core::Region::subtract(const core::Region& r) const {
   return ret;
 }
 
-bool core::Region::equals(const core::Region& r) const {
+bool core::Region::operator==(const core::Region& r) const {
   return pixman_region_equal(rgn, r.rgn);
+}
+
+bool core::Region::operator!=(const core::Region& r) const {
+  return !pixman_region_equal(rgn, r.rgn);
 }
 
 int core::Region::numRects() const {

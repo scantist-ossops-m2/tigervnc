@@ -704,7 +704,7 @@ void EncodeManager::findSolidRect(const core::Rect& rect, core::Region *changed,
         extendSolidAreaByBlock(sr, colourValue, pb, &erb);
 
         // Did we end up getting the entire rectangle?
-        if (erb.equals(rect))
+        if (erb == rect)
           erp = erb;
         else {
           // Don't bother with sending tiny rectangles
@@ -1007,7 +1007,7 @@ PixelBuffer* EncodeManager::preparePixelBuffer(const core::Rect& rect,
   int stride;
 
   // Do wo need to convert the data?
-  if (convert && !conn->client.pf().equal(pb->getPF())) {
+  if (convert && conn->client.pf() != pb->getPF()) {
     convertedPixelBuffer.setPF(conn->client.pf());
     convertedPixelBuffer.setSize(rect.width(), rect.height());
 

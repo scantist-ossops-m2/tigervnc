@@ -745,7 +745,7 @@ void CConnection::setQualityLevel(int level)
 
 void CConnection::setPF(const PixelFormat& pf)
 {
-  if (server.pf().equal(pf) && !formatChange)
+  if (server.pf() == pf && !formatChange)
     return;
 
   nextPF = pf;

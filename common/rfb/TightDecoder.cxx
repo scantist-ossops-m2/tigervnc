@@ -399,7 +399,7 @@ void TightDecoder::decodeRect(const core::Rect& r, const void* buffer,
   uint8_t* outbuf;
   int stride;
 
-  if (pb->getPF().equal(pf)) {
+  if (pb->getPF() == pf) {
     // Decode directly into the framebuffer (fast path)
     directDecode = true;
   } else {

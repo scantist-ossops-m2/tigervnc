@@ -38,7 +38,8 @@ namespace core {
     Point() : x(0), y(0) {}
     Point(int x_, int y_) : x(x_), y(y_) {}
     inline Point negate() const {return Point(-x, -y);}
-    inline bool equals(const Point &p) const {return x==p.x && y==p.y;}
+    inline bool operator==(const Point &p) const {return x==p.x && y==p.y;}
+    inline bool operator!=(const Point &p) const {return x!=p.x || y!=p.y;}
     inline Point translate(const Point &p) const {return Point(x+p.x, y+p.y);}
     inline Point subtract(const Point &p) const {return Point(x-p.x, y-p.y);}
     int x, y;
@@ -83,7 +84,8 @@ namespace core {
     inline Rect translate(const Point &p) const {
       return Rect(tl.translate(p), br.translate(p));
     }
-    inline bool equals(const Rect &r) const {return r.tl.equals(tl) && r.br.equals(br);}
+    inline bool operator==(const Rect &r) const {return r.tl == tl && r.br == br;}
+    inline bool operator!=(const Rect &r) const {return r.tl != tl || r.br != br;}
     inline bool is_empty() const {return (tl.x >= br.x) || (tl.y >= br.y);}
     inline void clear() {tl = Point(); br = Point();}
     inline bool enclosed_by(const Rect &r) const {
