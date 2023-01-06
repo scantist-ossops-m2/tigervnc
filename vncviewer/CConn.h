@@ -77,7 +77,9 @@ private:
 
   void resizeFramebuffer();
 
-  void autoSelectFormatAndEncoding();
+  void updateEncoding();
+  void updateCompressLevel();
+  void updateQualityLevel();
   void updatePixelFormat();
 
   static void handleOptions(void *data);
