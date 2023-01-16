@@ -54,6 +54,12 @@ from the X Consortium.
 #include <sys/stat.h>
 #include <errno.h>
 #include <sys/param.h>
+#ifdef MITSHM
+#include "shmint.h"
+#endif
+#ifdef HAVE_XSHMFENCE
+#include <misyncshm.h>
+#endif
 #include "dix.h"
 #include "os.h"
 #include "miline.h"
@@ -106,6 +112,8 @@ static VncScreenInfo vncScreenInfo = {
 
 static Bool vncPixmapDepths[33];
 static Bool Render = TRUE;
+static Bool hw3d = FALSE;
+const char *driNode = NULL;
 
 static Bool displaySpecified = FALSE;
 static char displayNumStr[16];
@@ -216,6 +224,8 @@ ddxUseMsg(void)
     ErrorF("-pixdepths list-of-int support given pixmap depths\n");
     ErrorF("+/-render		   turn on/off RENDER extension support"
            "(default on)\n");
+    ErrorF("-hw3d                  enable hardware 3d acceleration\n");
+    ErrorF("-drinode path          use another card than /dev/dri/renderD128\n");
 
     ErrorF("-geometry WxH          set screen 0's width, height\n");
     ErrorF("-depth D               set screen 0's depth\n");
@@ -307,6 +317,18 @@ ddxProcessArgument(int argc, char *argv[], int i)
     if (strcmp(argv[i], "-render") == 0) {      /* -render */
         Render = FALSE;
         return 1;
+    }
+
+    if (strcmp (argv[i], "-hw3d") == 0) {
+	hw3d = TRUE;
+	return 1;
+    }
+
+    if (strcmp (argv[i], "-drinode") == 0) {
+        CHECK_FOR_REQUIRED_ARGUMENTS(1);
+        ++i;
+        driNode = argv[i];
+        return 2;
     }
 
     if (strcmp(argv[i], "-geometry") == 0) {
@@ -1027,6 +1049,15 @@ vncScreenInit(ScreenPtr pScreen, int argc, char **argv)
     if (!ret)
         return FALSE;
 
+#ifdef MITSHM
+    ShmRegisterFbFuncs(pScreen);
+#endif
+
+#ifdef HAVE_XSHMFENCE
+    if (!miSyncShmScreenInit(pScreen))
+        return FALSE;
+#endif
+
     ret = vncRandRInit(pScreen);
     if (!ret)
         return FALSE;
@@ -1110,6 +1141,10 @@ static ExtensionModule glxExt = {
 #endif
 #endif
 
+#ifdef DRI3
+extern void xvnc_init_dri3(void);
+#endif
+
 void
 InitOutput(ScreenInfo * scrInfo, int argc, char **argv)
 {
@@ -1170,6 +1205,14 @@ InitOutput(ScreenInfo * scrInfo, int argc, char **argv)
 
     if (!AddCallback(&ClientStateCallback, vncClientStateChange, 0)) {
         FatalError("AddCallback failed\n");
+    }
+
+    if (hw3d) {
+#ifdef DRI3
+        xvnc_init_dri3();
+#else
+        FatalError("DRI3 disabled at compile time\n");
+#endif
     }
 }                               /* end InitOutput */
 
