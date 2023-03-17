@@ -18,7 +18,7 @@ if(BUILD_STATIC)
 
   set(BUILD_STATIC_GCC 1)
 
-  set(JPEG_LIBRARIES "-Wl,-Bstatic -ljpeg -Wl,-Bdynamic")
+  set(JPEG_LIBRARIES "-Wl,-Bstatic -lturbojpeg -Wl,-Bdynamic")
   set(ZLIB_LIBRARIES "-Wl,-Bstatic -lz -Wl,-Bdynamic")
   set(PIXMAN_LIBRARIES "-Wl,-Bstatic -lpixman-1 -Wl,-Bdynamic")
 
@@ -45,9 +45,9 @@ if(BUILD_STATIC)
 
     # FIXME: MSYS2 doesn't include a static version of this library, so
     #        we'll have to link it dynamically for now
-    if(UNISTRING_LIBRARY)
-      set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -lunistring")
-    endif()
+    ##if(UNISTRING_LIBRARY)
+    ##  set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -lunistring")
+    ##endif()
 
     if(APPLE)
       set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -framework Carbon")
@@ -65,7 +65,7 @@ if(BUILD_STATIC)
     FIND_LIBRARY(IDN2_LIBRARY NAMES idn2 libidn2
       HINTS ${PC_GNUTLS_LIBDIR} ${PC_GNUTLS_LIBRARY_DIRS})
 
-    set(GNUTLS_LIBRARIES "-Wl,-Bstatic -lgnutls")
+    set(GNUTLS_LIBRARIES "-Wl,-Bstatic -lgnutls -lbrotlidec -lbrotlienc -lbrotlicommon -lhogweed -lzstd")
 
     if(TASN1_LIBRARY)
       set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -ltasn1")
@@ -98,7 +98,7 @@ if(BUILD_STATIC)
         set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lp11-kit")
       endif()
       if(UNISTRING_LIBRARY)
-        set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lunistring")
+	set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -Wl,-Bstatic -lunistring -Wl,-Bdynamic")
       endif()
     endif()
 
@@ -186,9 +186,9 @@ if(BUILD_STATIC_GCC)
     find_package(Threads)
     if(CMAKE_USE_PTHREADS_INIT)
       # pthread has to be statically linked after libraries above and before kernel32
-      set(STATIC_BASE_LIBRARIES "${STATIC_BASE_LIBRARIES} -Wl,-Bstatic -lpthread -Wl,-Bdynamic")
+      set(STATIC_BASE_LIBRARIES "${STATIC_BASE_LIBRARIES} -Wl,-Bstatic -lwinpthread -Wl,-Bdynamic")
     endif()
-    set(STATIC_BASE_LIBRARIES "${STATIC_BASE_LIBRARIES} -luser32 -lkernel32 -ladvapi32 -lshell32")
+    set(STATIC_BASE_LIBRARIES "${STATIC_BASE_LIBRARIES} -lp11-kit -lgdiplus -luser32 -lkernel32 -ladvapi32 -lshell32")
     # mingw has some fun circular dependencies that requires us to link
     # these things again
     set(STATIC_BASE_LIBRARIES "${STATIC_BASE_LIBRARIES} -lmingw32 -lgcc_eh -lgcc -lmoldname -lmingwex -lmsvcrt")

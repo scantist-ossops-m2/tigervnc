@@ -1249,20 +1249,20 @@ void Viewport::initContextMenu()
 
   fltk_menu_add(contextMenu, p_("ContextMenu|", "&Full screen"),
                 0, NULL, (void*)ID_FULLSCREEN,
-                FL_MENU_TOGGLE | (window()->fullscreen_active()?FL_MENU_VALUE:0));
+                FL_MENU_TOGGLE | (window()->fullscreen_active()?(unsigned int)FL_MENU_VALUE:0));
   fltk_menu_add(contextMenu, p_("ContextMenu|", "Minimi&ze"),
                 0, NULL, (void*)ID_MINIMIZE, 0);
   fltk_menu_add(contextMenu, p_("ContextMenu|", "Resize &window to session"),
                 0, NULL, (void*)ID_RESIZE,
-                (window()->fullscreen_active()?FL_MENU_INACTIVE:0) |
+                (window()->fullscreen_active()?(unsigned int)FL_MENU_INACTIVE:0) |
                 FL_MENU_DIVIDER);
 
   fltk_menu_add(contextMenu, p_("ContextMenu|", "&Ctrl"),
                 0, NULL, (void*)ID_CTRL,
-                FL_MENU_TOGGLE | (menuCtrlKey?FL_MENU_VALUE:0));
+                (unsigned int)FL_MENU_TOGGLE | (menuCtrlKey?(unsigned int)FL_MENU_VALUE:0));
   fltk_menu_add(contextMenu, p_("ContextMenu|", "&Alt"),
                 0, NULL, (void*)ID_ALT,
-                FL_MENU_TOGGLE | (menuAltKey?FL_MENU_VALUE:0));
+                (unsigned int)FL_MENU_TOGGLE | (menuAltKey?(unsigned int)FL_MENU_VALUE:0));
 
   if (menuKeySym) {
     char sendMenuKey[64];
