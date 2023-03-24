@@ -25,6 +25,7 @@
 #ifndef __RDR_INSTREAM_H__
 #define __RDR_INSTREAM_H__
 
+#include <QObject>
 #include <rdr/types.h>
 #include <rdr/Exception.h>
 #include <string.h> // for memcpy
@@ -37,7 +38,8 @@
 
 namespace rdr {
 
-  class InStream {
+  class InStream : public ::QObject {
+    Q_OBJECT
 
   public:
 
@@ -121,7 +123,6 @@ namespace rdr {
     }
 
     // readU/SN() methods read unsigned and signed N-bit integers.
-
     inline U8  readU8()  { check(1); return *ptr++; }
     inline U16 readU16() { check(2); int b0 = *ptr++; int b1 = *ptr++;
                            return b0 << 8 | b1; }
@@ -196,11 +197,7 @@ namespace rdr {
 
   protected:
 
-    InStream() : restorePoint(NULL)
-#ifdef RFB_INSTREAM_CHECK
-      ,checkedBytes(0)
-#endif
-     {}
+    InStream();
     const U8* ptr;
     const U8* end;
   };

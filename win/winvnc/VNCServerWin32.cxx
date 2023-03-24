@@ -231,11 +231,11 @@ bool VNCServerWin32::disconnectClients(const char* reason) {
 bool VNCServerWin32::addNewClient(const char* client) {
   TcpSocket* sock = 0;
   try {
-    CharArray hostname;
+    std::string hostname;
     int port;
-    getHostAndPort(client, &hostname.buf, &port, 5500);
+    getHostAndPort(client, &hostname, &port, 5500);
     vlog.error("port=%d", port);
-    sock = new TcpSocket(hostname.buf, port);
+    sock = new TcpSocket(hostname.c_str(), port);
     if (queueCommand(AddClient, sock, 0))
       return true;
     delete sock;

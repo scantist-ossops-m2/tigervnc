@@ -27,8 +27,8 @@
 #include <errno.h>
 #ifdef _WIN32
 #include <winsock2.h>
-#undef errno
-#define errno WSAGetLastError()
+//#undef errno
+//#define errno WSAGetLastError()
 #include <os/winerrno.h>
 #else
 #include <sys/types.h>

@@ -4,67 +4,177 @@ include_directories(${PIXMAN_INCLUDE_DIRS})
 
 add_library(rfb STATIC
   Blacklist.cxx
-  Congestion.cxx
+  Blacklist.h
   CConnection.cxx
+  CConnection.h
   CMsgHandler.cxx
+  CMsgHandler.h
   CMsgReader.cxx
+  CMsgReader.h
   CMsgWriter.cxx
+  CMsgWriter.h
+  CSecurity.h
+  CSecurityNone.h
   CSecurityPlain.cxx
+  CSecurityPlain.h
+  CSecurityRSAAES.h
   CSecurityStack.cxx
+  CSecurityStack.h
+  CSecurityTLS.h
   CSecurityVeNCrypt.cxx
+  CSecurityVeNCrypt.h
   CSecurityVncAuth.cxx
+  CSecurityVncAuth.h
   ClientParams.cxx
+  ClientParams.h
   ComparingUpdateTracker.cxx
+  ComparingUpdateTracker.h
   Configuration.cxx
+  Configuration.h
+  Congestion.cxx
+  Congestion.h
   CopyRectDecoder.cxx
+  CopyRectDecoder.h
   Cursor.cxx
+  Cursor.h
   DecodeManager.cxx
+  DecodeManager.h
   Decoder.cxx
-  d3des.c
+  Decoder.h
   EncodeManager.cxx
+  EncodeManager.h
   Encoder.cxx
+  Encoder.h
+  Exception.h
+  H264Decoder.h
+  H264DecoderContext.h
+  H264LibavDecoderContext.h
+  H264WinDecoderContext.h
   HextileDecoder.cxx
+  HextileDecoder.h
   HextileEncoder.cxx
+  HextileEncoder.h
+  Hostname.h
+  InputHandler.h
   JpegCompressor.cxx
+  JpegCompressor.h
   JpegDecompressor.cxx
+  JpegDecompressor.h
   KeyRemapper.cxx
+  KeyRemapper.h
   LogWriter.cxx
+  LogWriter.h
   Logger.cxx
+  Logger.h
   Logger_file.cxx
+  Logger_file.h
   Logger_stdio.cxx
+  Logger_stdio.h
+  Logger_syslog.h
+  Palette.h
   Password.cxx
+  Password.h
+  Pixel.h
   PixelBuffer.cxx
+  PixelBuffer.h
   PixelFormat.cxx
-  RREEncoder.cxx
+  PixelFormat.h
   RREDecoder.cxx
+  RREDecoder.h
+  RREEncoder.cxx
+  RREEncoder.h
   RawDecoder.cxx
+  RawDecoder.h
   RawEncoder.cxx
+  RawEncoder.h
+  Rect.h
   Region.cxx
+  Region.h
   SConnection.cxx
+  SConnection.h
+  SDesktop.h
   SMsgHandler.cxx
+  SMsgHandler.h
   SMsgReader.cxx
+  SMsgReader.h
   SMsgWriter.cxx
-  ServerCore.cxx
-  ServerParams.cxx
-  Security.cxx
-  SecurityServer.cxx
-  SecurityClient.cxx
+  SMsgWriter.h
+  SSecurity.h
+  SSecurityNone.h
   SSecurityPlain.cxx
+  SSecurityPlain.h
+  SSecurityRSAAES.h
   SSecurityStack.cxx
-  SSecurityVncAuth.cxx
+  SSecurityStack.h
+  SSecurityTLS.h
   SSecurityVeNCrypt.cxx
+  SSecurityVeNCrypt.h
+  SSecurityVncAuth.cxx
+  SSecurityVncAuth.h
   ScaleFilters.cxx
-  Timer.cxx
+  ScaleFilters.h
+  ScreenSet.h
+  Security.cxx
+  Security.h
+  SecurityClient.cxx
+  SecurityClient.h
+  SecurityServer.cxx
+  SecurityServer.h
+  ServerCore.cxx
+  ServerCore.h
+  ServerParams.cxx
+  ServerParams.h
+  TightConstants.h
   TightDecoder.cxx
+  TightDecoder.h
   TightEncoder.cxx
+  TightEncoder.h
   TightJPEGEncoder.cxx
+  TightJPEGEncoder.h
+  Timer.cxx
+  Timer.h
+  UnixPasswordValidator.h
   UpdateTracker.cxx
+  UpdateTracker.h
+  UserMsgBox.h
+  UserPasswdGetter.h
   VNCSConnectionST.cxx
+  VNCSConnectionST.h
+  VNCServer.h
   VNCServerST.cxx
-  ZRLEEncoder.cxx
+  VNCServerST.h
+  WinPasswdValidator.h
+  XF86keysym.h
   ZRLEDecoder.cxx
+  ZRLEDecoder.h
+  ZRLEEncoder.cxx
+  ZRLEEncoder.h
+  clipboardTypes.h
+  d3des.c
+  d3des.h
   encodings.cxx
-  util.cxx)
+  encodings.h
+  fenceTypes.h
+  hextileConstants.h
+  hextileDecode.h
+  hextileEncode.h
+  hextileEncodeBetter.h
+  keysymdef.h
+  ledStates.h
+  msgTypes.h
+  pam.h
+  qemuTypes.h
+  rreDecode.h
+  rreEncode.h
+  screenTypes.h
+  tightDecode.h
+  util.cxx
+  util.h
+  zrleDecode.h
+  )
+
+target_compile_definitions(rfb
+  PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 
 target_link_libraries(rfb os rdr)
 target_link_libraries(rfb ${JPEG_LIBRARIES} ${PIXMAN_LIBRARIES})

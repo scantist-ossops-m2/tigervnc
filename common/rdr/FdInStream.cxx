@@ -27,8 +27,8 @@
 #ifdef _WIN32
 #include <winsock2.h>
 #define close closesocket
-#undef errno
-#define errno WSAGetLastError()
+//#undef errno
+//#define errno WSAGetLastError()
 #include <os/winerrno.h>
 #else
 #include <sys/types.h>

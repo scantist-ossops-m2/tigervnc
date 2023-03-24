@@ -20,7 +20,7 @@
 #ifndef __CCONN_H__
 #define __CCONN_H__
 
-#include <FL/Fl.H>
+//#include <FL/Fl.H>
 
 #include <rfb/CConnection.h>
 #include <rdr/FdInStream.h>
@@ -42,7 +42,7 @@ public:
   unsigned getPosition();
 
   // Callback when socket is ready (or broken)
-  static void socketEvent(FL_SOCKET fd, void *data);
+  static void socketEvent(int fd, void *data); // FL_SOCKET --> int
 
   // CConnection callback methods
   void initDone();
@@ -85,11 +85,11 @@ private:
   static void handleUpdateTimeout(void *data);
 
 private:
-  char* serverHost;
+  std::string serverHost;
   int serverPort;
   network::Socket* sock;
 
-  DesktopWindow *desktop;
+//  DesktopWindow *desktop;
 
   unsigned updateCount;
   unsigned pixelCount;

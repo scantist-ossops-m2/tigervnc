@@ -3,23 +3,49 @@ include_directories(${ZLIB_INCLUDE_DIRS})
 
 add_library(rdr STATIC
   AESInStream.cxx
+  AESInStream.h
   AESOutStream.cxx
+  AESOutStream.h
   BufferedInStream.cxx
+  BufferedInStream.h
   BufferedOutStream.cxx
+  BufferedOutStream.h
   Exception.cxx
+  Exception.h
   FdInStream.cxx
+  FdInStream.h
   FdOutStream.cxx
+  FdOutStream.h
   FileInStream.cxx
+  FileInStream.h
   HexInStream.cxx
+  HexInStream.h
   HexOutStream.cxx
+  HexOutStream.h
+  InStream.h
+  InStream.cxx
+  MemInStream.h
+  MemOutStream.h
+  OutStream.h
   RandomStream.cxx
+  RandomStream.h
   TLSException.cxx
+  TLSException.h
   TLSInStream.cxx
+  TLSInStream.h
   TLSOutStream.cxx
+  TLSOutStream.h
   ZlibInStream.cxx
-  ZlibOutStream.cxx)
+  ZlibInStream.h
+  ZlibOutStream.cxx
+  ZlibOutStream.h
+  types.h
+  )
 
-target_link_libraries(rdr ${ZLIB_LIBRARIES} os)
+target_compile_definitions(rdr
+  PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
+
+target_link_libraries(rdr Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Quick Qt${QT_VERSION_MAJOR}::Widgets ${ZLIB_LIBRARIES} os)
 
 if(GNUTLS_FOUND)
   include_directories(${GNUTLS_INCLUDE_DIR})
