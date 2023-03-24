@@ -42,7 +42,10 @@ add_library(rdr STATIC
   types.h
   )
 
-target_link_libraries(rdr ${ZLIB_LIBRARIES} os)
+target_compile_definitions(rdr
+  PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
+
+target_link_libraries(rdr Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Quick Qt${QT_VERSION_MAJOR}::Widgets ${ZLIB_LIBRARIES} os)
 
 if(GNUTLS_FOUND)
   include_directories(SYSTEM ${GNUTLS_INCLUDE_DIR})

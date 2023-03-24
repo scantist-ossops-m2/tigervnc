@@ -5,8 +5,14 @@ add_library(os STATIC
   Thread.cxx
   os.cxx)
 
+target_compile_definitions(os
+  PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
+
 if(UNIX)
-  target_link_libraries(os pthread)
+  target_link_libraries(os Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Quick Qt${QT_VERSION_MAJOR}::Widgets pthread)
+endif()
+if(WIN32)
+  target_link_libraries(os Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Quick Qt${QT_VERSION_MAJOR}::Widgets)
 endif()
 
 if(UNIX)
