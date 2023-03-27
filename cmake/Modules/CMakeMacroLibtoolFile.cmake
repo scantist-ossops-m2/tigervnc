@@ -105,19 +105,15 @@ function(libtool_generate_control_file _target)
           endif()
 
           if(STATIC_MODE)
-            set(_library ${CMAKE_STATIC_LIBRARY_PREFIX}${library}${CMAKE_STATIC_LIBRARY_SUFFIX})
-            find_library(FL ${_library} PATHS ${LIBRARY_PATHS})
+            set(library ${CMAKE_STATIC_LIBRARY_PREFIX}${library}${CMAKE_STATIC_LIBRARY_SUFFIX})
           endif()
 
-          if(NOT FL)
-            find_library(FL ${library} PATHS ${LIBRARY_PATHS})
-          endif()
-
+          find_library(FL ${library} PATHS ${LIBRARY_PATHS})
           if(FL)
             # Found library. Depending on if it's static or not we might
             # extract the path and library name, then add the
             # result to the libtool dependency libs.
-            if("${FL}" MATCHES ".+${CMAKE_STATIC_LIBRARY_SUFFIX}$")
+            if(STATIC_MODE)
               set(_target_dependency_libs "${_target_dependency_libs} ${FL}")
             else()
               get_filename_component(_shared_lib ${FL} NAME_WE)
