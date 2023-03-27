@@ -37,13 +37,11 @@ if(BUILD_STATIC)
       set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -lintl")
     endif()
 
-    set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -Wl,-Bdynamic")
-
-    # FIXME: MSYS2 doesn't include a static version of this library, so
-    #        we'll have to link it dynamically for now
     if(UNISTRING_LIBRARY)
       set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -lunistring")
     endif()
+
+    set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -Wl,-Bdynamic")
 
     if(ICONV_LIBRARY)
       if (APPLE)
@@ -71,6 +69,10 @@ if(BUILD_STATIC)
       HINTS ${PC_GNUTLS_LIBDIR} ${PC_GNUTLS_LIBRARY_DIRS})
     FIND_LIBRARY(IDN2_LIBRARY NAMES idn2 libidn2
       HINTS ${PC_GNUTLS_LIBDIR} ${PC_GNUTLS_LIBRARY_DIRS})
+    FIND_LIBRARY(P11KIT_LIBRARY NAMES p11-kit libp11-kit
+      HINTS ${PC_GNUTLS_LIBDIR} ${PC_GNUTLS_LIBRARY_DIRS})
+    FIND_LIBRARY(UNISTRING_LIBRARY NAMES unistring libunistring
+      HINTS ${PC_GNUTLS_LIBDIR} ${PC_GNUTLS_LIBRARY_DIRS})
 
     set(GNUTLS_LIBRARIES "-Wl,-Bstatic -lgnutls")
 
@@ -80,27 +82,20 @@ if(BUILD_STATIC)
     if(IDN2_LIBRARY)
       set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lidn2")
     endif()
+    if(P11KIT_LIBRARY)
+      set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lp11-kit")
+    endif()
+    if(UNISTRING_LIBRARY)
+      set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lunistring")
+    endif()
 
     set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -Wl,-Bdynamic")
 
     if (WIN32)
-      FIND_LIBRARY(P11KIT_LIBRARY NAMES p11-kit libp11-kit
-        HINTS ${PC_GNUTLS_LIBDIR} ${PC_GNUTLS_LIBRARY_DIRS})
-      FIND_LIBRARY(UNISTRING_LIBRARY NAMES unistring libunistring
-        HINTS ${PC_GNUTLS_LIBDIR} ${PC_GNUTLS_LIBRARY_DIRS})
-
       # GnuTLS uses various crypto-api stuff
       set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lcrypt32 -lncrypt")
       # And sockets
       set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lws2_32")
-
-      # p11-kit only available as dynamic library for MSYS2 on Windows and dynamic linking of unistring is required
-      if(P11KIT_LIBRARY)
-        set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lp11-kit")
-      endif()
-      if(UNISTRING_LIBRARY)
-        set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lunistring")
-      endif()
     endif()
 
     if(${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
