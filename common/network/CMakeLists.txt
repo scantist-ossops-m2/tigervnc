@@ -1,5 +1,3 @@
-include_directories(${CMAKE_SOURCE_DIR}/common)
-
 add_library(network STATIC
   Socket.cxx
   Socket.h
@@ -10,6 +8,8 @@ add_library(network STATIC
 if(NOT WIN32)
   target_sources(network PRIVATE UnixSocket.cxx UnixSocket.h)
 endif()
+
+target_include_directories(network PUBLIC ${CMAKE_SOURCE_DIR}/common)
 
 if(UNIX)
   libtool_create_control_file(network)

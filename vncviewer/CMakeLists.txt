@@ -1,7 +1,3 @@
-include_directories(SYSTEM ${GETTEXT_INCLUDE_DIR})
-
-include_directories(${CMAKE_SOURCE_DIR}/common)
-
 #list(APPEND CMAKE_PREFIX_PATH "/opt/Qt/Static/6.2.4/gcc_64s")
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Quick QuickWidgets Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Quick QuickWidgets Widgets REQUIRED)
@@ -185,6 +181,8 @@ endif()
 
 target_compile_definitions(vncviewer
   PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
+target_include_directories(vncviewer SYSTEM PUBLIC ${GETTEXT_INCLUDE_DIR})
+target_include_directories(vncviewer PUBLIC ${CMAKE_SOURCE_DIR}/common)
 if(QT_VERSION_MAJOR GREATER_EQUAL 6)
     target_link_libraries(vncviewer
       PRIVATE

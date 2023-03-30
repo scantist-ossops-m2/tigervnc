@@ -1,7 +1,3 @@
-include_directories(${CMAKE_SOURCE_DIR}/common)
-include_directories(SYSTEM ${JPEG_INCLUDE_DIR})
-include_directories(SYSTEM ${PIXMAN_INCLUDE_DIRS})
-
 add_library(rfb STATIC
   Blacklist.cxx
   Blacklist.h
@@ -174,6 +170,9 @@ add_library(rfb STATIC
   ZRLEEncoder.h
   )
 
+target_include_directories(rfb PUBLIC ${CMAKE_SOURCE_DIR}/common)
+target_include_directories(rfb SYSTEM PUBLIC ${JPEG_INCLUDE_DIR})
+target_include_directories(rfb SYSTEM PUBLIC ${PIXMAN_INCLUDE_DIRS})
 target_link_libraries(rfb os rdr)
 target_link_libraries(rfb ${JPEG_LIBRARIES} ${PIXMAN_LIBRARIES})
 target_link_directories(rfb PUBLIC ${PIXMAN_LIBRARY_DIRS})
@@ -185,7 +184,7 @@ if(ENABLE_H264 AND NOT H264_LIBS STREQUAL "NONE")
   elseif(H264_LIBS STREQUAL "WIN")
     target_sources(rfb PRIVATE H264WinDecoderContext.cxx)
   endif()
-  include_directories(SYSTEM ${H264_INCLUDE_DIRS})
+  target_include_directories(rfb SYSTEM PUBLIC ${H264_INCLUDE_DIRS})
   target_link_libraries(rfb ${H264_LIBRARIES})
   target_link_directories(rfb PUBLIC ${H264_LIBRARY_DIRS})
 endif()
@@ -195,7 +194,7 @@ if(UNIX)
 endif()
 
 if(WIN32)
-  include_directories(${CMAKE_SOURCE_DIR}/win)
+  target_include_directories(rfb PUBLIC ${CMAKE_SOURCE_DIR}/win)
   target_sources(rfb PRIVATE WinPasswdValidator.cxx WinPasswdValidator.h)
 endif(WIN32)
 
@@ -206,14 +205,15 @@ endif()
 
 if(GNUTLS_FOUND)
   target_sources(rfb PRIVATE CSecurityTLS.cxx SSecurityTLS.cxx CSecurityTLS.h SSecurityTLS.h)
-  include_directories(SYSTEM ${GNUTLS_INCLUDE_DIR})
+  target_include_directories(rfb SYSTEM PUBLIC ${GNUTLS_INCLUDE_DIR})
   target_link_libraries(rfb ${GNUTLS_LIBRARIES})
 endif()
 
 if (NETTLE_FOUND)
   target_sources(rfb PRIVATE CSecurityDH.cxx CSecurityDH.h CSecurityMSLogonII.cxx CSecurityMSLogonII.h
                  CSecurityRSAAES.cxx CSecurityRSAAES.h SSecurityRSAAES.cxx SSecurityRSAAES.h)
-  include_directories(SYSTEM ${NETTLE_INCLUDE_DIRS} ${GMP_INCLUDE_DIRS})
+  target_include_directories(rfb SYSTEM PUBLIC ${NETTLE_INCLUDE_DIRS}
+                             ${GMP_INCLUDE_DIRS})
   target_link_libraries(rfb ${HOGWEED_LIBRARIES}
                         ${NETTLE_LIBRARIES} ${GMP_LIBRARIES})
   target_link_directories(rfb PUBLIC ${HOGWEED_LIBRARY_DIRS}
