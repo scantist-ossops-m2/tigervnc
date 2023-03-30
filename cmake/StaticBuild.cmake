@@ -13,136 +13,205 @@ option(BUILD_STATIC
 option(BUILD_STATIC_GCC
     "Link statically against only libgcc and libstdc++" OFF)
 
+macro(find_static_library var)
+  unset(${var})
+  unset(${var} CACHE)
+
+  cmake_parse_arguments(ARGS "" "" "NAMES;HINTS" ${ARGN})
+
+  unset(STATIC_NAMES)
+  foreach(NAME IN LISTS ARGS_NAMES)
+    list(APPEND STATIC_NAMES ${CMAKE_STATIC_LIBRARY_PREFIX}${NAME}${CMAKE_STATIC_LIBRARY_SUFFIX})
+  endforeach()
+
+  find_library(${var} NAMES ${STATIC_NAMES} HINTS ${ARGS_HINTS})
+
+  if(NOT ${var})
+    find_library(${var} NAMES ${ARGS_NAMES} HINTS ${ARGS_HINTS})
+    if(${var})
+      message("Could not find static version of \"${ARGS_NAMES}\", using dynamic linking")
+    endif()
+  endif()
+endmacro()
+
 if(BUILD_STATIC)
   message(STATUS "Attempting to link static binaries...")
 
   set(BUILD_STATIC_GCC 1)
 
-  set(JPEG_LIBRARIES "-Wl,-Bstatic -ljpeg -Wl,-Bdynamic")
-  set(ZLIB_LIBRARIES "-Wl,-Bstatic -lz -Wl,-Bdynamic")
-  set(PIXMAN_LIBRARIES "-Wl,-Bstatic -lpixman-1 -Wl,-Bdynamic")
+  find_static_library(JPEG_LIBRARIES NAMES jpeg)
+  find_static_library(ZLIB_LIBRARIES NAMES z)
+  find_static_library(PIXMAN_LIBRARIES NAMES pixman-1)
 
   # gettext is included in libc on many unix systems
   if(NOT LIBC_HAS_DGETTEXT)
-    FIND_LIBRARY(UNISTRING_LIBRARY NAMES unistring libunistring
+    find_static_library(UNISTRING_LIBRARY NAMES unistring
       HINTS ${PC_GETTEXT_LIBDIR} ${PC_GETTEXT_LIBRARY_DIRS})
-    FIND_LIBRARY(INTL_LIBRARY NAMES intl libintl
-      HINTS ${PC_GETTEXT_LIBDIR} ${PC_GETTEXT_LIBRARY_DIRS})
-    FIND_LIBRARY(ICONV_LIBRARY NAMES iconv libiconv
+    find_static_library(INTL_LIBRARY NAMES intl
       HINTS ${PC_GETTEXT_LIBDIR} ${PC_GETTEXT_LIBRARY_DIRS})
 
-    set(GETTEXT_LIBRARIES "-Wl,-Bstatic")
+    set(GETTEXT_LIBRARIES "")
 
     if(INTL_LIBRARY)
-      set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -lintl")
+      list(APPEND GETTEXT_LIBRARIES ${INTL_LIBRARY})
     endif()
 
     if(UNISTRING_LIBRARY)
-      set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -lunistring")
+      list(APPEND GETTEXT_LIBRARIES ${UNISTRING_LIBRARY})
     endif()
 
-    set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -Wl,-Bdynamic")
-
-    if(ICONV_LIBRARY)
-      if (APPLE)
-        set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -liconv")
-      else()
-        set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -Wl,-Bstatic")
-        set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -liconv")
-        set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -Wl,-Bdynamic")
-      endif()
+    if (APPLE)
+      list(APPEND GETTEXT_LIBRARIES -liconv)
+    else()
+      find_static_library(ICONV_LIBRARY NAMES iconv
+        HINTS ${PC_GETTEXT_LIBDIR} ${PC_GETTEXT_LIBRARY_DIRS})
+      list(APPEND GETTEXT_LIBRARIES ${ICONV_LIBRARY})
     endif()
 
     if(APPLE)
-      set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -framework Carbon")
+      list(APPEND GETTEXT_LIBRARIES "-framework Carbon")
     endif()
   endif()
 
   if(NETTLE_FOUND)
-    set(NETTLE_LIBRARIES "-Wl,-Bstatic -lnettle -Wl,-Bdynamic")
-    set(HOGWEED_LIBRARIES "-Wl,-Bstatic -lhogweed -Wl,-Bdynamic")
-    set(GMP_LIBRARIES "-Wl,-Bstatic -lgmp -Wl,-Bdynamic")
+    find_static_library(NETTLE_LIBRARIES NAMES nettle)
+    find_static_library(HOGWEED_LIBRARIES NAMES hogweed)
+    find_static_library(GMP_LIBRARIES NAMES gmp)
   endif()
 
   if(GNUTLS_FOUND)
-    FIND_LIBRARY(TASN1_LIBRARY NAMES tasn1 libtasn1
-      HINTS ${PC_GNUTLS_LIBDIR} ${PC_GNUTLS_LIBRARY_DIRS})
-    FIND_LIBRARY(IDN2_LIBRARY NAMES idn2 libidn2
-      HINTS ${PC_GNUTLS_LIBDIR} ${PC_GNUTLS_LIBRARY_DIRS})
-    FIND_LIBRARY(P11KIT_LIBRARY NAMES p11-kit libp11-kit
-      HINTS ${PC_GNUTLS_LIBDIR} ${PC_GNUTLS_LIBRARY_DIRS})
-    FIND_LIBRARY(UNISTRING_LIBRARY NAMES unistring libunistring
+    find_static_library(GNUTLS_LIBRARIES NAMES gnutls
       HINTS ${PC_GNUTLS_LIBDIR} ${PC_GNUTLS_LIBRARY_DIRS})
 
-    set(GNUTLS_LIBRARIES "-Wl,-Bstatic -lgnutls")
+    find_static_library(TASN1_LIBRARY NAMES tasn1
+      HINTS ${PC_GNUTLS_LIBDIR} ${PC_GNUTLS_LIBRARY_DIRS})
+    find_static_library(IDN2_LIBRARY NAMES idn2
+      HINTS ${PC_GNUTLS_LIBDIR} ${PC_GNUTLS_LIBRARY_DIRS})
+    find_static_library(P11KIT_LIBRARY NAMES p11-kit
+      HINTS ${PC_GNUTLS_LIBDIR} ${PC_GNUTLS_LIBRARY_DIRS})
+    find_static_library(UNISTRING_LIBRARY NAMES unistring
+      HINTS ${PC_GNUTLS_LIBDIR} ${PC_GNUTLS_LIBRARY_DIRS})
 
     if(TASN1_LIBRARY)
-      set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -ltasn1")
+      list(APPEND GNUTLS_LIBRARIES ${TASN1_LIBRARY})
     endif()
     if(IDN2_LIBRARY)
-      set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lidn2")
+      list(APPEND GNUTLS_LIBRARIES ${IDN2_LIBRARY})
     endif()
     if(P11KIT_LIBRARY)
-      set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lp11-kit")
+      list(APPEND GNUTLS_LIBRARIES ${P11KIT_LIBRARY})
     endif()
     if(UNISTRING_LIBRARY)
-      set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lunistring")
+      list(APPEND GNUTLS_LIBRARIES ${UNISTRING_LIBRARY})
     endif()
-
-    set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -Wl,-Bdynamic")
 
     if (WIN32)
       # GnuTLS uses various crypto-api stuff
-      set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lcrypt32 -lncrypt")
+      list(APPEND GNUTLS_LIBRARIES -lcrypt32 -lncrypt)
       # And sockets
-      set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lws2_32")
+      list(APPEND GNUTLS_LIBRARIES -lws2_32)
     endif()
 
     # GnuTLS uses nettle, gettext and zlib, so make sure those are
     # always included and in the proper order
-    set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} ${HOGWEED_LIBRARIES}")
-    set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} ${NETTLE_LIBRARIES}")
-    set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} ${GMP_LIBRARIES}")
-    set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} ${ZLIB_LIBRARIES}")
-    set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} ${GETTEXT_LIBRARIES}")
-
-    # The last variables might introduce whitespace, which CMake
-    # throws a hissy fit about
-    string(STRIP ${GNUTLS_LIBRARIES} GNUTLS_LIBRARIES)
+    list(APPEND GNUTLS_LIBRARIES ${HOGWEED_LIBRARIES})
+    list(APPEND GNUTLS_LIBRARIES ${NETTLE_LIBRARIES})
+    list(APPEND GNUTLS_LIBRARIES ${GMP_LIBRARIES})
+    list(APPEND GNUTLS_LIBRARIES ${ZLIB_LIBRARIES})
+    if(GETTEXT_LIBRARIES)
+      list(APPEND GNUTLS_LIBRARIES ${GETTEXT_LIBRARIES})
+    endif()
   endif()
 
   if(DEFINED FLTK_LIBRARIES)
-    set(FLTK_LIBRARIES "-Wl,-Bstatic -lfltk_images -lpng -ljpeg -lfltk -Wl,-Bdynamic")
+    find_static_library(FLTK_LIBRARY NAMES fltk)
+    find_static_library(FLTK_IMAGES_LIBRARY NAMES fltk_images)
+    find_static_library(PNG_LIBRARY NAMES png)
+
+    set(FLTK_LIBRARIES "")
+
+    list(APPEND FLTK_LIBRARIES ${FLTK_IMAGES_LIBRARY})
+    list(APPEND FLTK_LIBRARIES ${PNG_LIBRARY})
+    list(APPEND FLTK_LIBRARIES ${JPEG_LIBRARIES})
+
+    list(APPEND FLTK_LIBRARIES ${FLTK_LIBRARY})
 
     if(WIN32)
-      set(FLTK_LIBRARIES "${FLTK_LIBRARIES} -lcomctl32")
+      list(APPEND FLTK_LIBRARIES -lcomctl32)
     elseif(APPLE)
-      set(FLTK_LIBRARIES "${FLTK_LIBRARIES} -framework Cocoa")
+      list(APPEND FLTK_LIBRARIES "-framework Cocoa")
     else()
-      set(FLTK_LIBRARIES "${FLTK_LIBRARIES} -lm -ldl")
+      list(APPEND FLTK_LIBRARIES -lm -ldl)
     endif()
 
     if(X11_FOUND AND NOT APPLE)
-      set(FLTK_LIBRARIES "${FLTK_LIBRARIES} -Wl,-Bstatic -lXcursor -lXfixes -lXft -lfontconfig -lexpat -lfreetype -lpng -lbz2 -luuid -lXrender -lXext -lXinerama -Wl,-Bdynamic -lX11")
+      if(X11_Xcursor_FOUND)
+        find_static_library(X11_Xcursor_LIB NAMES Xcursor)
+        list(APPEND FLTK_LIBRARIES ${X11_Xcursor_LIB})
+      endif()
+
+      if(X11_Xfixes_FOUND)
+        find_static_library(X11_Xfixes_LIB NAMES Xfixes)
+        list(APPEND FLTK_LIBRARIES ${X11_Xfixes_LIB})
+      endif()
+
+      if(X11_Xft_FOUND)
+        find_static_library(X11_Xft_LIB NAMES Xft)
+        find_static_library(FONTCONFIG_LIBRARY NAMES fontconfig)
+        find_static_library(EXPAT_LIBRARY NAMES expat)
+        find_static_library(FREETYPE_LIBRARY NAMES freetype)
+        find_static_library(BZ2_LIBRARY NAMES bz2)
+        find_static_library(UUID_LIBRARY NAMES uuid)
+        list(APPEND FLTK_LIBRARIES ${X11_Xft_LIB})
+        list(APPEND FLTK_LIBRARIES ${FONTCONFIG_LIBRARY})
+        list(APPEND FLTK_LIBRARIES ${EXPAT_LIBRARY})
+        list(APPEND FLTK_LIBRARIES ${FREETYPE_LIBRARY})
+        list(APPEND FLTK_LIBRARIES ${PNG_LIBRARY})
+        list(APPEND FLTK_LIBRARIES ${BZ2_LIBRARY})
+        list(APPEND FLTK_LIBRARIES ${UUID_LIBRARY})
+      endif()
+
+      if(X11_Xrender_FOUND)
+        find_static_library(X11_Xrender_LIB NAMES Xrender)
+        list(APPEND FLTK_LIBRARIES ${X11_Xrender_LIB})
+      endif()
+
+      if(X11_Xext_FOUND)
+        list(APPEND FLTK_LIBRARIES ${X11_Xext_LIB})
+        find_static_library(X11_Xinerama_LIB NAMES Xinerama)
+      endif()
+
+      if(X11_Xinerama_FOUND)
+        list(APPEND FLTK_LIBRARIES ${X11_Xinerama_LIB})
+        find_static_library(X11_Xext_LIB NAMES Xext)
+      endif()
+
+      list(APPEND FLTK_LIBRARIES -lX11)
     endif()
   endif()
 
   # X11 libraries change constantly on Linux systems so we have to link
   # them statically, even libXext. libX11 is somewhat stable, although
   # even it has had an ABI change once or twice.
-  if(X11_FOUND)
-    set(X11_LIBRARIES "-Wl,-Bstatic -lXext -Wl,-Bdynamic -lX11")
-    if(X11_XTest_LIB)
-      set(X11_XTest_LIB "-Wl,-Bstatic -lXtst -Wl,-Bdynamic")
+  if(X11_FOUND AND NOT APPLE)
+    if(X11_Xext_FOUND)
+      find_static_library(X11_Xext_LIB NAMES Xext)
     endif()
-    if(X11_Xdamage_LIB)
-      set(X11_Xdamage_LIB "-Wl,-Bstatic -lXdamage -Wl,-Bdynamic")
+    if(X11_Xtst_FOUND)
+      find_static_library(X11_Xtst_LIB NAMES Xtst)
+    endif()
+    if(X11_Xdamage_FOUND)
+      find_static_library(X11_Xdamage_LIB NAMES Xdamage)
+    endif()
+    if(X11_Xrandr_FOUND)
+      find_static_library(X11_Xrandr_LIB NAMES Xrandr)
+    endif()
+    if(X11_Xi_FOUND)
+      find_static_library(X11_Xi_LIB NAMES Xi)
     endif()
     if(X11_Xrandr_LIB)
-      set(X11_Xrandr_LIB "-Wl,-Bstatic -lXrandr -lXrender -Wl,-Bdynamic")
-    endif()
-    if(X11_Xi_LIB)
-      set(X11_Xi_LIB "-Wl,-Bstatic -lXi -Wl,-Bdynamic")
+      find_static_library(X11_Xrender_LIB NAMES Xrender)
+      list(APPEND X11_Xrandr_LIB ${X11_Xrender_LIB})
     endif()
   endif()
 endif()
