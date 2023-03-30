@@ -1,4 +1,4 @@
-include_directories(${GETTEXT_INCLUDE_DIR})
+include_directories(SYSTEM ${GETTEXT_INCLUDE_DIR})
 
 include_directories(${CMAKE_SOURCE_DIR}/common)
 
