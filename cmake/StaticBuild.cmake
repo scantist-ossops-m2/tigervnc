@@ -60,9 +60,13 @@ if(BUILD_STATIC)
     endif()
   endif()
 
+  if(NETTLE_FOUND)
+    set(NETTLE_LIBRARIES "-Wl,-Bstatic -lnettle -Wl,-Bdynamic")
+    set(HOGWEED_LIBRARIES "-Wl,-Bstatic -lhogweed -Wl,-Bdynamic")
+    set(GMP_LIBRARIES "-Wl,-Bstatic -lgmp -Wl,-Bdynamic")
+  endif()
+
   if(GNUTLS_FOUND)
-    FIND_LIBRARY(NETTLE_LIBRARY NAMES nettle libnettle
-      HINTS ${PC_GNUTLS_LIBDIR} ${PC_GNUTLS_LIBRARY_DIRS})
     FIND_LIBRARY(TASN1_LIBRARY NAMES tasn1 libtasn1
       HINTS ${PC_GNUTLS_LIBDIR} ${PC_GNUTLS_LIBRARY_DIRS})
     FIND_LIBRARY(IDN2_LIBRARY NAMES idn2 libidn2
@@ -72,9 +76,6 @@ if(BUILD_STATIC)
 
     if(TASN1_LIBRARY)
       set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -ltasn1")
-    endif()
-    if(NETTLE_LIBRARY)
-      set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lhogweed -lnettle -lgmp")
     endif()
     if(IDN2_LIBRARY)
       set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lidn2")
@@ -109,20 +110,17 @@ if(BUILD_STATIC)
       set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lsocket")
     endif()
 
-    # GnuTLS uses gettext and zlib, so make sure those are always
-    # included and in the proper order
+    # GnuTLS uses nettle, gettext and zlib, so make sure those are
+    # always included and in the proper order
+    set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} ${HOGWEED_LIBRARIES}")
+    set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} ${NETTLE_LIBRARIES}")
+    set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} ${GMP_LIBRARIES}")
     set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} ${ZLIB_LIBRARIES}")
     set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} ${GETTEXT_LIBRARIES}")
 
     # The last variables might introduce whitespace, which CMake
     # throws a hissy fit about
     string(STRIP ${GNUTLS_LIBRARIES} GNUTLS_LIBRARIES)
-  endif()
-
-  if(NETTLE_FOUND)
-    set(NETTLE_LIBRARIES "-Wl,-Bstatic -lnettle -Wl,-Bdynamic")
-    set(HOGWEED_LIBRARIES "-Wl,-Bstatic -lhogweed -Wl,-Bdynamic")
-    set(GMP_LIBRARIES "-Wl,-Bstatic -lgmp -Wl,-Bdynamic")
   endif()
 
   if(DEFINED FLTK_LIBRARIES)
