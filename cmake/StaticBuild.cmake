@@ -98,13 +98,6 @@ if(BUILD_STATIC)
       set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lws2_32")
     endif()
 
-    if(${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
-      # nanosleep() lives here on Solaris
-      set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lrt")
-      # and socket functions are hidden here
-      set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lsocket")
-    endif()
-
     # GnuTLS uses nettle, gettext and zlib, so make sure those are
     # always included and in the proper order
     set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} ${HOGWEED_LIBRARIES}")
@@ -130,20 +123,14 @@ if(BUILD_STATIC)
     endif()
 
     if(X11_FOUND AND NOT APPLE)
-      if(${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
-        set(FLTK_LIBRARIES "${FLTK_LIBRARIES} ${X11_Xcursor_LIB} ${X11_Xfixes_LIB} -Wl,-Bstatic -lXft -Wl,-Bdynamic -lfontconfig -lXrender -lXext -R/usr/sfw/lib -L=/usr/sfw/lib -lfreetype -lsocket -lnsl")
-      else()
-        set(FLTK_LIBRARIES "${FLTK_LIBRARIES} -Wl,-Bstatic -lXcursor -lXfixes -lXft -lfontconfig -lexpat -lfreetype -lpng -lbz2 -luuid -lXrender -lXext -lXinerama -Wl,-Bdynamic")
-      endif()
-
-      set(FLTK_LIBRARIES "${FLTK_LIBRARIES} -lX11")
+      set(FLTK_LIBRARIES "${FLTK_LIBRARIES} -Wl,-Bstatic -lXcursor -lXfixes -lXft -lfontconfig -lexpat -lfreetype -lpng -lbz2 -luuid -lXrender -lXext -lXinerama -Wl,-Bdynamic -lX11")
     endif()
   endif()
 
   # X11 libraries change constantly on Linux systems so we have to link
   # them statically, even libXext. libX11 is somewhat stable, although
   # even it has had an ABI change once or twice.
-  if(X11_FOUND AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
+  if(X11_FOUND)
     set(X11_LIBRARIES "-Wl,-Bstatic -lXext -Wl,-Bdynamic -lX11")
     if(X11_XTest_LIB)
       set(X11_XTest_LIB "-Wl,-Bstatic -lXtst -Wl,-Bdynamic")
