@@ -36,10 +36,6 @@ if(BUILD_STATIC)
     if(INTL_LIBRARY)
       set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -lintl")
     endif()
-    
-    if(ICONV_LIBRARY)
-      set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -liconv")
-    endif()
 
     set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -Wl,-Bdynamic")
 
@@ -47,6 +43,16 @@ if(BUILD_STATIC)
     #        we'll have to link it dynamically for now
     if(UNISTRING_LIBRARY)
       set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -lunistring")
+    endif()
+
+    if(ICONV_LIBRARY)
+      if (APPLE)
+        set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -liconv")
+      else()
+        set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -Wl,-Bstatic")
+        set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -liconv")
+        set(GETTEXT_LIBRARIES "${GETTEXT_LIBRARIES} -Wl,-Bdynamic")
+      endif()
     endif()
 
     if(APPLE)
