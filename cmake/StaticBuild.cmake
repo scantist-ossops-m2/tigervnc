@@ -61,9 +61,6 @@ if(BUILD_STATIC)
   endif()
 
   if(GNUTLS_FOUND)
-    # GnuTLS has historically had different crypto backends
-    FIND_LIBRARY(GCRYPT_LIBRARY NAMES gcrypt libgcrypt
-      HINTS ${PC_GNUTLS_LIBDIR} ${PC_GNUTLS_LIBRARY_DIRS})
     FIND_LIBRARY(NETTLE_LIBRARY NAMES nettle libnettle
       HINTS ${PC_GNUTLS_LIBDIR} ${PC_GNUTLS_LIBRARY_DIRS})
     FIND_LIBRARY(TASN1_LIBRARY NAMES tasn1 libtasn1
@@ -78,9 +75,6 @@ if(BUILD_STATIC)
     endif()
     if(NETTLE_LIBRARY)
       set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lhogweed -lnettle -lgmp")
-    endif()
-    if(GCRYPT_LIBRARY)
-      set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lgcrypt -lgpg-error")
     endif()
     if(IDN2_LIBRARY)
       set(GNUTLS_LIBRARIES "${GNUTLS_LIBRARIES} -lidn2")
