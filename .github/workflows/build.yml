@@ -32,6 +32,8 @@ jobs:
         if: ${{ failure() }}
         run: |
           pwd
+          ls -l build
+          ls -l build/CMakeFiles
           for log in build/CMakeFiles/*.log; do
             echo
             echo @@@@@@@@@@@@@@@@ ${log} @@@@@@@@@@@@@@@@
