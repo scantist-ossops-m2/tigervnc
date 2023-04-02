@@ -28,6 +28,14 @@ jobs:
       - name: Install
         working-directory: build
         run: make tarball
+      - name: Failure build logs
+        if: ${{ failure() }}
+        run: |
+          for log in build/CMakeFiles/*.log; do
+            echo
+            echo @@@@@@@@@@@@@@@@ ${log} @@@@@@@@@@@@@@@@
+            echo
+            cat ${log}
       - uses: actions/upload-artifact@v3
         with:
           name: Linux (Ubuntu)
@@ -65,6 +73,14 @@ jobs:
         env:
           MSYS2_PATH_TYPE: inherit
         run: make installer winvnc_installer
+      - name: Failure build logs
+        if: ${{ failure() }}
+        run: |
+          for log in build/CMakeFiles/*.log; do
+            echo
+            echo @@@@@@@@@@@@@@@@ ${log} @@@@@@@@@@@@@@@@
+            echo
+            cat ${log}
       - uses: actions/upload-artifact@v3
         with:
           name: Windows
@@ -92,6 +108,14 @@ jobs:
       - name: Install
         working-directory: build
         run: make dmg
+      - name: Failure build logs
+        if: ${{ failure() }}
+        run: |
+          for log in build/CMakeFiles/*.log; do
+            echo
+            echo @@@@@@@@@@@@@@@@ ${log} @@@@@@@@@@@@@@@@
+            echo
+            cat ${log}
       - uses: actions/upload-artifact@v3
         with:
           name: macOS
@@ -117,6 +141,14 @@ jobs:
       - name: Build
         working-directory: java/build
         run: make
+      - name: Failure build logs
+        if: ${{ failure() }}
+        run: |
+          for log in java/build/CMakeFiles/*.log; do
+            echo
+            echo @@@@@@@@@@@@@@@@ ${log} @@@@@@@@@@@@@@@@
+            echo
+            cat ${log}
       - uses: actions/upload-artifact@v3
         with:
           name: Java (${{ matrix.java }})
