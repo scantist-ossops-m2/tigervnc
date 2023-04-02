@@ -31,11 +31,13 @@ jobs:
       - name: Failure build logs
         if: ${{ failure() }}
         run: |
+          pwd
           for log in build/CMakeFiles/*.log; do
             echo
             echo @@@@@@@@@@@@@@@@ ${log} @@@@@@@@@@@@@@@@
             echo
             cat ${log}
+          done
       - uses: actions/upload-artifact@v3
         with:
           name: Linux (Ubuntu)
@@ -81,6 +83,7 @@ jobs:
             echo @@@@@@@@@@@@@@@@ ${log} @@@@@@@@@@@@@@@@
             echo
             cat ${log}
+          done
       - uses: actions/upload-artifact@v3
         with:
           name: Windows
@@ -116,6 +119,7 @@ jobs:
             echo @@@@@@@@@@@@@@@@ ${log} @@@@@@@@@@@@@@@@
             echo
             cat ${log}
+          done
       - uses: actions/upload-artifact@v3
         with:
           name: macOS
@@ -149,6 +153,7 @@ jobs:
             echo @@@@@@@@@@@@@@@@ ${log} @@@@@@@@@@@@@@@@
             echo
             cat ${log}
+          done
       - uses: actions/upload-artifact@v3
         with:
           name: Java (${{ matrix.java }})
