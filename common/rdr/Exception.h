@@ -34,6 +34,7 @@ namespace rdr {
   struct Exception {
     enum { len = 256 };
     char str_[len];
+    bool abort{false};
     Exception(QString);
     Exception(const char *format = 0, ...) __printf_attr(2, 3);
     virtual ~Exception() {}

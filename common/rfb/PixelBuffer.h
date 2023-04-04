@@ -156,6 +156,8 @@ namespace rfb {
     virtual const rdr::U8* getBuffer(const Rect& r, int* stride) const;
     virtual rdr::U8* getBufferRW(const Rect& r, int* stride);
     virtual void commitBufferRW(const Rect& r);
+    rdr::U8 *bits() { return data; }
+    int getStride() { return stride; }
 
   protected:
     FullFramePixelBuffer();
@@ -166,7 +168,7 @@ namespace rfb {
 
   private:
     rdr::U8* data;
-    int stride;
+    int stride; // number of bytes per line.
   };
 
   // -=- Managed pixel buffer class
