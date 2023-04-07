@@ -27,8 +27,6 @@
 #include <errno.h>
 #ifdef _WIN32
 #include <winsock2.h>
-//#undef errno
-//#define errno WSAGetLastError()
 #include <os/winerrno.h>
 #else
 #include <sys/types.h>
@@ -99,6 +97,9 @@ bool FdOutStream::flushBuffer()
 size_t FdOutStream::writeFd(const void* data, size_t length)
 {
   int n;
+#if defined(WIN32)
+  int werrno;
+#endif
 
   do {
     fd_set fds;
@@ -109,10 +110,21 @@ size_t FdOutStream::writeFd(const void* data, size_t length)
     FD_ZERO(&fds);
     FD_SET(fd, &fds);
     n = select(fd+1, 0, &fds, 0, &tv);
-  } while (n < 0 && errno == EINTR);
+#if defined(WIN32)
+    werrno = WSAGetLastError();
+#endif
+  } while (n < 0 && (errno == EINTR
+#if defined(WIN32)
+                     || werrno == WSAEINTR
+#endif
+                     ));
 
   if (n < 0)
+#if defined(WIN32)
+    throw SystemException("select", werrno);
+#else
     throw SystemException("select", errno);
+#endif
 
   if (n == 0)
     return 0;
@@ -126,10 +138,21 @@ size_t FdOutStream::writeFd(const void* data, size_t length)
 #else
     n = ::send(fd, (const char*)data, length, MSG_DONTWAIT);
 #endif
-  } while (n < 0 && (errno == EINTR));
+#if defined(WIN32)
+    werrno = WSAGetLastError();
+#endif
+  } while (n < 0 && (errno == EINTR
+#if defined(WIN32)
+                     || werrno == WSAEINTR
+#endif
+                     ));
 
   if (n < 0)
+#if defined(WIN32)
+    throw SystemException("write", werrno);
+#else
     throw SystemException("write", errno);
+#endif
 
   gettimeofday(&lastWrite, NULL);
 

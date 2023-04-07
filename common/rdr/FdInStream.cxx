@@ -27,8 +27,6 @@
 #ifdef _WIN32
 #include <winsock2.h>
 #define close closesocket
-//#undef errno
-//#define errno WSAGetLastError()
 #include <os/winerrno.h>
 #else
 #include <sys/types.h>
@@ -80,6 +78,9 @@ bool FdInStream::fillBuffer()
 size_t FdInStream::readFd(void* buf, size_t len)
 {
   int n;
+#if defined(WIN32)
+  int werrno;
+#endif
   do {
     fd_set fds;
     struct timeval tv;
@@ -89,20 +90,42 @@ size_t FdInStream::readFd(void* buf, size_t len)
     FD_ZERO(&fds);
     FD_SET(fd, &fds);
     n = select(fd+1, &fds, 0, 0, &tv);
-  } while (n < 0 && errno == EINTR);
+#if defined(WIN32)
+    werrno = WSAGetLastError();
+#endif
+  } while (n < 0 && (errno == EINTR
+#if defined(WIN32)
+                     || werrno == WSAEINTR
+#endif
+                     ));
 
   if (n < 0)
-    throw SystemException("select",errno);
+#if defined(WIN32)
+    throw SystemException("select", werrno);
+#else
+    throw SystemException("select", errno);
+#endif
 
   if (n == 0)
     return 0;
 
   do {
     n = ::recv(fd, (char*)buf, len, 0);
-  } while (n < 0 && errno == EINTR);
+#if defined(WIN32)
+    werrno = WSAGetLastError();
+#endif
+  } while (n < 0 && (errno == EINTR
+#if defined(WIN32)
+                     || werrno == WSAEINTR
+#endif
+                     ));
 
   if (n < 0)
-    throw SystemException("read",errno);
+#if defined(WIN32)
+    throw SystemException("read", werrno);
+#else
+    throw SystemException("read", errno);
+#endif
   if (n == 0)
     throw EndOfStream();
 
