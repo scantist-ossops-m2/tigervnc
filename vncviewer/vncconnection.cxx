@@ -795,8 +795,6 @@ void QVNCConnection::initDone()
   delete m_framebuffer;
   m_framebuffer = new PlatformPixelBuffer(m_serverParams->width(), m_serverParams->height());
   emit newVncWindowRequested(m_serverParams->width(), m_serverParams->height(), m_serverParams->name() /*, m_serverPF, this */);
-  //  desktop = new DesktopWindow(m_serverParams->width(), m_serverParams->height(),
-  //                              m_serverParams->name(), serverPF, this);
   *m_fullColourPF = m_framebuffer->getPF();
 
   // Force a switch to the format and encoding we'd like
@@ -857,6 +855,7 @@ void QVNCConnection::requestNewUpdate()
                                                  m_serverParams->width(),
                                                  m_serverParams->height()),
                                             !m_forceNonincremental);
+    qDebug() << "QVNCConnection::requestNewUpdate: w=" << m_serverParams->width() << ", h=" << m_serverParams->height();
   }
 
   m_forceNonincremental = false;
