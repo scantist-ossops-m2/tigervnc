@@ -11,13 +11,6 @@ if(NOT WIN32)
   target_sources(network PRIVATE UnixSocket.cxx UnixSocket.h)
 endif()
 
-target_compile_definitions(network
-  PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
-
-if(WIN32)
-        target_link_libraries(network Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Quick Qt${QT_VERSION_MAJOR}::Widgets ws2_32)
-endif()
-
 if(UNIX)
   libtool_create_control_file(network)
 endif()

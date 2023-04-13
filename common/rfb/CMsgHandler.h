@@ -24,7 +24,6 @@
 #ifndef __RFB_CMSGHANDLER_H__
 #define __RFB_CMSGHANDLER_H__
 
-#include <QObject>
 #include <rdr/types.h>
 #include <rfb/Pixel.h>
 #include <rfb/ServerParams.h>
@@ -35,8 +34,7 @@ namespace rdr { class InStream; }
 
 namespace rfb {
 
-  class CMsgHandler : public ::QObject {
-    Q_OBJECT
+  class CMsgHandler {
 
   public:
     CMsgHandler();

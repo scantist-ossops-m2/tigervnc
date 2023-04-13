@@ -173,9 +173,6 @@ add_library(rfb STATIC
   zrleDecode.h
   )
 
-target_compile_definitions(rfb
-  PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
-
 target_link_libraries(rfb os rdr)
 target_link_libraries(rfb ${JPEG_LIBRARIES} ${PIXMAN_LIBRARIES})
 target_link_directories(rfb PUBLIC ${PIXMAN_LIBRARY_DIRS})

@@ -12,3 +12,4 @@ Makefile.in
 config.h
 CMakeLists.txt.user
 deploy
+CMakeLists.txt.user.*

@@ -25,7 +25,6 @@
 #ifndef __RDR_INSTREAM_H__
 #define __RDR_INSTREAM_H__
 
-#include <QObject>
 #include <rdr/types.h>
 #include <rdr/Exception.h>
 #include <string.h> // for memcpy
@@ -38,8 +37,7 @@
 
 namespace rdr {
 
-  class InStream : public ::QObject {
-    Q_OBJECT
+  class InStream {
 
   public:
 

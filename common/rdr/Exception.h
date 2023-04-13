@@ -27,15 +27,12 @@
 #  define __printf_attr(a, b)
 #endif // __GNUC__
 
-#include <QString>
-
 namespace rdr {
 
   struct Exception {
     enum { len = 256 };
     char str_[len];
     bool abort{false};
-    Exception(QString);
     Exception(const char *format = 0, ...) __printf_attr(2, 3);
     virtual ~Exception() {}
     virtual const char* str() const { return str_; }
