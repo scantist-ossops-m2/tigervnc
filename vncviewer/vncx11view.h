@@ -1,18 +1,22 @@
 #ifndef VNCX11VIEW_H
 #define VNCX11VIEW_H
 
+#include <X11/Xlib.h>
 #include "abstractvncview.h"
 
 namespace rfb {
   class Rect;
 }
 
-class QVNCX11view : public QAbstractVNCView
+class QVNCX11View : public QAbstractVNCView
 {
   Q_OBJECT
 public:
-  QVNCX11view(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::Widget);
-  virtual ~QVNCX11view();
+  QVNCX11View(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::Widget);
+  virtual ~QVNCX11View();
+  qulonglong nativeWindowHandle() const override;
+
+public slots:
   void bell() override;
 
 protected:
@@ -26,7 +30,10 @@ signals:
   void message(const QString &msg, int timeout);
 
 private:
+  Window m_window;
   rfb::Rect *m_rect;
+
+  void fixParent();
 };
 
 #endif // VNCX11VIEW_H

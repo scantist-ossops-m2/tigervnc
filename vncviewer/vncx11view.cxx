@@ -12,7 +12,9 @@
 
 #include <X11/Xlib.h>
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-#include <QtX11Extras/QX11Info>
+#include <QX11Info>
+#else
+#include <QGuiApplication>
 #endif
 
 #include <QDebug>
@@ -48,18 +50,15 @@
     after the native window has been created, i.e. do not call
     QWidget::setParent or move the VNCX11view into a different layout.
 */
-QVNCX11view::QVNCX11view(QWidget *parent, Qt::WindowFlags f)
+QVNCX11View::QVNCX11View(QWidget *parent, Qt::WindowFlags f)
   : QAbstractVNCView(parent, f)
+  , m_window(0)
   , m_rect(new rfb::Rect)
 {
   setAttribute(Qt::WA_NoBackground);
   setAttribute(Qt::WA_NoSystemBackground);
   setFocusPolicy(Qt::StrongFocus);
   connect(AppManager::instance(), &AppManager::updateRequested, this, [this](int x0, int y0, int x1, int y1) {
-#if defined(WIN32)
-    RECT r{x0, y0, x1, y1};
-    InvalidateRect(m_hwnd, &r, false); // otherwise, UpdateWindow(m_hwnd);
-#endif
     m_rect->union_boundary(rfb::Rect(x0, y0, x1, y1));
   });
 }
@@ -69,23 +68,83 @@ QVNCX11view::QVNCX11view(QWidget *parent, Qt::WindowFlags f)
     been set explicitly using setWindow() the window will be
     destroyed.
 */
-QVNCX11view::~QVNCX11view()
+QVNCX11View::~QVNCX11View()
 {
   delete m_rect;
+}
+
+qulonglong QVNCX11View::nativeWindowHandle() const
+{
+  return (qulonglong)m_window;
+}
+
+void QVNCX11View::fixParent()
+{
+  Display *display = QX11Info::display();
+  XReparentWindow(display, m_window, winId(), 0, 0);
+  XMapWindow(display, m_window); // must be performed after XReparentWindow,
 }
 
 /*!
     \reimp
 */
-bool QVNCX11view::event(QEvent *e)
+bool QVNCX11View::event(QEvent *e)
 {
+  switch(e->type()) {
+    case QEvent::Polish:
+      if (!m_window) {
+        qDebug() << "display numbers:  QX11Info::display()=" <<  QX11Info::display() << ", XOpenDisplay(NULL)=" << XOpenDisplay(NULL);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        Display *display = QX11Info::display();
+#else
+        Display *display = QGuiApplication::instance()->nativeInterface<QNativeInterface::QX11Application>()->display();
+#endif
+        //int screenNumber = DefaultScreen(display);
+        //Window rootWindow = XDefaultRootWindow(display);
+        //unsigned long color = BlackPixel(display, screenNumber);
+        unsigned long color = 0x0000ff;
+        int w = width();
+        int h = height();
+        int borderWidth = 0;
+        m_window = XCreateSimpleWindow(display, winId(), 0, 0, w, h, borderWidth, 1 /*magic number*/, color);
+        XMapWindow(display, m_window);
+        //XSelectInput(display, m_window, KeyPressMask | ButtonPressMask | ExposureMask | KeyReleaseMask | ButtonReleaseMask | PointerMotionMask);
+      }
+      break;
+    case QEvent::WindowBlocked:
+      //      if (m_hwnd)
+      //        EnableWindow(m_hwnd, false);
+      break;
+    case QEvent::WindowUnblocked:
+      //      if (m_hwnd)
+      //        EnableWindow(m_hwnd, true);
+      break;
+    case QEvent::WindowActivate:
+      //qDebug() << "WindowActivate";
+      break;
+    case QEvent::WindowDeactivate:
+      //qDebug() << "WindowDeactivate";
+      break;
+    case QEvent::Enter:
+      //qDebug() << "Enter";
+      break;
+    case QEvent::Leave:
+      //qDebug() << "Leave";
+      break;
+    case QEvent::CursorChange:
+      //qDebug() << "CursorChange";
+      e->setAccepted(true); // This event must be ignored, otherwise setCursor() may crash.
+    default:
+      qDebug() << "Unprocessed Event: " << e->type();
+      break;
+  }
   return QWidget::event(e);
 }
 
 /*!
     \reimp
 */
-void QVNCX11view::showEvent(QShowEvent *e)
+void QVNCX11View::showEvent(QShowEvent *e)
 {
   QWidget::showEvent(e);
 }
@@ -93,7 +152,7 @@ void QVNCX11view::showEvent(QShowEvent *e)
 /*!
     \reimp
 */
-void QVNCX11view::focusInEvent(QFocusEvent *e)
+void QVNCX11View::focusInEvent(QFocusEvent *e)
 {
   QWidget::focusInEvent(e);
 }
@@ -101,7 +160,7 @@ void QVNCX11view::focusInEvent(QFocusEvent *e)
 /*!
     \reimp
 */
-void QVNCX11view::resizeEvent(QResizeEvent *e)
+void QVNCX11View::resizeEvent(QResizeEvent *e)
 {
   QWidget::resizeEvent(e);
 }
@@ -109,19 +168,17 @@ void QVNCX11view::resizeEvent(QResizeEvent *e)
 /*!
     \reimp
 */
-bool QVNCX11view::nativeEvent(const QByteArray &eventType, void *message, long *result)
+bool QVNCX11View::nativeEvent(const QByteArray &eventType, void *message, long *result)
 {
   return QWidget::nativeEvent(eventType, message, result);
 }
 
-void QVNCX11view::bell()
+void QVNCX11View::bell()
 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    Display *display = QX11Info::display();
+  Display *display = QX11Info::display();
 #else
-    QNativeInterface::QX11Application *f = (QNativeInterface::QX11Application *)QGuiApplication::nativeInterface<QNativeInterface::QX11Application>();
-    Display *display f->display();
+  Display *display = QGuiApplication::instance()->nativeInterface<QNativeInterface::QX11Application>()->display();
 #endif
-    extern int XBell(Display*, int);
-    XBell(display, 0 /* volume */);
+  XBell(display, 0 /* volume */);
 }

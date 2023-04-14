@@ -21,6 +21,7 @@ public:
   HWND window() const;
   void postMouseMoveEvent(int x, int y, int mask);
   bool hasFocus() const;
+  qulonglong nativeWindowHandle() const override;
 
 protected:
   static LRESULT CALLBACK eventHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

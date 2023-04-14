@@ -131,6 +131,11 @@ QVNCWinView::~QVNCWinView()
   DestroyIcon(m_cursor);
 }
 
+qulonglong QVNCWinView::nativeWindowHandle() const
+{
+  return (qulonglong)m_hwnd;
+}
+
 /*!
     Reimplement this virtual function to create and return the native
     Win32 window. \a parent is the handle to this widget, and \a

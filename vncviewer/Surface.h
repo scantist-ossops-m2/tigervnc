@@ -69,19 +69,20 @@ protected:
 #elif defined(__APPLE__)
   unsigned char* data;
 #else
-  Pixmap pixmap;
-  Picture picture;
-  XRenderPictFormat* visFormat;
+  Pixmap m_pixmap{0};
+  Picture m_picture{0};
+  XRenderPictFormat* m_visualFormat{nullptr};
 
   // cf. https://www.fltk.org/doc-1.3/osissues.html
-  Display *fl_display;
-  Window fl_window;
-  GC fl_gc;
-  int fl_screen;
-  XVisualInfo *fl_visual;
-  Colormap fl_colormap;
+  Display *m_display{nullptr};
+//  Window m_hwnd{0};
+  GC m_gc{nullptr};
+  int m_screen{0};
+  XVisualInfo *m_visualInfo{nullptr};
+  Colormap m_colorMap{0};
 
   Picture alpha_mask(int a);
+  bool initialize();
 #endif
 };
 

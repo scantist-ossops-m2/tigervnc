@@ -356,6 +356,11 @@ void QAbstractVNCView::createContextMenu()
   }
 }
 
+qulonglong QAbstractVNCView::nativeWindowHandle() const
+{
+  return 0;
+}
+
 void QAbstractVNCView::handleKeyPress(int, quint32)
 {
 }
