@@ -57,8 +57,7 @@ PlatformPixelBuffer::PlatformPixelBuffer(int width, int height) :
 {
 #if !defined(WIN32) && !defined(__APPLE__)
   if (!setupShm(width, height)) {
-    xim = XCreateImage(fl_display, CopyFromParent, 32,
-                       ZPixmap, 0, 0, width, height, 32, 0);
+    xim = XCreateImage(m_display, CopyFromParent, 32, ZPixmap, 0, 0, width, height, 32, 0);
     if (!xim)
       throw rdr::Exception("XCreateImage");
 
@@ -69,8 +68,9 @@ PlatformPixelBuffer::PlatformPixelBuffer(int width, int height) :
     vlog.debug("Using standard XImage");
   }
 
-  setBuffer(width, height, (rdr::U8*)xim->data,
-            xim->bytes_per_line / (getPF().bpp/8));
+  int bytesPerPixel = getPF().bpp /* Bits/Pixel */ / 8;
+  int stride = xim->bytes_per_line / bytesPerPixel;
+  setBuffer(width, height, (rdr::U8*)xim->data, stride);
 
   // On X11, the Pixmap backing this Surface is uninitialized.
   clear(0, 0, 0);
@@ -84,7 +84,7 @@ PlatformPixelBuffer::~PlatformPixelBuffer()
 #if !defined(WIN32) && !defined(__APPLE__)
   if (shminfo) {
     vlog.debug("Freeing shared memory XImage");
-    XShmDetach(fl_display, shminfo);
+    XShmDetach(m_display, shminfo);
     shmdt(shminfo->shmaddr);
     shmctl(shminfo->shmid, IPC_RMID, 0);
     delete shminfo;
@@ -105,7 +105,7 @@ void PlatformPixelBuffer::commitBufferRW(const rfb::Rect& r)
   damage.assign_union(rfb::Region(r));
   mutex.unlock();
 
-  AppManager::instance()->update(r.tl.x, r.tl.y, r.br.x, r.br.y);
+  AppManager::instance()->invalidate(r.tl.x, r.tl.y, r.br.x, r.br.y);
 //  qDebug() << "PlatformPixelBuffer::commitBufferRW(): Rect=(" << r.tl.x << "," << r.tl.y << ")-(" << r.br.x << "," << r.br.y << ")";
 }
 
@@ -118,27 +118,28 @@ rfb::Rect PlatformPixelBuffer::getDamage(void)
   damage.clear();
   mutex.unlock();
 
+#if 0
 #if !defined(WIN32) && !defined(__APPLE__)
   if (r.width() == 0 || r.height() == 0)
     return r;
 
   GC gc;
 
-  gc = XCreateGC(fl_display, pixmap, 0, NULL);
+  gc = XCreateGC(m_display, m_pixmap, 0, NULL);
   if (shminfo) {
-    XShmPutImage(fl_display, pixmap, gc, xim,
+    XShmPutImage(m_display, m_pixmap, gc, xim,
                  r.tl.x, r.tl.y, r.tl.x, r.tl.y,
                  r.width(), r.height(), False);
     // Need to make sure the X server has finished reading the
     // shared memory before we return
-    XSync(fl_display, False);
+    XSync(m_display, False);
   } else {
-    XPutImage(fl_display, pixmap, gc, xim,
+    XPutImage(m_display, m_pixmap, gc, xim,
               r.tl.x, r.tl.y, r.tl.x, r.tl.y, r.width(), r.height());
   }
-  XFreeGC(fl_display, gc);
+  XFreeGC(m_display, gc);
 #endif
-
+#endif
   qDebug() << "PlatformPixelBuffer::getDamage(): Rect=(" << r.tl.x << "," << r.tl.y << ")-(" << r.br.x << "," << r.br.y << ")";
   return r;
 }
@@ -161,15 +162,15 @@ bool PlatformPixelBuffer::setupShm(int width, int height)
   const char *display_name = XDisplayName (NULL);
 
   /* Don't use MIT-SHM on remote displays */
-  if (*display_name && *display_name != ':')
+  if ((*display_name && *display_name != ':') || QString(qgetenv("QT_X11_NO_MITSHM")).toInt() != 0)
     return false;
 
-  if (!XShmQueryVersion(fl_display, &major, &minor, &pixmaps))
+  if (!XShmQueryVersion(m_display, &major, &minor, &pixmaps))
     return false;
 
   shminfo = new XShmSegmentInfo;
 
-  xim = XShmCreateImage(fl_display, CopyFromParent, 32,
+  xim = XShmCreateImage(m_display, CopyFromParent, 32,
                         ZPixmap, 0, shminfo, width, height);
   if (!xim)
     goto free_shminfo;
@@ -192,12 +193,12 @@ bool PlatformPixelBuffer::setupShm(int width, int height)
   caughtError = false;
   old_handler = XSetErrorHandler(XShmAttachErrorHandler);
 
-  if (!XShmAttach(fl_display, shminfo)) {
+  if (!XShmAttach(m_display, shminfo)) {
     XSetErrorHandler(old_handler);
     goto free_shmaddr;
   }
 
-  XSync(fl_display, False);
+  XSync(m_display, False);
 
   XSetErrorHandler(old_handler);
 
