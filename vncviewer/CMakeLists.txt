@@ -26,6 +26,7 @@ else()
       vncx11view.cxx
       vncx11view.h
       Surface_X11.cxx
+      xkb_to_qnum.c
       #vncwaylandview.cxx
       #vncwaylandview.h
   )
