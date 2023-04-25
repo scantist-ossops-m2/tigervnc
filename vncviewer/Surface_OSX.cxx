@@ -24,9 +24,10 @@
 
 #include <ApplicationServices/ApplicationServices.h>
 
-#include <FL/Fl_RGB_Image.H>
-#include <FL/Fl_Window.H>
-#include <FL/x.H>
+#include <QImage>
+//#include <FL/Fl_RGB_Image.H>
+//#include <FL/Fl_Window.H>
+//#include <FL/x.H>
 
 #include <rdr/Exception.h>
 
@@ -138,6 +139,7 @@ void Surface::clear(unsigned char r, unsigned char g, unsigned char b, unsigned 
 
 void Surface::draw(int src_x, int src_y, int x, int y, int w, int h)
 {
+#if 0
   CGColorSpaceRef lut;
 
   CGContextSaveGState(fl_gc);
@@ -155,6 +157,7 @@ void Surface::draw(int src_x, int src_y, int x, int y, int w, int h)
   CGColorSpaceRelease(lut);
 
   CGContextRestoreGState(fl_gc);
+#endif
 }
 
 void Surface::draw(Surface* dst, int src_x, int src_y, int x, int y, int w, int h)
@@ -174,6 +177,7 @@ void Surface::draw(Surface* dst, int src_x, int src_y, int x, int y, int w, int 
 
 void Surface::blend(int src_x, int src_y, int x, int y, int w, int h, int a)
 {
+#if 0
   CGColorSpaceRef lut;
 
   CGContextSaveGState(fl_gc);
@@ -191,6 +195,7 @@ void Surface::blend(int src_x, int src_y, int x, int y, int w, int h, int a)
   CGColorSpaceRelease(lut);
 
   CGContextRestoreGState(fl_gc);
+#endif
 }
 
 void Surface::blend(Surface* dst, int src_x, int src_y, int x, int y, int w, int h, int a)
@@ -218,8 +223,9 @@ void Surface::dealloc()
   delete [] data;
 }
 
-void Surface::update(const Fl_RGB_Image* image)
+void Surface::update(const QImage* image)
 {
+#if 0
   int x, y;
   const unsigned char* in;
   unsigned char* out;
@@ -263,4 +269,5 @@ void Surface::update(const Fl_RGB_Image* image)
     if (image->ld() != 0)
       in += image->ld() - image->w() * image->d();
   }
+#endif
 }

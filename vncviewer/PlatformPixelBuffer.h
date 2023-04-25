@@ -44,7 +44,7 @@ public:
   virtual void commitBufferRW(const rfb::Rect& r);
 
   rfb::Rect getDamage(void);
-#if !defined(WIN32)
+#if !defined(WIN32) && !defined(__APPLE__)
   XImage *ximage() { return xim; }
   XShmSegmentInfo *shmSegmentInfo() { return shminfo; }
 #endif
