@@ -19,9 +19,12 @@ if (WIN32)
 elseif(APPLE)
 #  set(APP_ICONS "${CMAKE_CURRENT_SOURCE_DIR}/media/icons/tigervnc.icns")
   set(OS_DEP_SOURCES
-      #vncosxview.cxx
-      #vncosxview.h
+      vncmacview.cxx
+      vncmacview.h
       Surface_OSX.cxx
+      cocoa.h
+      cocoa.mm
+      osx_to_qnum.c
   )
 else()
   set(OS_DEP_SOURCES
@@ -31,8 +34,6 @@ else()
       xkb_to_qnum.c
       XInputTouchHandler.h
       XInputTouchHandler.cxx
-      #vncwaylandview.cxx
-      #vncwaylandview.h
   )
 endif()
 
@@ -265,7 +266,7 @@ if(WIN32)
     add_custom_command(
         TARGET vncviewer
         POST_BUILD
-        COMMAND ${DEPLOYQT} --dir $<TARGET_FILE_DIR:vncviewer>/$<TARGET_FILE_NAME:vncviewer> --qmldir ${CMAKE_SOURCE_DIR}/vncviewer/qml --no-translations $<TARGET_FILE_DIR:vncviewer>/$<TARGET_FILE_NAME:vncviewer>)
+        COMMAND ${DEPLOYQT} --dir $<TARGET_FILE_DIR:vncviewer> --qmldir ${CMAKE_SOURCE_DIR}/vncviewer/qml --no-translations $<TARGET_FILE_DIR:vncviewer>/$<TARGET_FILE_NAME:vncviewer>)
     add_custom_command(
         TARGET vncviewer
         POST_BUILD
