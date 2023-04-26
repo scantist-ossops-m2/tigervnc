@@ -29,6 +29,8 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <tchar.h>
+#else
+#include <sys/stat.h>
 #endif
 
 #include <QtGlobal>
@@ -633,18 +635,21 @@ void saveViewerParameters(const char *filename, const char *servername) {
 
   // Write to the registry or a predefined file if no filename was specified.
   if(filename == NULL) {
-
 #ifdef _WIN32
     saveToReg(servername);
     return;
-#endif
-    
+#else
     char* homeDir = NULL;
     if (getvnchomedir(&homeDir) == -1)
       throw Exception(_("Could not obtain the home directory path"));
 
+    struct stat sb;
+    if (stat(homeDir, &sb)) {
+      mkdir(homeDir, S_IRWXU);
+    }
     snprintf(filepath, sizeof(filepath), "%sdefault.tigervnc", homeDir);
     delete[] homeDir;
+#endif
   } else {
     snprintf(filepath, sizeof(filepath), "%s", filename);
   }
@@ -742,14 +747,18 @@ char* loadViewerParameters(const char *filename) {
 
 #ifdef _WIN32
     return loadFromReg();
-#endif
-
+#else
     char* homeDir = NULL;
     if (getvnchomedir(&homeDir) == -1)
       throw Exception(_("Could not obtain the home directory path"));
 
+    struct stat sb;
+    if (stat(homeDir, &sb)) {
+      mkdir(homeDir, S_IRWXU);
+    }
     snprintf(filepath, sizeof(filepath), "%sdefault.tigervnc", homeDir);
     delete[] homeDir;
+#endif
   } else {
     snprintf(filepath, sizeof(filepath), "%s", filename);
   }
