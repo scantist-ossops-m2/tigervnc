@@ -16,6 +16,8 @@
  * USA.
  */
 
+//#define LEGACY_MAC
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -25,14 +27,13 @@
 #include <ApplicationServices/ApplicationServices.h>
 
 #include <QImage>
-//#include <FL/Fl_RGB_Image.H>
-//#include <FL/Fl_Window.H>
-//#include <FL/x.H>
 
 #include <rdr/Exception.h>
 
 #include "cocoa.h"
 #include "Surface.h"
+#include "appmanager.h"
+#include "abstractvncview.h"
 
 static CGColorSpaceRef srgb = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
 
@@ -139,24 +140,29 @@ void Surface::clear(unsigned char r, unsigned char g, unsigned char b, unsigned 
 
 void Surface::draw(int src_x, int src_y, int x, int y, int w, int h)
 {
-#if 0
-  CGColorSpaceRef lut;
+#if !defined(LEGACY_MAC)
+  QAbstractVNCView *window = AppManager::instance()->view();
+  NSView *view = (NSView*)window->nativeWindowHandle();
+  cocoa_draw(view, x, y, w, h);
+#else
+  QAbstractVNCView *window = AppManager::instance()->view();
+  NSView *view = (NSView*)window->nativeWindowHandle();
+  CGContext *gc = cocoa_gc(view);
 
-  CGContextSaveGState(fl_gc);
+  CGContextSaveGState(gc);
 
   // Reset the transformation matrix back to the default identity
   // matrix as otherwise we get a massive performance hit
-  CGContextConcatCTM(fl_gc, CGAffineTransformInvert(CGContextGetCTM(fl_gc)));
+  CGContextConcatCTM(gc, CGAffineTransformInvert(CGContextGetCTM(gc)));
 
   // macOS Coordinates are from bottom left, not top left
-  y = Fl_Window::current()->h() - (y + h);
+  y = window->height() - (y + h);
 
-  lut = cocoa_win_color_space(Fl_Window::current());
-  render(fl_gc, lut, data, kCGBlendModeCopy, 1.0,
-         src_x, src_y, width(), height(), x, y, w, h);
+  CGColorSpaceRef lut = cocoa_win_color_space(view);
+  render(gc, lut, data, kCGBlendModeCopy, 1.0, src_x, src_y, width(), height(), x, y, w, h);
   CGColorSpaceRelease(lut);
 
-  CGContextRestoreGState(fl_gc);
+  CGContextRestoreGState(gc);
 #endif
 }
 
@@ -174,6 +180,20 @@ void Surface::draw(Surface* dst, int src_x, int src_y, int x, int y, int w, int 
 
   CGContextRelease(bitmap);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void Surface::blend(int src_x, int src_y, int x, int y, int w, int h, int a)
 {
@@ -215,12 +235,21 @@ void Surface::blend(Surface* dst, int src_x, int src_y, int x, int y, int w, int
 
 void Surface::alloc()
 {
+#if !defined(LEGACY_MAC)
+  m_bitmap = cocoa_create_bitmap(width(), height());
+  data = cocoa_get_bitmap_data(m_bitmap);
+#else
   data = new unsigned char[width() * height() * 4];
+#endif
 }
 
 void Surface::dealloc()
 {
-  delete [] data;
+#if 0
+  cocoa_delete_bitmap(m_bitmap);
+#else
+  delete[] data;
+#endif
 }
 
 void Surface::update(const QImage* image)
