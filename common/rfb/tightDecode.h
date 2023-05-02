@@ -175,11 +175,7 @@ void TightDecoder::FilterPalette(const PIXEL_T* palette, int palSize,
     while (h > 0) {
       PIXEL_T *endOfRow = ptr + w;
       while (ptr < endOfRow) {
-#if defined(__APPLE__)
-        *ptr++ = palette[*srcPtr++] | 0xff000000;
-#else
         *ptr++ = palette[*srcPtr++];
-#endif
       }
       ptr += pad;
       h--;
