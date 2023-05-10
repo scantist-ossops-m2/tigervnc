@@ -65,7 +65,6 @@ set(PROJECT_SOURCES
         GestureHandler.cxx
         GestureHandler.h
         GestureEvent.h
-        #
         gettext.h
         parameters.h
         parameters.cxx
@@ -78,11 +77,7 @@ set(PROJECT_SOURCES
         PlatformPixelBuffer.cxx
         Surface.h
         Surface.cxx
-        DecodeManager.h
-        DecodeManager.cxx
         #
-        ##CConn.h
-        ##CConn.cxx
         qml.qrc
         ${APP_ICONS}
         ${OS_DEP_SOURCES}
