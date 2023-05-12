@@ -36,8 +36,6 @@ set(PROJECT_SOURCES
         main.cxx
         appmanager.h
         appmanager.cxx
-        eventfilter.h
-        eventfilter.cxx
         msgreader.h
         msgreader.cxx
         msgwriter.h
@@ -47,8 +45,6 @@ set(PROJECT_SOURCES
         vncconnection.h
         vncconnection.cxx
         vncpackethandler.h
-        vncstream.h
-        vncstream.cxx
         abstractvncview.h
         abstractvncview.cxx
         keysym2ucs.c
