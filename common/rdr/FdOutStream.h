@@ -46,6 +46,9 @@ namespace rdr {
   private:
     virtual bool flushBuffer();
     size_t writeFd(const void* data, size_t length);
+#if defined(WIN32)
+    unsigned long long
+#endif
     int fd;
     struct timeval lastWrite;
   };

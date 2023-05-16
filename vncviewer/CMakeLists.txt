@@ -33,7 +33,7 @@ else()
 endif()
 
 set(PROJECT_SOURCES
-        main.cxx
+        vncviewer.cxx
         appmanager.h
         appmanager.cxx
         msgreader.h
