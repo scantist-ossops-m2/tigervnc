@@ -85,8 +85,7 @@ namespace rfb {
     virtual void handleClipboardProvide(rdr::U32 flags,
                                         const size_t* lengths,
                                         const rdr::U8* const* data);
-
-    ServerParams server;
+    virtual ServerParams *server() = 0;
   };
 }
 #endif

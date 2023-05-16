@@ -35,10 +35,6 @@ set(PROJECT_SOURCES
         vncviewer.cxx
         appmanager.h
         appmanager.cxx
-        msgreader.h
-        msgreader.cxx
-        msgwriter.h
-        msgwriter.cxx
         viewerconfig.h
         viewerconfig.cxx
         vncconnection.h

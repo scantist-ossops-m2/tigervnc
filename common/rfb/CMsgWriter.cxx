@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 
+#include "os/Mutex.h"
 #include <rdr/OutStream.h>
 #include <rdr/MemOutStream.h>
 #include <rdr/ZlibOutStream.h>
@@ -40,22 +41,25 @@
 using namespace rfb;
 
 CMsgWriter::CMsgWriter(ServerParams* server_, rdr::OutStream* os_)
-  : server(server_), os(os_)
+ : server(server_), os(os_), m_mutex(new os::Mutex)
 {
 }
 
 CMsgWriter::~CMsgWriter()
 {
+  delete m_mutex;
 }
 
 void CMsgWriter::writeClientInit(bool shared)
 {
+  os::AutoMutex locker(m_mutex);
   os->writeU8(shared);
   endMsg();
 }
 
 void CMsgWriter::writeSetPixelFormat(const PixelFormat& pf)
 {
+  os::AutoMutex locker(m_mutex);
   startMsg(msgTypeSetPixelFormat);                                 
   os->pad(3);
   pf.write(os);
@@ -64,6 +68,7 @@ void CMsgWriter::writeSetPixelFormat(const PixelFormat& pf)
 
 void CMsgWriter::writeSetEncodings(const std::list<rdr::U32> encodings)
 {
+  os::AutoMutex locker(m_mutex);
   std::list<rdr::U32>::const_iterator iter;
   startMsg(msgTypeSetEncodings);
   os->pad(1);
@@ -76,6 +81,7 @@ void CMsgWriter::writeSetEncodings(const std::list<rdr::U32> encodings)
 void CMsgWriter::writeSetDesktopSize(int width, int height,
                                      const ScreenSet& layout)
 {
+  os::AutoMutex locker(m_mutex);
   if (!server->supportsSetDesktopSize)
     throw Exception("Server does not support SetDesktopSize");
 
@@ -103,6 +109,7 @@ void CMsgWriter::writeSetDesktopSize(int width, int height,
 
 void CMsgWriter::writeFramebufferUpdateRequest(const Rect& r, bool incremental)
 {
+  os::AutoMutex locker(m_mutex);
   startMsg(msgTypeFramebufferUpdateRequest);
   os->writeU8(incremental);
   os->writeU16(r.tl.x);
@@ -115,6 +122,7 @@ void CMsgWriter::writeFramebufferUpdateRequest(const Rect& r, bool incremental)
 void CMsgWriter::writeEnableContinuousUpdates(bool enable,
                                               int x, int y, int w, int h)
 {
+  os::AutoMutex locker(m_mutex);
   if (!server->supportsContinuousUpdates)
     throw Exception("Server does not support continuous updates");
 
@@ -132,6 +140,7 @@ void CMsgWriter::writeEnableContinuousUpdates(bool enable,
 
 void CMsgWriter::writeFence(rdr::U32 flags, unsigned len, const char data[])
 {
+  os::AutoMutex locker(m_mutex);
   if (!server->supportsFence)
     throw Exception("Server does not support fences");
   if (len > 64)
@@ -152,6 +161,7 @@ void CMsgWriter::writeFence(rdr::U32 flags, unsigned len, const char data[])
 
 void CMsgWriter::writeKeyEvent(rdr::U32 keysym, rdr::U32 keycode, bool down)
 {
+  os::AutoMutex locker(m_mutex);
   if (!server->supportsQEMUKeyEvent || !keycode) {
     /* This event isn't meaningful without a valid keysym */
     if (!keysym)
@@ -175,6 +185,7 @@ void CMsgWriter::writeKeyEvent(rdr::U32 keysym, rdr::U32 keycode, bool down)
 
 void CMsgWriter::writePointerEvent(const Point& pos, int buttonMask)
 {
+  os::AutoMutex locker(m_mutex);
   Point p(pos);
   if (p.x < 0) p.x = 0;
   if (p.y < 0) p.y = 0;
@@ -191,6 +202,7 @@ void CMsgWriter::writePointerEvent(const Point& pos, int buttonMask)
 
 void CMsgWriter::writeClientCutText(const char* str)
 {
+  os::AutoMutex locker(m_mutex);
   size_t len;
 
   if (strchr(str, '\r') != NULL)
@@ -207,6 +219,7 @@ void CMsgWriter::writeClientCutText(const char* str)
 void CMsgWriter::writeClipboardCaps(rdr::U32 caps,
                                     const rdr::U32* lengths)
 {
+  os::AutoMutex locker(m_mutex);
   size_t i, count;
 
   if (!(server->clipboardFlags() & clipboardCaps))
@@ -235,6 +248,7 @@ void CMsgWriter::writeClipboardCaps(rdr::U32 caps,
 
 void CMsgWriter::writeClipboardRequest(rdr::U32 flags)
 {
+  os::AutoMutex locker(m_mutex);
   if (!(server->clipboardFlags() & clipboardRequest))
     throw Exception("Server does not support clipboard \"request\" action");
 
@@ -247,6 +261,7 @@ void CMsgWriter::writeClipboardRequest(rdr::U32 flags)
 
 void CMsgWriter::writeClipboardPeek(rdr::U32 flags)
 {
+  os::AutoMutex locker(m_mutex);
   if (!(server->clipboardFlags() & clipboardPeek))
     throw Exception("Server does not support clipboard \"peek\" action");
 
@@ -259,6 +274,7 @@ void CMsgWriter::writeClipboardPeek(rdr::U32 flags)
 
 void CMsgWriter::writeClipboardNotify(rdr::U32 flags)
 {
+  os::AutoMutex locker(m_mutex);
   if (!(server->clipboardFlags() & clipboardNotify))
     throw Exception("Server does not support clipboard \"notify\" action");
 
@@ -273,6 +289,7 @@ void CMsgWriter::writeClipboardProvide(rdr::U32 flags,
                                       const size_t* lengths,
                                       const rdr::U8* const* data)
 {
+  os::AutoMutex locker(m_mutex);
   rdr::MemOutStream mos;
   rdr::ZlibOutStream zos;
 
