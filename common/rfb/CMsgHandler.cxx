@@ -44,54 +44,54 @@ CMsgHandler::~CMsgHandler()
 
 void CMsgHandler::setDesktopSize(int width, int height)
 {
-  server.setDimensions(width, height);
+  server()->setDimensions(width, height);
 }
 
 void CMsgHandler::setExtendedDesktopSize(unsigned reason, unsigned result,
                                          int width, int height,
                                          const ScreenSet& layout)
 {
-  server.supportsSetDesktopSize = true;
+  server()->supportsSetDesktopSize = true;
 
   if ((reason == reasonClient) && (result != resultSuccess))
     return;
 
-  server.setDimensions(width, height, layout);
+  server()->setDimensions(width, height, layout);
 }
 
 void CMsgHandler::setPixelFormat(const PixelFormat& pf)
 {
-  server.setPF(pf);
+  server()->setPF(pf);
 }
 
 void CMsgHandler::setName(const char* name)
 {
-  server.setName(name);
+  server()->setName(name);
 }
 
 void CMsgHandler::fence(uint32_t /*flags*/, unsigned /*len*/,
                         const char /*data*/ [])
 {
-  server.supportsFence = true;
+  server()->supportsFence = true;
 }
 
 void CMsgHandler::endOfContinuousUpdates()
 {
-  server.supportsContinuousUpdates = true;
+  server()->supportsContinuousUpdates = true;
 }
 
 void CMsgHandler::supportsQEMUKeyEvent()
 {
-  server.supportsQEMUKeyEvent = true;
+  server()->supportsQEMUKeyEvent = true;
 }
 
 void CMsgHandler::serverInit(int width, int height,
                              const PixelFormat& pf,
                              const char* name)
 {
-  server.setDimensions(width, height);
-  server.setPF(pf);
-  server.setName(name);
+  server()->setDimensions(width, height);
+  server()->setPF(pf);
+  server()->setName(name);
 }
 
 void CMsgHandler::framebufferUpdateStart()
@@ -104,7 +104,7 @@ void CMsgHandler::framebufferUpdateEnd()
 
 void CMsgHandler::setLEDState(unsigned int state)
 {
-  server.setLEDState(state);
+  server()->setLEDState(state);
 }
 
 void CMsgHandler::handleClipboardCaps(uint32_t flags, const uint32_t* lengths)
@@ -146,7 +146,7 @@ void CMsgHandler::handleClipboardCaps(uint32_t flags, const uint32_t* lengths)
     }
   }
 
-  server.setClipboardCaps(flags, lengths);
+  server()->setClipboardCaps(flags, lengths);
 }
 
 void CMsgHandler::handleClipboardRequest(uint32_t /*flags*/)
