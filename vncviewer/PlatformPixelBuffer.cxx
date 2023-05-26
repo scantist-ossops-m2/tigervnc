@@ -44,11 +44,7 @@
 static rfb::LogWriter vlog("PlatformPixelBuffer");
 
 PlatformPixelBuffer::PlatformPixelBuffer(int width, int height) :
-#if defined(__APPLE__)
-  FullFramePixelBuffer(rfb::PixelFormat(32, 24, false, true, 255, 255, 255, 0, 8, 16), 0, 0, NULL, 0),
-#else
   FullFramePixelBuffer(rfb::PixelFormat(32, 24, false, true, 255, 255, 255, 16, 8, 0), 0, 0, NULL, 0),
-#endif
   Surface(width, height)
 {
   setBuffer(width, height, (rdr::U8*)framebuffer(), width);
