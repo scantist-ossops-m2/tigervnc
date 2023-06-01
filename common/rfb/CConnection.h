@@ -245,14 +245,12 @@ namespace rfb {
     bool supportsDesktopResize;
     bool supportsLEDState;
 
-  private:
     // This is a default implementation of fences that automatically
     // responds to requests, stating no support for synchronisation.
     // When overriding, call CMsgHandler::fence() directly in order to
     // state correct support for fence flags.
     virtual void fence(rdr::U32 flags, unsigned len, const char data[]);
 
-  private:
     bool processVersionMsg();
     bool processSecurityTypesMsg();
     bool processSecurityMsg();
@@ -265,6 +263,7 @@ namespace rfb {
     void requestNewUpdate();
     void updateEncodings();
 
+  private:
     rdr::InStream* is;
     rdr::OutStream* os;
     CMsgReader* reader_;
