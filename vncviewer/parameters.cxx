@@ -881,8 +881,10 @@ ViewerConfig::ViewerConfig()
  , messageDir_(nullptr)
 {
   connect(this, &ViewerConfig::accessPointChanged, this, [this](QString accessPoint) {
+    serverHistory_.removeOne(accessPoint);
     serverHistory_.push_front(accessPoint);
-    parserServerName();
+    parseServerName();
+    saveServerHistory();
     emit serverHistoryChanged(serverHistory_);
   }, Qt::QueuedConnection);
   initializeLogger();
@@ -957,7 +959,7 @@ ViewerConfig::ViewerConfig()
 
   loadServerHistory();
   serverName_ = serverHistory_.length() > 0 ? serverHistory_[0] : "";
-  parserServerName();
+  parseServerName();
 
   rfb::Security security(rfb::SecurityClient::secTypes);
   auto secTypes = security.GetEnabledSecTypes();
@@ -1055,9 +1057,14 @@ QString ViewerConfig::toLocalFile(const QUrl url) const
   return QDir::toNativeSeparators(url.toLocalFile());
 }
 
-void ViewerConfig::saveViewerParameters(QString path, QString serverName) const
+void ViewerConfig::saveViewerParameters(QString path, QString serverName)
 {
+  serverHistory_.removeOne(serverName);
+  serverHistory_.push_front(serverName);
+  parseServerName();
+  saveServerHistory();
   ::saveViewerParameters(path.isEmpty() ? nullptr : path.toStdString().c_str(), serverName.toStdString().c_str());
+  emit serverHistoryChanged(serverHistory_);
 }
 
 QString ViewerConfig::loadViewerParameters(QString path)
@@ -1143,7 +1150,7 @@ void ViewerConfig::setServerHistory(QStringList history)
 void ViewerConfig::saveServerHistory()
 {
   serverName_ = serverHistory_.length() > 0 ? serverHistory_[0] : "";
-  parserServerName();
+  parseServerName();
 #ifdef _WIN32
   saveHistoryToRegKey(serverHistory_);
 #else
@@ -1838,7 +1845,7 @@ QString ViewerConfig::gatewayHost() const
   return QString(::via);
 }
 
-void ViewerConfig::parserServerName()
+void ViewerConfig::parseServerName()
 {
   if (!QString(::via).isEmpty() && !gatewayLocalPort_) {
     network::initSockets();
