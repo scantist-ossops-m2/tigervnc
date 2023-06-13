@@ -457,13 +457,12 @@ bool CMsgReader::readFramebufferUpdate()
 
 bool CMsgReader::readRect(const Rect& r, int encoding)
 {
-  if ((r.br.x > handler->server()->width()) ||
-      (r.br.y > handler->server()->height())) {
+  if ((r.br.x > handler->server.width()) ||
+      (r.br.y > handler->server.height())) {
     vlog.error("Rect too big: %dx%d at %d,%d exceeds %dx%d",
 	    r.width(), r.height(), r.tl.x, r.tl.y,
-	    handler->server()->width(), handler->server()->height());
-    vlog.error("Rect too big");
-    return false;
+            handler->server.width(), handler->server.height());
+    throw Exception("Rect too big");
   }
 
   if (r.is_empty())
@@ -541,7 +540,7 @@ bool CMsgReader::readSetCursor(int width, int height, const Point& hotspot)
   if (width > maxCursorSize || height > maxCursorSize)
     throw Exception("Too big cursor");
 
-  int data_len = width * height * (handler->server()->pf().bpp/8);
+  int data_len = width * height * (handler->server.pf().bpp/8);
   int mask_len = ((width+7)/8) * height;
   rdr::U8Array data(data_len);
   rdr::U8Array mask(mask_len);
@@ -565,14 +564,14 @@ bool CMsgReader::readSetCursor(int width, int height, const Point& hotspot)
       int byte = y * maskBytesPerRow + x / 8;
       int bit = 7 - x % 8;
 
-      handler->server()->pf().rgbFromBuffer(out, in, 1);
+      handler->server.pf().rgbFromBuffer(out, in, 1);
 
       if (mask.buf[byte] & (1 << bit))
         out[3] = 255;
       else
         out[3] = 0;
 
-      in += handler->server()->pf().bpp/8;
+      in += handler->server.pf().bpp/8;
       out += 4;
     }
   }
@@ -606,10 +605,10 @@ bool CMsgReader::readSetCursorWithAlpha(int width, int height, const Point& hots
     cursorEncoding = is->readS32();
   }
 
-  origPF = handler->server()->pf();
-  handler->server()->setPF(rgbaPF);
+  origPF = handler->server.pf();
+  handler->server.setPF(rgbaPF);
   ret = handler->readAndDecodeRect(pb.getRect(), cursorEncoding, &pb);
-  handler->server()->setPF(origPF);
+  handler->server.setPF(origPF);
 
   if (!ret)
     return false;
@@ -659,7 +658,7 @@ bool CMsgReader::readSetVMwareCursor(int width, int height, const Point& hotspot
   is->skip(1);
 
   if (type == 0) {
-    int len = width * height * (handler->server()->pf().bpp/8);
+    int len = width * height * (handler->server.pf().bpp/8);
     rdr::U8Array andMask(len);
     rdr::U8Array xorMask(len);
 
@@ -680,13 +679,13 @@ bool CMsgReader::readSetVMwareCursor(int width, int height, const Point& hotspot
     andIn = andMask.buf;
     xorIn = xorMask.buf;
     out = data.buf;
-    Bpp = handler->server()->pf().bpp/8;
+    Bpp = handler->server.pf().bpp/8;
     for (int y = 0;y < height;y++) {
       for (int x = 0;x < width;x++) {
         Pixel andPixel, xorPixel;
 
-        andPixel = handler->server()->pf().pixelFromBuffer(andIn);
-        xorPixel = handler->server()->pf().pixelFromBuffer(xorIn);
+        andPixel = handler->server.pf().pixelFromBuffer(andIn);
+        xorPixel = handler->server.pf().pixelFromBuffer(xorIn);
         andIn += Bpp;
         xorIn += Bpp;
 
@@ -695,7 +694,7 @@ bool CMsgReader::readSetVMwareCursor(int width, int height, const Point& hotspot
 
           // Opaque pixel
 
-          handler->server()->pf().rgbFromPixel(xorPixel, &r, &g, &b);
+          handler->server.pf().rgbFromPixel(xorPixel, &r, &g, &b);
           *out++ = r;
           *out++ = g;
           *out++ = b;

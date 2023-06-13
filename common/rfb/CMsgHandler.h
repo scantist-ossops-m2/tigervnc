@@ -35,7 +35,6 @@ namespace rdr { class InStream; }
 namespace rfb {
 
   class CMsgHandler {
-
   public:
     CMsgHandler();
     virtual ~CMsgHandler();
@@ -85,7 +84,8 @@ namespace rfb {
     virtual void handleClipboardProvide(rdr::U32 flags,
                                         const size_t* lengths,
                                         const rdr::U8* const* data);
-    virtual ServerParams *server() = 0;
+
+    ServerParams server;
   };
 }
 #endif

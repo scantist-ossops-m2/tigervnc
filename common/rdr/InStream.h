@@ -121,6 +121,7 @@ namespace rdr {
     }
 
     // readU/SN() methods read unsigned and signed N-bit integers.
+
     inline U8  readU8()  { check(1); return *ptr++; }
     inline U16 readU16() { check(2); int b0 = *ptr++; int b1 = *ptr++;
                            return b0 << 8 | b1; }
