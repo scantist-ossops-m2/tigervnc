@@ -306,6 +306,7 @@ endif()
 
 if(BUILD_VIEWER)
   add_subdirectory(vncviewer)
+  add_subdirectory(media)
 endif()
 
 add_subdirectory(tests)
