@@ -17,10 +17,8 @@ add_library(rfb STATIC
   CSecurityNone.h
   CSecurityPlain.cxx
   CSecurityPlain.h
-  CSecurityRSAAES.h
   CSecurityStack.cxx
   CSecurityStack.h
-  CSecurityTLS.h
   CSecurityVeNCrypt.cxx
   CSecurityVeNCrypt.h
   CSecurityVncAuth.cxx
@@ -70,11 +68,9 @@ add_library(rfb STATIC
   Logger_file.h
   Logger_stdio.cxx
   Logger_stdio.h
-  Logger_syslog.h
+  obfuscate.cxx
+  obfuscate.h
   Palette.h
-  Password.cxx
-  Password.h
-  Pixel.h
   PixelBuffer.cxx
   PixelBuffer.h
   PixelFormat.cxx
@@ -103,10 +99,8 @@ add_library(rfb STATIC
   SSecurityNone.h
   SSecurityPlain.cxx
   SSecurityPlain.h
-  SSecurityRSAAES.h
   SSecurityStack.cxx
   SSecurityStack.h
-  SSecurityTLS.h
   SSecurityVeNCrypt.cxx
   SSecurityVeNCrypt.h
   SSecurityVncAuth.cxx
@@ -133,7 +127,6 @@ add_library(rfb STATIC
   TightJPEGEncoder.h
   Timer.cxx
   Timer.h
-  UnixPasswordValidator.h
   UpdateTracker.cxx
   UpdateTracker.h
   UserMsgBox.h
@@ -156,21 +149,29 @@ add_library(rfb STATIC
   encodings.h
   fenceTypes.h
   hextileConstants.h
-  hextileDecode.h
-  hextileEncode.h
-  hextileEncodeBetter.h
+  hextileDecoder.cxx
+  hextileDecoder.h
+  hextileEncoder.cxx
+  hextileEncoder.h
   keysymdef.h
   ledStates.h
   msgTypes.h
-  pam.h
   qemuTypes.h
-  rreDecode.h
-  rreEncode.h
+  RREDecoder.cxx
+  RREDecoder.h
+  RREEncoder.cxx
+  RREEncoder.h
   screenTypes.h
-  tightDecode.h
+  TightDecoder.cxx
+  TightDecoder.h
+  TightEncoder.cxx
+  TightEncoder.h
   util.cxx
   util.h
-  zrleDecode.h
+  ZRLEDecoder.cxx
+  ZRLEDecoder.h
+  ZRLEEncoder.cxx
+  ZRLEEncoder.h
   )
 
 target_link_libraries(rfb os rdr)
@@ -190,28 +191,28 @@ if(ENABLE_H264 AND NOT H264_LIBS STREQUAL "NONE")
 endif()
 
 if(UNIX)
-  target_sources(rfb PRIVATE Logger_syslog.cxx)
+  target_sources(rfb PRIVATE Logger_syslog.cxx Logger_syslog.h)
 endif()
 
 if(WIN32)
   include_directories(${CMAKE_SOURCE_DIR}/win)
-  target_sources(rfb PRIVATE WinPasswdValidator.cxx)
+  target_sources(rfb PRIVATE WinPasswdValidator.cxx WinPasswdValidator.h)
 endif(WIN32)
 
 if(UNIX AND NOT APPLE)
-  target_sources(rfb PRIVATE UnixPasswordValidator.cxx pam.c)
+  target_sources(rfb PRIVATE UnixPasswordValidator.cxx UnixPasswordValidator.h pam.c pam.h)
   target_link_libraries(rfb ${PAM_LIBS})
 endif()
 
 if(GNUTLS_FOUND)
-  target_sources(rfb PRIVATE CSecurityTLS.cxx SSecurityTLS.cxx)
+  target_sources(rfb PRIVATE CSecurityTLS.cxx SSecurityTLS.cxx CSecurityTLS.h SSecurityTLS.h)
   include_directories(SYSTEM ${GNUTLS_INCLUDE_DIR})
   target_link_libraries(rfb ${GNUTLS_LIBRARIES})
 endif()
 
 if (NETTLE_FOUND)
-  target_sources(rfb PRIVATE CSecurityDH.cxx CSecurityMSLogonII.cxx
-                 CSecurityRSAAES.cxx SSecurityRSAAES.cxx)
+  target_sources(rfb PRIVATE CSecurityDH.cxx CSecurityDH.h CSecurityMSLogonII.cxx CSecurityMSLogonII.h
+                 CSecurityRSAAES.cxx CSecurityRSAAES.h SSecurityRSAAES.cxx SSecurityRSAAES.h)
   include_directories(SYSTEM ${NETTLE_INCLUDE_DIRS} ${GMP_INCLUDE_DIRS})
   target_link_libraries(rfb ${HOGWEED_LIBRARIES}
                         ${NETTLE_LIBRARIES} ${GMP_LIBRARIES})

@@ -204,7 +204,11 @@ namespace rdr {
 
   protected:
 
-    InStream();
+    InStream() : restorePoint(NULL)
+#ifdef RFB_INSTREAM_CHECK
+      ,checkedBytes(0)
+#endif
+     {}
     const uint8_t* ptr;
     const uint8_t* end;
   };

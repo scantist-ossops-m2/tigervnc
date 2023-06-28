@@ -238,7 +238,6 @@ if(UNIX)
                 --desktop --template vncviewer.desktop.in
                 -d ${CMAKE_SOURCE_DIR}/po -o vncviewer.desktop
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/vncviewer.desktop.in
-              ${CMAKE_SOURCE_DIR}/po/*.po
     )
   elseif(INTLTOOL_MERGE_EXECUTABLE)
     add_custom_command(OUTPUT vncviewer.desktop
@@ -250,7 +249,6 @@ if(UNIX)
                 -d ${CMAKE_SOURCE_DIR}/po
                 vncviewer.desktop.intl vncviewer.desktop
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/vncviewer.desktop.in
-              ${CMAKE_SOURCE_DIR}/po/*.po
     )
   else()
     add_custom_command(OUTPUT vncviewer.desktop
@@ -267,7 +265,6 @@ if(UNIX)
                 --xml --template ${CMAKE_CURRENT_SOURCE_DIR}/org.tigervnc.vncviewer.metainfo.xml.in
                 -d ${CMAKE_SOURCE_DIR}/po -o org.tigervnc.vncviewer.metainfo.xml
       DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/org.tigervnc.vncviewer.metainfo.xml.in
-              ${CMAKE_SOURCE_DIR}/po/*.po
     )
   elseif(INTLTOOL_MERGE_EXECUTABLE)
     add_custom_command(OUTPUT org.tigervnc.vncviewer.metainfo.xml
@@ -280,7 +277,6 @@ if(UNIX)
                 -x ${CMAKE_SOURCE_DIR}/po
                 org.tigervnc.vncviewer.metainfo.xml.intl org.tigervnc.vncviewer.metainfo.xml
       DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/org.tigervnc.vncviewer.metainfo.xml.in
-              ${CMAKE_SOURCE_DIR}/po/*.po
     )
   else()
     add_custom_command(OUTPUT org.tigervnc.vncviewer.metainfo.xml

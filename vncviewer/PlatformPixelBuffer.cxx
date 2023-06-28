@@ -47,7 +47,7 @@ PlatformPixelBuffer::PlatformPixelBuffer(int width, int height) :
   FullFramePixelBuffer(rfb::PixelFormat(32, 24, false, true, 255, 255, 255, 16, 8, 0), 0, 0, NULL, 0),
   Surface(width, height)
 {
-  setBuffer(width, height, (rdr::U8*)framebuffer(), width);
+  setBuffer(width, height, (uint8_t*)framebuffer(), width);
 }
 
 PlatformPixelBuffer::~PlatformPixelBuffer()
