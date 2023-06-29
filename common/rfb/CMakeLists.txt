@@ -145,10 +145,6 @@ add_library(rfb STATIC
   encodings.h
   fenceTypes.h
   hextileConstants.h
-  hextileDecoder.cxx
-  hextileDecoder.h
-  hextileEncoder.cxx
-  hextileEncoder.h
   keysymdef.h
   ledStates.h
   msgTypes.h
