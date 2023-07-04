@@ -40,6 +40,8 @@ elseif(APPLE)
   set(OS_DEP_SOURCES
       vncmacview.cxx
       vncmacview.h
+      vncscrollbar.cxx
+      vncscrollbar.h
       Surface_OSX.cxx
       cocoa.h
       cocoa.mm
@@ -49,6 +51,8 @@ else()
   set(OS_DEP_SOURCES
       vncx11view.cxx
       vncx11view.h
+      vncscrollbar.cxx
+      vncscrollbar.h
       Surface_X11.cxx
       X11TouchHandler.cxx
       X11TouchHandler.h

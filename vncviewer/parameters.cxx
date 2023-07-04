@@ -960,9 +960,8 @@ ViewerConfig::ViewerConfig()
   parseServerName();
 
   rfb::Security security(rfb::SecurityClient::secTypes);
-  auto secTypes = security.GetEnabledSecTypes();
-  for (auto iter = secTypes.begin(); iter != secTypes.end(); ++iter) {
-    switch (*iter) {
+  for (uint32_t sec : security.GetEnabledExtSecTypes()) {
+    switch (sec) {
     case rfb::secTypeNone:
       encNone_ = true;
       authNone_ = true;
@@ -973,9 +972,11 @@ ViewerConfig::ViewerConfig()
       break;
     }
   }
-  auto secTypesExt = security.GetEnabledExtSecTypes();
-  for (auto iterExt = secTypesExt.begin(); iterExt != secTypesExt.end(); ++iterExt) {
-    switch (*iterExt) {
+  for (uint32_t sec : security.GetEnabledExtSecTypes()) {
+    switch (sec) {
+    case rfb::secTypeNone:
+    case rfb::secTypeVncAuth:
+      break;
     case rfb::secTypePlain:
       encNone_ = true;
       authPlain_ = true;
@@ -1015,6 +1016,8 @@ ViewerConfig::ViewerConfig()
       authVNC_ = true;
       authPlain_ = true;
       break;
+    default:
+      break;
     }
   }
   auto keysyms = getMenuKeySymbols();
@@ -1042,24 +1045,75 @@ int ViewerConfig::initialize()
   return 0;
 }
 
-bool ViewerConfig::installedSecurity(int type) const
-{
-  return availableSecurityTypes_.contains(type);
-}
-
-bool ViewerConfig::enabledSecurity(int type) const
-{
-  auto found = availableSecurityTypes_.find(type);
-  return found != availableSecurityTypes_.end() && *found;
-}
-
 QString ViewerConfig::toLocalFile(const QUrl url) const
 {
   return QDir::toNativeSeparators(url.toLocalFile());
 }
 
+void ViewerConfig::formatSecurityTypes()
+{
+  Security security;
+  /* Process security types which don't use encryption */
+  if (encNone_) {
+    if (authNone_) {
+      security.EnableSecType(secTypeNone);
+    }
+    if (authVNC_) {
+      security.EnableSecType(secTypeVncAuth);
+#ifdef HAVE_NETTLE
+      security.EnableSecType(secTypeRAne256);
+#endif
+    }
+    if (authPlain_) {
+      security.EnableSecType(secTypePlain);
+#ifdef HAVE_NETTLE
+      security.EnableSecType(secTypeRA2ne);
+      security.EnableSecType(secTypeRAne256);
+#endif
+    }
+  }
+
+#ifdef HAVE_GNUTLS
+  /* Process security types which use TLS encryption */
+  if (encTLSAnon_) {
+    if (authNone_) {
+      security.EnableSecType(secTypeTLSNone);
+    }
+    if (authVNC_) {
+      security.EnableSecType(secTypeTLSVnc);
+    }
+    if (authPlain_) {
+      security.EnableSecType(secTypeTLSPlain);
+    }
+  }
+
+  /* Process security types which use X509 encryption */
+  if (encTLSX509_) {
+    if (authNone_) {
+      security.EnableSecType(secTypeX509None);
+    }
+    if (authVNC_) {
+      security.EnableSecType(secTypeX509Vnc);
+    }
+    if (authPlain_) {
+      security.EnableSecType(secTypeX509Plain);
+    }
+  }
+#endif
+
+#ifdef HAVE_NETTLE
+  if (encAES_) {
+    security.EnableSecType(secTypeRA2);
+    security.EnableSecType(secTypeRA256);
+  }
+#endif
+  char *str = security.ToString();
+  SecurityClient::secTypes.setParam(str);
+}
+
 void ViewerConfig::saveViewerParameters(QString path, QString serverName)
 {
+  formatSecurityTypes();
   serverHistory_.removeOne(serverName);
   serverHistory_.push_front(serverName);
   parseServerName();

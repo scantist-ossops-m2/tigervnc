@@ -260,8 +260,6 @@ signals:
   void accessPointChanged(QString accessPoint);
 
 public slots:
-  bool installedSecurity(int type) const;
-  bool enabledSecurity(int type) const;
   QString toLocalFile(const QUrl url) const;
   void saveViewerParameters(QString path, QString serverName);
   QString loadViewerParameters(QString path);
@@ -273,7 +271,6 @@ public slots:
 private:
   static ViewerConfig *config_;
   //
-  QHash<int, bool> availableSecurityTypes_; // Each element is a pair of (availableSecurityId, userPreferenceToUseIt).
   QStringList menuKeys_;
   bool encNone_;
   bool encTLSAnon_;
@@ -293,6 +290,7 @@ private:
   QString getlocaledir();
   void initializeLogger();
   void parseServerName();
+  void formatSecurityTypes();
 };
 
 #endif

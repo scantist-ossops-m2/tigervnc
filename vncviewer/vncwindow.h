@@ -6,6 +6,7 @@
 class QMoveEvent;
 class QResizeEvent;
 class QVNCToast;
+class QVNCScrollBar;
 
 class QVNCWindow : public QScrollArea
 {
@@ -28,6 +29,10 @@ protected:
 
 private:
   QVNCToast *toast_;
+#if !defined(WIN32)
+  QVNCScrollBar *hscroll_;
+  QVNCScrollBar *vscroll_;
+#endif
 };
 
 #endif // VNCWINDOW_H

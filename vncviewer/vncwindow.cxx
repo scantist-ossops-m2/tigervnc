@@ -18,12 +18,19 @@
 #if defined(WIN32)
 #include <windows.h>
 #endif
+#if !defined(WIN32)
+#include "vncscrollbar.h"
+#endif
 
 static rfb::LogWriter vlog("VNCWindow");
 
 QVNCWindow::QVNCWindow(QWidget *parent)
  : QScrollArea(parent)
  , toast_(new QVNCToast(this))
+ #if !defined(WIN32)
+ , hscroll_(new QVNCScrollBar)
+ , vscroll_(new QVNCScrollBar)
+ #endif
 {
   setAttribute(Qt::WA_InputMethodTransparent);
   setAttribute(Qt::WA_NativeWindow);
@@ -48,6 +55,10 @@ QVNCWindow::QVNCWindow(QWidget *parent)
 
   setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 
+#if !defined(WIN32)
+  setHorizontalScrollBar(hscroll_);
+  setVerticalScrollBar(vscroll_);
+#endif
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
@@ -74,6 +85,10 @@ QVNCWindow::QVNCWindow(QWidget *parent)
 QVNCWindow::~QVNCWindow()
 {
   delete toast_;
+#if !defined(WIN32) && !defined(__APPLE__)
+  hscroll_->deleteLater();
+  vscroll_->deleteLater();
+#endif
 }
 
 void QVNCWindow::popupToast()
