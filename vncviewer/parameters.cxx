@@ -957,7 +957,6 @@ ViewerConfig::ViewerConfig()
   }
 
   loadServerHistory();
-  serverName_ = serverHistory_.length() > 0 ? serverHistory_[0] : "";
   parseServerName();
 
   rfb::Security security(rfb::SecurityClient::secTypes);
@@ -1878,6 +1877,9 @@ void ViewerConfig::parseServerName()
     int port = serverName_.toInt(&ok, 10);
     if (ok) {
       serverPort_ = port;
+    }
+    else {
+      serverHost_ = serverName_;
     }
   }
 }
