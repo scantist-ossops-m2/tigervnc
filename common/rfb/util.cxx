@@ -28,6 +28,7 @@
 #include <string.h>
 #include <sys/time.h>
 
+#include <rfb/i18n.h>
 #include <rfb/util.h>
 
 namespace rfb {

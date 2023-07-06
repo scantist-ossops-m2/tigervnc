@@ -23,6 +23,8 @@
 
 #include <assert.h>
 
+#include <rfb/i18n.h>
+
 #include "scrnintstr.h"
 #ifdef RANDR
 #include "randrstr.h"

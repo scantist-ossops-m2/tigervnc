@@ -27,6 +27,7 @@
 
 #include <rdr/Exception.h>
 #include <rdr/TLSException.h>
+#include <rfb/i18n.h>
 #ifdef _WIN32
 #include <winsock2.h>
 #include <windows.h>

@@ -28,6 +28,7 @@
 
 #include <rfb/Logger.h>
 #include <rfb/LogWriter.h>
+#include <rfb/i18n.h>
 
 using namespace rfb;
 
