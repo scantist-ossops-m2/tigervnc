@@ -43,7 +43,6 @@
 #include <rfb/Configuration.h>
 #include <rfb/Logger_stdio.h>
 #include <rfb/LogWriter.h>
-#include <rfb/i18n.h>
 #include "TXWindow.h"
 #include "TXCheckbox.h"
 #include "TXLabel.h"
@@ -210,7 +209,6 @@ int main(int argc, char** argv)
   programName = argv[0];
 
   setlocale(LC_ALL, "");
-  initTranslations();
 
   rfb::initStdIOLoggers();
   rfb::LogWriter::setLogParams("*:stderr:30");

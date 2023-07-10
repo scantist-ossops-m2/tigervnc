@@ -32,7 +32,6 @@
 #include <unistd.h>
 #include <os/os.h>
 
-#include <rfb/i18n.h>
 #include <rfb/obfuscate.h>
 
 #include <termios.h>
@@ -138,7 +137,6 @@ int main(int argc, char** argv)
   char fname[PATH_MAX];
 
   setlocale(LC_ALL, "");
-  initTranslations();
 
   fname[0] = '\0';
 

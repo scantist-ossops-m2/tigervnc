@@ -22,14 +22,6 @@
 
 #define DEFAULT_TEXT_DOMAIN "tigervnc"
 
-/* Need to tell gcc that pgettext() doesn't screw up format strings */
-#ifdef __GNUC__
-static const char *
-pgettext_aux (const char *domain,
-              const char *msg_ctxt_id, const char *msgid,
-              int category) __attribute__ ((format_arg (3)));
-#endif
-
 #include "gettext.h"
 
 /* gettext breaks -Wformat (upstream bug 64384) */
@@ -58,6 +50,21 @@ extern int swprintf (wchar_t *, size_t, const wchar_t *, ...)
 #define C_(Context, String) pgettext (Context, String)
 #define N_(String) gettext_noop (String)
 
-void initTranslations();
+#undef dgettext
+#undef dcgettext
+#undef pgettext_aux
+#define dgettext dgettext_rfb
+#define dcgettext dcgettext_rfb
+#define pgettext_aux pgettext_rfb
 
+const char *dgettext_rfb(const char *domainname, const char *msgid)
+                         __attribute__ ((format_arg (2)));
+const char *dcgettext_rfb(const char *domainname, const char *msgid,
+                          int category)
+                          __attribute__ ((format_arg (2)));
+
+const char *pgettext_rfb(const char *domain,
+                         const char *msg_ctxt_id, const char *msgid,
+                         int category)
+                         __attribute__ ((format_arg (3)));
 #endif

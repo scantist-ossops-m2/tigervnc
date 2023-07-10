@@ -36,7 +36,6 @@
 #include <rfb/VNCServerST.h>
 #include <rfb/Configuration.h>
 #include <rfb/Timer.h>
-#include <rfb/i18n.h>
 #include <network/TcpSocket.h>
 #include <network/UnixSocket.h>
 
@@ -241,7 +240,6 @@ static void usage()
 int main(int argc, char** argv)
 {
   setlocale(LC_ALL, "");
-  initTranslations();
 
   initStdIOLoggers();
   LogWriter::setLogParams("*:stderr:30");
