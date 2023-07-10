@@ -92,7 +92,8 @@ static const char* getlocaledir()
 
   return localebuf;
 #else
-  return CMAKE_INSTALL_FULL_LOCALEDIR;
+  return "/usr/share/locale";
+//  return CMAKE_INSTALL_FULL_LOCALEDIR;
 #endif
 }
 
