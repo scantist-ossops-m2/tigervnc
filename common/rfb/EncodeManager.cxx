@@ -38,6 +38,7 @@
 #include <rfb/RawEncoder.h>
 #include <rfb/RREEncoder.h>
 #include <rfb/HextileEncoder.h>
+#include <rfb/JPEGEncoder.h>
 #include <rfb/ZRLEEncoder.h>
 #include <rfb/TightEncoder.h>
 #include <rfb/TightJPEGEncoder.h>
@@ -69,6 +70,7 @@ enum EncoderClass {
   encoderTight,
   encoderTightJPEG,
   encoderZRLE,
+  encoderJPEG,
   encoderClassMax,
 };
 
@@ -104,6 +106,8 @@ static const char *encoderClassName(EncoderClass klass)
     return "Tight (JPEG)";
   case encoderZRLE:
     return "ZRLE";
+  case encoderJPEG:
+    return "JPEG";
   case encoderClassMax:
     break;
   }
@@ -147,6 +151,7 @@ EncodeManager::EncodeManager(SConnection* conn_)
   encoders[encoderTight] = new TightEncoder(conn);
   encoders[encoderTightJPEG] = new TightJPEGEncoder(conn);
   encoders[encoderZRLE] = new ZRLEEncoder(conn);
+  encoders[encoderJPEG] = new JPEGEncoder(conn);
 
   updates = 0;
   memset(&copyStats, 0, sizeof(copyStats));
@@ -247,6 +252,7 @@ bool EncodeManager::supported(int encoding)
   case encodingRaw:
   case encodingRRE:
   case encodingHextile:
+  case encodingJPEG:
   case encodingZRLE:
   case encodingTight:
     return true;
@@ -407,13 +413,21 @@ void EncodeManager::prepareEncoders(bool allowLossy)
     bitmapRLE = indexedRLE = encoderZRLE;
     bitmap = indexed = encoderZRLE;
     break;
+  case encodingJPEG:
+    if (allowJPEG)
+      fullColour = encoderJPEG;
+    break;
   }
 
   // JPEG is the only encoder that can reduce things to grayscale
-  if ((conn->client.subsampling == subsampleGray) &&
-      encoders[encoderTightJPEG]->isSupported() && allowLossy) {
-    solid = bitmap = bitmapRLE = encoderTightJPEG;
-    indexed = indexedRLE = fullColour = encoderTightJPEG;
+  if ((conn->client.subsampling == subsampleGray) && allowLossy) {
+    if (encoders[encoderJPEG]->isSupported()) {
+      solid = bitmap = bitmapRLE = encoderJPEG;
+      indexed = indexedRLE = fullColour = encoderJPEG;
+    } else if (encoders[encoderTightJPEG]->isSupported()) {
+      solid = bitmap = bitmapRLE = encoderTightJPEG;
+      indexed = indexedRLE = fullColour = encoderTightJPEG;
+    }
   }
 
   // Can't use lossy encoders for lossless refresh
