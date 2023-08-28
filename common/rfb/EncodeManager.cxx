@@ -495,6 +495,11 @@ void EncodeManager::prepareEncoders(bool allowLossy)
       solid = encoderHextile;
   }
 
+  // Prefer the plain JPEG encoder as it compresses better
+  if ((fullColour == encoderTightJPEG) &&
+      encoders[encoderJPEG]->isSupported())
+    fullColour = encoderJPEG;
+
   activeEncoders[encoderSolid] = solid;
   activeEncoders[encoderBitmap] = bitmap;
   activeEncoders[encoderBitmapRLE] = bitmapRLE;
