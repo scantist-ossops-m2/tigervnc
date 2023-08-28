@@ -20,6 +20,8 @@
 #ifndef __RFB_JPEGENCODER_H__
 #define __RFB_JPEGENCODER_H__
 
+#include <vector>
+
 #include <rfb/Encoder.h>
 #include <rfb/JpegCompressor.h>
 
@@ -48,6 +50,9 @@ namespace rfb {
     int qualityLevel;
     int fineQuality;
     int fineSubsampling;
+
+    std::vector<uint8_t> lastHuffmanTables;
+    std::vector<uint8_t> lastQuantTables;
   };
 }
 #endif
