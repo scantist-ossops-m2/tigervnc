@@ -29,6 +29,7 @@
 #include <rfb/CopyRectDecoder.h>
 #include <rfb/RREDecoder.h>
 #include <rfb/HextileDecoder.h>
+#include <rfb/JPEGDecoder.h>
 #include <rfb/ZRLEDecoder.h>
 #include <rfb/TightDecoder.h>
 #ifdef HAVE_H264
@@ -72,6 +73,7 @@ bool Decoder::supported(int encoding)
   case encodingCopyRect:
   case encodingRRE:
   case encodingHextile:
+  case encodingJPEG:
   case encodingZRLE:
   case encodingTight:
 #ifdef HAVE_H264
@@ -94,6 +96,8 @@ Decoder* Decoder::createDecoder(int encoding)
     return new RREDecoder();
   case encodingHextile:
     return new HextileDecoder();
+  case encodingJPEG:
+    return new JPEGDecoder();
   case encodingZRLE:
     return new ZRLEDecoder();
   case encodingTight:
