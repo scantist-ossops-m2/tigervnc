@@ -13,3 +13,9 @@ config.h
 CMakeLists.txt.user
 deploy
 CMakeLists.txt.user.*
+conan_venv/*
+*.bat
+conanbuildinfo.txt
+conaninfo.txt
+graph_info.json
+conan.lock
