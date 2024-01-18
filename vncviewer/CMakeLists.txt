@@ -32,7 +32,6 @@ if (WIN32)
   set(OS_DEP_SOURCES
       vncwinview.cxx
       vncwinview.h
-      Surface_Win32.cxx
       Win32TouchHandler.cxx
       Win32TouchHandler.h
       win32.c

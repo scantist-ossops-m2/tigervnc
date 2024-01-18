@@ -10,28 +10,29 @@ class QVNCScrollBar;
 
 class QVNCWindow : public QScrollArea
 {
-  Q_OBJECT
+    Q_OBJECT
+
 public:
-  QVNCWindow(QWidget *parent = nullptr);
-  virtual ~QVNCWindow();
-  void resize(int width, int height);
-  void normalizedResize(int width, int height);
+    QVNCWindow(QWidget* parent = nullptr);
+    virtual ~QVNCWindow();
+    void resize(int width, int height);
+    void normalizedResize(int width, int height);
 
 public slots:
-  void popupToast();
+    void popupToast();
 
 protected:
-  void moveEvent(QMoveEvent *e) override;
-  void resizeEvent(QResizeEvent *e) override;
-  void changeEvent(QEvent *e) override;
-  void focusInEvent(QFocusEvent*) override;
-  void focusOutEvent(QFocusEvent*) override;
+    void moveEvent(QMoveEvent* e) override;
+    void resizeEvent(QResizeEvent* e) override;
+    void changeEvent(QEvent* e) override;
+    void focusInEvent(QFocusEvent*) override;
+    void focusOutEvent(QFocusEvent*) override;
 
 private:
-  QVNCToast *toast_;
+    QVNCToast* toast_;
 #if !defined(WIN32)
-  QVNCScrollBar *hscroll_;
-  QVNCScrollBar *vscroll_;
+    QVNCScrollBar* hscroll_;
+    QVNCScrollBar* vscroll_;
 #endif
 };
 
