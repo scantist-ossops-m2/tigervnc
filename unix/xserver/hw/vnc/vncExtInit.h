@@ -87,6 +87,10 @@ void vncPreScreenResize(int scrIdx);
 void vncPostScreenResize(int scrIdx, int success, int width, int height);
 void vncRefreshScreenLayout(int scrIdx);
 
+uint64_t vncGetMsc(int scrIdx);
+void vncQueueMsc(int scrIdx, uint64_t id, uint64_t msc);
+void vncAbortMsc(int scrIdx, uint64_t id);
+
 int vncOverrideParam(const char *nameAndValue);
 
 #ifdef __cplusplus

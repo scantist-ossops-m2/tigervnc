@@ -482,6 +482,33 @@ void vncRefreshScreenLayout(int scrIdx)
   }
 }
 
+uint64_t vncGetMsc(int scrIdx)
+{
+  try {
+    return desktop[scrIdx]->getMsc();
+  } catch (rdr::Exception& e) {
+    vncFatalError("vncGetMsc: %s\n", e.str());
+  }
+}
+
+void vncQueueMsc(int scrIdx, uint64_t id, uint64_t msc)
+{
+  try {
+    desktop[scrIdx]->queueMsc(id, msc);
+  } catch (rdr::Exception& e) {
+    vncFatalError("vncQueueMsc: %s\n", e.str());
+  }
+}
+
+void vncAbortMsc(int scrIdx, uint64_t id)
+{
+  try {
+    desktop[scrIdx]->abortMsc(id);
+  } catch (rdr::Exception& e) {
+    vncFatalError("vncAbortMsc: %s\n", e.str());
+  }
+}
+
 int vncOverrideParam(const char *nameAndValue)
 {
   const char* equalSign = strchr(nameAndValue, '=');
