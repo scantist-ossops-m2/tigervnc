@@ -1106,14 +1106,17 @@ vncClientStateChange(CallbackListPtr *a, void *b, void *c)
 #ifdef GLXEXT
 #if XORG_OLDER_THAN(1, 20, 0)
 extern void GlxExtensionInit(void);
+#endif
+#endif
 
-static ExtensionModule glxExt = {
-    GlxExtensionInit,
-    "GLX",
-    &noGlxExtension
+static const ExtensionModule vncExtensions[] = {
+    {vncExtensionInit, "VNC-EXTENSION", NULL},
+#ifdef GLXEXT
+#if XORG_OLDER_THAN(1, 20, 0)
+    { GlxExtensionInit, "GLX", &noGlxExtension },
+#endif
+#endif
 };
-#endif
-#endif
 
 void
 InitOutput(ScreenInfo * scrInfo, int argc, char **argv)
@@ -1123,15 +1126,11 @@ InitOutput(ScreenInfo * scrInfo, int argc, char **argv)
 
     vncPrintBanner();
 
+    if (serverGeneration == 1)
+        LoadExtensionList(vncExtensions, ARRAY_SIZE(vncExtensions), TRUE);
+
 #if XORG_AT_LEAST(1, 20, 0)
     xorgGlxCreateVendor();
-#else
-
-#ifdef GLXEXT
-    if (serverGeneration == 1)
-        LoadExtensionList(&glxExt, 1, TRUE);
-#endif
-
 #endif
 
     /* initialize pixmap formats */
