@@ -1,4 +1,4 @@
-#include "qpainter.h"
+#include "Win32KeyboardHandler.h"
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -13,8 +13,6 @@
 #define XK_LATIN1
 #define XK_MISCELLANY
 #define XK_XKB_KEYS
-#include "PlatformPixelBuffer.h"
-#include "Win32TouchHandler.h"
 #include "appmanager.h"
 #include "i18n.h"
 #include "parameters.h"
@@ -24,8 +22,6 @@
 #include "rfb/keysymdef.h"
 #include "rfb/ledStates.h"
 #include "vncconnection.h"
-#include "vncwindow.h"
-#include "vncwinview.h"
 #include "win32.h"
 
 #include <QDebug>
@@ -39,203 +35,86 @@ static rfb::LogWriter vlog("Viewport");
 static const WORD SCAN_FAKE = 0xaa;
 static const WORD NoSymbol  = 0;
 
-QVNCWinView::QVNCWinView(QWidget* parent, Qt::WindowFlags f)
-    : QAbstractVNCView(parent, f), altGrArmed_(false), altGrCtrlTimer_(new QTimer), touchHandler_(nullptr)
+Win32KeyboardHandler::Win32KeyboardHandler(QObject* parent) : BaseKeyboardHandler(parent)
 {
-    // Do not set either Qt::WA_NoBackground nor Qt::WA_NoSystemBackground
-    // for Windows. Otherwise, unneeded ghost image of the toast is shown
-    // when dimming.
-    setAttribute(Qt::WA_InputMethodTransparent);
-    setAttribute(Qt::WA_NativeWindow);
-    setAttribute(Qt::WA_AcceptTouchEvents);
-
-    grabGesture(Qt::TapGesture);
-    grabGesture(Qt::TapAndHoldGesture);
-    grabGesture(Qt::PanGesture);
-    grabGesture(Qt::PinchGesture);
-    grabGesture(Qt::SwipeGesture);
-    grabGesture(Qt::CustomGesture);
-
-    setFocusPolicy(Qt::StrongFocus);
-    connect(
-        AppManager::instance()->connection(),
-        &QVNCConnection::framebufferResized,
-        this,
-        [this](int width, int height) {
-            grabPointer();
-            maybeGrabKeyboard();
-        },
-        Qt::QueuedConnection);
-
-    altGrCtrlTimer_->setInterval(100);
-    altGrCtrlTimer_->setSingleShot(true);
-    connect(altGrCtrlTimer_, &QTimer::timeout, this, [this]() {
+    altGrCtrlTimer_.setInterval(100);
+    altGrCtrlTimer_.setSingleShot(true);
+    connect(&altGrCtrlTimer_, &QTimer::timeout, this, [=]() {
         altGrArmed_ = false;
         handleKeyPress(0x1d, XK_Control_L);
     });
 }
 
-QVNCWinView::~QVNCWinView()
+bool Win32KeyboardHandler::nativeEventFilter(QByteArray const& eventType, void* message, long*)
 {
-    altGrCtrlTimer_->stop();
-    altGrCtrlTimer_->deleteLater();
+    MSG* windowsmsg = static_cast<MSG*>(message);
 
-    delete touchHandler_;
-}
+    switch (windowsmsg->message)
+    {
+    case WM_KEYDOWN:
+    case WM_SYSKEYDOWN:
+        handleKeyDownEvent(windowsmsg->message, windowsmsg->wParam, windowsmsg->lParam);
+        return true;
+    case WM_KEYUP:
+    case WM_SYSKEYUP:
+        handleKeyUpEvent(windowsmsg->message, windowsmsg->wParam, windowsmsg->lParam);
+        return true;
+    case WM_SETFOCUS:
+        maybeGrabKeyboard();
 
-void QVNCWinView::getMouseProperties(QMouseEvent* event, int& x, int& y, int& buttonMask, int& wheelMask)
-{
-    buttonMask = 0;
-    wheelMask  = 0;
-    if (event->buttons() & Qt::LeftButton)
-    {
-        buttonMask |= 1;
-    }
-    if (event->buttons() & Qt::MiddleButton)
-    {
-        buttonMask |= 2;
-    }
-    if (event->buttons() & Qt::RightButton)
-    {
-        buttonMask |= 4;
-    }
+        // We may have gotten our lock keys out of sync with the server
+        // whilst we didn't have focus. Try to sort this out.
+        pushLEDState();
 
-    x = event->x();
-    y = event->y();
-}
-
-bool QVNCWinView::event(QEvent* e)
-{
-    try
-    {
-        switch (e->type())
+        // Resend Ctrl/Alt if needed
+        if (menuCtrlKey_)
         {
-        case QEvent::WindowBlocked:
-            setEnabled(false);
-            break;
-        case QEvent::WindowUnblocked:
-            setEnabled(true);
-            break;
-        default:
-            break;
+            handleKeyPress(0x1d, XK_Control_L);
         }
-        return QWidget::event(e);
+        if (menuAltKey_)
+        {
+            handleKeyPress(0x38, XK_Alt_L);
+        }
+        return true;
+    case WM_KILLFOCUS:
+        if (ViewerConfig::config()->fullscreenSystemKeys())
+        {
+            ungrabKeyboard();
+        }
+        // We won't get more key events, so reset our knowledge about keys
+        resetKeyboard();
+        return true;
     }
-    catch (rdr::Exception& e)
-    {
-        vlog.error("%s", e.str());
-        AppManager::instance()->publishError(e.str(), true);
-        return false;
-    }
+
+    return false;
 }
 
-void QVNCWinView::showEvent(QShowEvent* e)
-{
-    QWidget::showEvent(e);
-
-    int w = width() * devicePixelRatio_;
-    int h = height() * devicePixelRatio_;
-    setFixedSize(w, h);
-}
-
-void QVNCWinView::enterEvent(QEvent* e)
-{
-    qDebug() << "QVNCWinView::enterEvent";
-    grabPointer();
-    QWidget::enterEvent(e);
-}
-
-void QVNCWinView::leaveEvent(QEvent* e)
-{
-    qDebug() << "QVNCWinView::leaveEvent";
-    ungrabPointer();
-    QWidget::leaveEvent(e);
-}
-
-void QVNCWinView::focusInEvent(QFocusEvent* e)
-{
-    qDebug() << "QVNCWinView::focusInEvent";
-    maybeGrabKeyboard();
-
-    // We may have gotten our lock keys out of sync with the server
-    // whilst we didn't have focus. Try to sort this out.
-    pushLEDState();
-
-    // Resend Ctrl/Alt if needed
-    if (menuCtrlKey_)
-    {
-        handleKeyPress(0x1d, XK_Control_L);
-    }
-    if (menuAltKey_)
-    {
-        handleKeyPress(0x38, XK_Alt_L);
-    }
-    QWidget::focusInEvent(e);
-}
-
-void QVNCWinView::focusOutEvent(QFocusEvent* e)
-{
-    qDebug() << "QVNCWinView::focusOutEvent";
-    if (ViewerConfig::config()->fullscreenSystemKeys())
-    {
-        ungrabKeyboard();
-    }
-    // We won't get more key events, so reset our knowledge about keys
-    resetKeyboard();
-    QWidget::focusOutEvent(e);
-}
-
-void QVNCWinView::resizeEvent(QResizeEvent* e)
-{
-    QVNCWindow* window = AppManager::instance()->window();
-    QSize       vsize  = window->viewport()->size();
-    qDebug() << "QVNCWinView::resizeEvent: w=" << e->size().width() << ", h=" << e->size().height()
-             << ", viewport=" << vsize;
-
-    // Try to get the remote size to match our window size, provided
-    // the following conditions are true:
-    //
-    // a) The user has this feature turned on
-    // b) The server supports it
-    // c) We're not still waiting for startup fullscreen to kick in
-    //
-    QVNCConnection* cc = AppManager::instance()->connection();
-    if (!firstUpdate_ && ViewerConfig::config()->remoteResize() && cc->server()->supportsSetDesktopSize)
-    {
-        postRemoteResizeRequest();
-    }
-    // Some systems require a grab after the window size has been changed.
-    // Otherwise they might hold on to displays, resulting in them being unusable.
-    grabPointer();
-    maybeGrabKeyboard();
-}
-
-void QVNCWinView::resolveAltGrDetection(bool isAltGrSequence)
+void Win32KeyboardHandler::resolveAltGrDetection(bool isAltGrSequence)
 {
     altGrArmed_ = false;
-    altGrCtrlTimer_->stop();
+    altGrCtrlTimer_.stop();
     // when it's not an AltGr sequence we can't supress the Ctrl anymore
     if (!isAltGrSequence)
         handleKeyPress(0x1d, XK_Control_L);
 }
 
-void QVNCWinView::handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode)
+void Win32KeyboardHandler::handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode)
 {
     if (menuKeySym_ && keySym == menuKeySym_)
     {
-        if (isVisibleContextMenu())
-        {
-            if (!menuShortCutMode)
-            {
-                sendContextMenuKey();
-                return;
-            }
-        }
-        else
-        {
-            popupContextMenu();
-        }
-        return;
+        // if (isVisibleContextMenu())
+        // {
+        //     if (!menuShortCutMode)
+        //     {
+        //         sendContextMenuKey();
+        //         return;
+        //     }
+        // }
+        // else
+        // {
+        //     popupContextMenu();
+        // }
+        // return;
     }
 
     if (ViewerConfig::config()->viewOnly())
@@ -270,7 +149,7 @@ void QVNCWinView::handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutM
     }
 }
 
-void QVNCWinView::handleKeyRelease(int keyCode)
+void Win32KeyboardHandler::handleKeyRelease(int keyCode)
 {
     DownMap::iterator iter;
 
@@ -304,7 +183,7 @@ void QVNCWinView::handleKeyRelease(int keyCode)
     downKeySym_.erase(iter);
 }
 
-int QVNCWinView::handleKeyDownEvent(UINT message, WPARAM wParam, LPARAM lParam)
+int Win32KeyboardHandler::handleKeyDownEvent(UINT message, WPARAM wParam, LPARAM lParam)
 {
     Q_UNUSED(message);
     unsigned int timestamp  = GetMessageTime();
@@ -420,7 +299,7 @@ int QVNCWinView::handleKeyDownEvent(UINT message, WPARAM wParam, LPARAM lParam)
         {
             altGrArmed_    = true;
             altGrCtrlTime_ = timestamp;
-            altGrCtrlTimer_->start();
+            altGrCtrlTimer_.start();
             return 1;
         }
     }
@@ -441,7 +320,7 @@ int QVNCWinView::handleKeyDownEvent(UINT message, WPARAM wParam, LPARAM lParam)
     return 1;
 }
 
-int QVNCWinView::handleKeyUpEvent(UINT message, WPARAM wParam, LPARAM lParam)
+int Win32KeyboardHandler::handleKeyUpEvent(UINT message, WPARAM wParam, LPARAM lParam)
 {
     Q_UNUSED(message);
     UINT vKey       = wParam;
@@ -507,33 +386,9 @@ int QVNCWinView::handleKeyUpEvent(UINT message, WPARAM wParam, LPARAM lParam)
     return 1;
 }
 
-int QVNCWinView::handleTouchEvent(UINT message, WPARAM wParam, LPARAM lParam)
+void Win32KeyboardHandler::pushLEDState()
 {
-    return touchHandler_->processEvent(message, wParam, lParam);
-}
-
-void QVNCWinView::setQCursor(QCursor const& cursor)
-{
-    setCursor(cursor);
-}
-
-void QVNCWinView::setCursorPos(int x, int y)
-{
-    if (!mouseGrabbed_)
-    {
-        // Do nothing if we do not have the mouse captured.
-        return;
-    }
-    QPoint gp = mapToGlobal(QPoint(x, y));
-    qDebug() << "QVNCWinView::setCursorPos: local xy=" << x << y << ", screen xy=" << gp.x() << gp.y();
-    x = gp.x();
-    y = gp.y();
-    QCursor::setPos(x, y);
-}
-
-void QVNCWinView::pushLEDState()
-{
-    qDebug() << "QVNCWinView::pushLEDState";
+    qDebug() << "Win32KeyboardHandler::pushLEDState";
     // Server support?
     rfb::ServerParams* server = AppManager::instance()->connection()->server();
     if (server->ledState() == rfb::ledUnknown)
@@ -575,29 +430,29 @@ void QVNCWinView::pushLEDState()
     }
 }
 
-void QVNCWinView::setLEDState(unsigned int state)
+void Win32KeyboardHandler::setLEDState(unsigned int state)
 {
-    qDebug() << "QVNCWinView::setLEDState";
+    qDebug() << "Win32KeyboardHandler::setLEDState";
     vlog.debug("Got server LED state: 0x%08x", state);
 
     // The first message is just considered to be the server announcing
     // support for this extension. We will push our state to sync up the
     // server when we get focus. If we already have focus we need to push
     // it here though.
-    if (firstLEDState_)
-    {
-        firstLEDState_ = false;
-        if (hasFocus())
-        {
-            pushLEDState();
-        }
-        return;
-    }
+    // if (firstLEDState_)
+    // {
+    //     firstLEDState_ = false;
+    //     if (hasFocus())
+    //     {
+    //         pushLEDState();
+    //     }
+    //     return;
+    // }
 
-    if (!hasFocus())
-    {
-        return;
-    }
+    // if (!hasFocus())
+    // {
+    //     return;
+    // }
 
     INPUT input[6];
     memset(input, 0, sizeof(input));
@@ -645,130 +500,19 @@ void QVNCWinView::setLEDState(unsigned int state)
     }
 }
 
-void QVNCWinView::grabKeyboard()
+void Win32KeyboardHandler::grabKeyboard()
 {
-    int ret = win32_enable_lowlevel_keyboard((HWND)winId());
-    if (ret != 0)
-    {
-        vlog.error(_("Failure grabbing keyboard"));
-        return;
-    }
-    QAbstractVNCView::grabKeyboard();
+    BaseKeyboardHandler::grabKeyboard();
+    // int ret = win32_enable_lowlevel_keyboard((HWND)winId());
+    // if (ret != 0)
+    // {
+    //     vlog.error(_("Failure grabbing keyboard"));
+    //     return;
+    // }
 }
 
-void QVNCWinView::ungrabKeyboard()
+void Win32KeyboardHandler::ungrabKeyboard()
 {
-    ungrabPointer();
-    win32_disable_lowlevel_keyboard((HWND)winId());
-    QAbstractVNCView::ungrabKeyboard();
-}
-
-void QVNCWinView::bell()
-{
-    MessageBeep(0xFFFFFFFF); // cf. fltk/src/drivers/WinAPI/Fl_WinAPI_Screen_Driver.cxx:245
-}
-
-void QVNCWinView::moveView(int x, int y)
-{
-    MoveWindow((HWND)window()->winId(), x, y, width(), height(), false);
-}
-
-void QVNCWinView::updateWindow()
-{
-    QAbstractVNCView::updateWindow();
-    framebuffer_     = (PlatformPixelBuffer*)AppManager::instance()->connection()->framebuffer();
-    rfb::Rect r      = framebuffer_->getDamage();
-    int       x      = r.tl.x;
-    int       y      = r.tl.y;
-    int       width  = r.br.x - x;
-    int       height = r.br.y - y;
-    rect_            = QRect{x, y, x + width, y + height};
-    pixmap_          = framebuffer_->pixmap();
-    if (!rect_.isEmpty() && !pixmap_.isNull())
-    {
-        update(rect_);
-        // qDebug() << "QVNCWinView::updateWindow" << rect_;
-    }
-}
-
-void QVNCWinView::paintEvent(QPaintEvent* event)
-{
-    QPainter painter(this);
-    painter.drawPixmap(rect(), pixmap_);
-    AppManager::instance()->connection()->refreshFramebuffer();
-}
-
-void QVNCWinView::mouseMoveEvent(QMouseEvent* event)
-{
-    grabPointer();
-    int x, y, buttonMask, wheelMask;
-    getMouseProperties(event, x, y, buttonMask, wheelMask);
-    filterPointerEvent(rfb::Point(x, y), buttonMask | wheelMask);
-}
-
-void QVNCWinView::mousePressEvent(QMouseEvent* event)
-{
-    qDebug() << "QVNCWinView::mousePressEvent";
-
-    if (ViewerConfig::config()->viewOnly())
-    {
-        return;
-    }
-
-    setFocus(Qt::FocusReason::MouseFocusReason);
-
-    int x, y, buttonMask, wheelMask;
-    getMouseProperties(event, x, y, buttonMask, wheelMask);
-    filterPointerEvent(rfb::Point(x, y), buttonMask);
-
-    if (keyboardGrabbed_ && !mouseGrabbed_)
-    {
-        grabPointer();
-    }
-}
-
-void QVNCWinView::mouseReleaseEvent(QMouseEvent* event)
-{
-    qDebug() << "QVNCWinView::mouseReleaseEvent";
-
-    if (ViewerConfig::config()->viewOnly())
-    {
-        return;
-    }
-
-    setFocus(Qt::FocusReason::MouseFocusReason);
-
-    int x, y, buttonMask, wheelMask;
-    getMouseProperties(event, x, y, buttonMask, wheelMask);
-    filterPointerEvent(rfb::Point(x, y), buttonMask);
-
-    if (keyboardGrabbed_ && !mouseGrabbed_)
-    {
-        grabPointer();
-    }
-}
-
-QRect QVNCWinView::getExtendedFrameProperties()
-{
-    // Returns Windows10's magic number. This method might not be necessary for Qt6 / Windows11.
-    // See the followin URL for more details.
-    // https://stackoverflow.com/questions/42473554/windows-10-screen-coordinates-are-offset-by-7
-    return QRect(7, 7, 7, 7);
-}
-
-void QVNCWinView::dim(bool enabled)
-{
-    if (enabled)
-    {
-        LONG lStyle = GetWindowLong((HWND)winId(), GWL_EXSTYLE);
-        lStyle |= WS_EX_LAYERED;
-        SetWindowLong((HWND)winId(), GWL_EXSTYLE, lStyle);
-        SetLayeredWindowAttributes((HWND)winId(), RGB(0, 0, 0), 128, LWA_ALPHA | LWA_COLORKEY);
-    }
-    else
-    {
-        LONG lStyle = GetWindowLong((HWND)winId(), GWL_EXSTYLE);
-        lStyle &= ~WS_EX_LAYERED;
-        SetWindowLong((HWND)winId(), GWL_EXSTYLE, lStyle);
-    }
+    // win32_disable_lowlevel_keyboard((HWND)winId());
+    BaseKeyboardHandler::ungrabKeyboard();
 }

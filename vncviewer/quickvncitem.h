@@ -16,16 +16,24 @@ public:
     QuickVNCItem(QQuickItem* parent = nullptr);
     QSGNode* updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* updatePaintNodeData);
 
-    void grabPointer();
-    void ungrabPointer();
+public slots:
+    void bell();
 
 signals:
     void popupToast(QString const& text);
 
 protected:
+    void grabPointer();
+    void ungrabPointer();
+
     void getMouseProperties(QMouseEvent* event, int& x, int& y, int& buttonMask, int& wheelMask);
 
+    void focusInEvent(QFocusEvent* event);
+    void focusOutEvent(QFocusEvent* event);
+    void hoverEnterEvent(QHoverEvent* event);
+    void hoverLeaveEvent(QHoverEvent* event);
     void hoverMoveEvent(QHoverEvent* event);
+
     void mouseMoveEvent(QMouseEvent* event);
     void mousePressEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
@@ -40,8 +48,7 @@ private:
     QRect                rect_;
     QImage               image_;
 
-    bool       keyboardGrabbed_ = false;
-    bool       mouseGrabbed_    = false;
+    bool       mouseGrabbed_ = false;
     rfb::Point lastPointerPos_;
     int        lastButtonMask_;
     QTimer     mousePointerTimer_;

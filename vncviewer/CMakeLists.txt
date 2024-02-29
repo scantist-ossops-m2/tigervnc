@@ -32,13 +32,15 @@ if (WIN32)
   set(OS_DEP_SOURCES
       Win32TouchHandler.cxx
       Win32TouchHandler.h
+      Win32KeyboardHandler.cxx
+      Win32KeyboardHandler.h
       win32.c
       win32.h
   )
 elseif(APPLE)
   set(OS_DEP_SOURCES
-      vncmacview.cxx
-      vncmacview.h
+      MacKeyboardHandler.cxx
+      MacKeyboardHandler.h
       vncscrollbar.cxx
       vncscrollbar.h
       Surface_OSX.cxx
@@ -48,13 +50,13 @@ elseif(APPLE)
   )
 else()
   set(OS_DEP_SOURCES
-      vncx11view.cxx
-      vncx11view.h
       vncscrollbar.cxx
       vncscrollbar.h
       Surface_X11.cxx
       X11TouchHandler.cxx
       X11TouchHandler.h
+      X11KeyboardHandler.cxx
+      X11KeyboardHandler.h
       GestureHandler.cxx
       GestureHandler.h
       vncgesture.h
@@ -66,6 +68,8 @@ else()
 endif()
 
 set(PROJECT_SOURCES
+        BaseKeyboardHandler.cxx
+        BaseKeyboardHandler.h
         vncviewer.cxx
         vnctranslator.h
         appmanager.h

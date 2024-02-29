@@ -21,6 +21,7 @@ Item {
             anchors.centerIn: parent
             width: AppManager.remoteViewWidth
             height: AppManager.remoteViewHeight
+            focus: true
 
             onPopupToast: function(text) {
                 toastLabel.text = text

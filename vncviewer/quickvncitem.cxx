@@ -1,12 +1,19 @@
 #include "quickvncitem.h"
 
+#include "Win32KeyboardHandler.h"
 #include "appmanager.h"
 #include "i18n.h"
 #include "parameters.h"
+#include "qabstracteventdispatcher.h"
+#include "rdr/Exception.h"
+#include "rfb/LogWriter.h"
 
+#include <QAbstractNativeEventFilter>
 #include <QDateTime>
 #include <QQuickWindow>
 #include <QSGSimpleTextureNode>
+
+static rfb::LogWriter vlog("Viewport");
 
 QuickVNCItem::QuickVNCItem(QQuickItem* parent) : QQuickItem(parent)
 {
@@ -49,6 +56,8 @@ QuickVNCItem::QuickVNCItem(QQuickItem* parent) : QQuickItem(parent)
         }
         mbemu_->handleTimeout();
     });
+
+    QAbstractEventDispatcher::instance()->installNativeEventFilter(new Win32KeyboardHandler);
 }
 
 QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* updatePaintNodeData)
@@ -66,6 +75,17 @@ QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaint
     node->markDirty(QSGNode::DirtyForceUpdate);
     node->setTexture(texture);
     return node;
+}
+
+void QuickVNCItem::bell()
+{
+#if defined(Q_OS_WINDOWS)
+    MessageBeep(0xFFFFFFFF); // cf. fltk/src/drivers/WinAPI/Fl_WinAPI_Screen_Driver.cxx:245
+#elif defined(__APPLE__)
+    cocoa_beep();
+#elif defined(Q_OS_UNIX)
+    XBell(display_, 0 /* volume */);
+#endif
 }
 
 void QuickVNCItem::updateWindow()
@@ -136,6 +156,30 @@ void QuickVNCItem::getMouseProperties(QMouseEvent* event, int& x, int& y, int& b
     y = event->y();
 }
 
+void QuickVNCItem::focusInEvent(QFocusEvent* event)
+{
+    grabPointer();
+    QQuickItem::focusInEvent(event);
+}
+
+void QuickVNCItem::focusOutEvent(QFocusEvent* event)
+{
+    grabPointer();
+    QQuickItem::focusOutEvent(event);
+}
+
+void QuickVNCItem::hoverEnterEvent(QHoverEvent* event)
+{
+    grabPointer();
+    QQuickItem::hoverEnterEvent(event);
+}
+
+void QuickVNCItem::hoverLeaveEvent(QHoverEvent* event)
+{
+    ungrabPointer();
+    QQuickItem::hoverLeaveEvent(event);
+}
+
 void QuickVNCItem::filterPointerEvent(rfb::Point const& pos, int mask)
 {
     if (ViewerConfig::config()->viewOnly())
@@ -184,7 +228,7 @@ void QuickVNCItem::mousePressEvent(QMouseEvent* event)
     getMouseProperties(event, x, y, buttonMask, wheelMask);
     filterPointerEvent(rfb::Point(x, y), buttonMask);
 
-    if (keyboardGrabbed_ && !mouseGrabbed_)
+    if (!mouseGrabbed_)
     {
         grabPointer();
     }
@@ -205,7 +249,7 @@ void QuickVNCItem::mouseReleaseEvent(QMouseEvent* event)
     getMouseProperties(event, x, y, buttonMask, wheelMask);
     filterPointerEvent(rfb::Point(x, y), buttonMask);
 
-    if (keyboardGrabbed_ && !mouseGrabbed_)
+    if (!mouseGrabbed_)
     {
         grabPointer();
     }
