@@ -57,7 +57,9 @@ QuickVNCItem::QuickVNCItem(QQuickItem* parent) : QQuickItem(parent)
         mbemu_->handleTimeout();
     });
 
-    QAbstractEventDispatcher::instance()->installNativeEventFilter(new Win32KeyboardHandler);
+#ifdef Q_OS_WINDOWS
+    QAbstractEventDispatcher::instance()->installNativeEventFilter(new Win32KeyboardHandler(this));
+#endif
 }
 
 QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* updatePaintNodeData)
