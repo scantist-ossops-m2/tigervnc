@@ -14,7 +14,6 @@ class QScreen;
 class QClipboard;
 class QMoveEvent;
 class QGestureEvent;
-class QVNCToast;
 class EmulateMB;
 class GestureHandler;
 

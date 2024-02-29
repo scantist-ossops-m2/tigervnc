@@ -361,7 +361,7 @@ void QAbstractVNCView::popupContextMenu()
     contextMenu_->exec(QCursor::pos());
 }
 
-void QAbstractVNCView::createContextMenu()
+void QAbstractVNCView::createContextMenu() // xTODO QML side
 {
     if (!contextMenu_)
     {

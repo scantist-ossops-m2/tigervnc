@@ -4,22 +4,19 @@
 #include "vncconnection.h"
 
 #include <QObject>
+#include <QQuickView>
 
 class QAbstractVNCView;
 class QVNCWindow;
 class QTimer;
-#if defined(__APPLE__)
-class QQuickWidget;
-#endif
 
 class AppManager : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(int error READ error NOTIFY errorOcurred)
     Q_PROPERTY(QVNCConnection* connection READ connection CONSTANT)
-    Q_PROPERTY(QAbstractVNCView* view READ view CONSTANT)
-    Q_PROPERTY(QVNCWindow* window READ window CONSTANT)
-    Q_PROPERTY(bool visibleInfo READ visibleInfo NOTIFY visibleInfoChanged)
+    Q_PROPERTY(int remoteViewWidth READ remoteViewWidth NOTIFY remoteViewSizeChanged)
+    Q_PROPERTY(int remoteViewHeight READ remoteViewHeight NOTIFY remoteViewSizeChanged)
 
 public:
     virtual ~AppManager();
@@ -41,19 +38,19 @@ public:
         return error_;
     }
 
-    QAbstractVNCView* view() const
-    {
-        return view_;
-    }
-
-    QVNCWindow* window() const
-    {
-        return scroll_;
-    }
-
     bool visibleInfo() const
     {
         return visibleInfo_;
+    }
+
+    int remoteViewWidth() const
+    {
+        return remoteViewWidth_;
+    }
+
+    int remoteViewHeight() const
+    {
+        return remoteViewHeight_;
     }
 
 signals:
@@ -75,8 +72,8 @@ signals:
     void aboutDialogRequested();
     void vncWindowOpened();
     void vncWindowClosed();
-    void closeOverlayRequested();
     void visibleInfoChanged();
+    void remoteViewSizeChanged(int width, int height);
 
 public slots:
     void publishError(QString const message, bool quit = false);
@@ -108,14 +105,11 @@ private:
     static AppManager* manager_;
     int                error_;
     QVNCConnection*    facade_;
-    QAbstractVNCView*  view_;
-    QVNCWindow*        scroll_;
+    QQuickView*        connectionView_;
     QTimer*            rfbTimerProxy_;
     bool               visibleInfo_;
-#if defined(__APPLE__)
-    QQuickWidget* overlay_;
-    void          openOverlay(QString qml, char const* title, char const* message = nullptr);
-#endif
+    int                remoteViewWidth_  = 0;
+    int                remoteViewHeight_ = 0;
     AppManager();
 };
 

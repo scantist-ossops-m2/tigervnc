@@ -6,7 +6,6 @@
 #include "i18n.h"
 #include "parameters.h"
 #include "rfb/LogWriter.h"
-#include "vnctoast.h"
 #include "vncwindow.h"
 
 #include <QDebug>
@@ -25,7 +24,7 @@
 static rfb::LogWriter vlog("VNCWindow");
 
 QVNCWindow::QVNCWindow(QWidget* parent)
-    : QScrollArea(parent), toast_(new QVNCToast(this))
+    : QScrollArea(parent)
 #if !defined(WIN32)
       ,
       hscroll_(new QVNCScrollBar), vscroll_(new QVNCScrollBar)

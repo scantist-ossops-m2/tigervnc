@@ -15,6 +15,7 @@ Item {
             serverDialog.visible = true
         }
     }
+
     Connections {
         target: AppManager
         function onErrorOcurred(seq, message, quit) {
@@ -59,7 +60,6 @@ Item {
         onOptionDialogRequested: onOptionDialogRequested()
         onAboutDialogRequested: onAboutDialogRequested()
         onMessageDialogRequested: onMessageDialogRequested(flags, title, text)
-        onServerHistoryChanged: onServerHistoryChanged()
         onCredentialRequested: onCredentialRequested(secured, userNeeded, passwordNeeded)
     }
 

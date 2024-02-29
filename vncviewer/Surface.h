@@ -40,11 +40,10 @@ public:
         return h;
     }
 
-    QPixmap pixmap()
+    QImage image()
     {
-        QImage  i((unsigned char*)data.data(), w, h, QImage::Format_RGB32);
-        QPixmap p = QPixmap::fromImage(i);
-        return p;
+        QImage i((unsigned char*)data.data(), w, h, QImage::Format_RGB32);
+        return i;
     }
 
     char* framebuffer()

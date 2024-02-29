@@ -30,8 +30,6 @@ endif()
 
 if (WIN32)
   set(OS_DEP_SOURCES
-      vncwinview.cxx
-      vncwinview.h
       Win32TouchHandler.cxx
       Win32TouchHandler.h
       win32.c
@@ -72,18 +70,14 @@ set(PROJECT_SOURCES
         vnctranslator.h
         appmanager.h
         appmanager.cxx
+        quickvncitem.cxx
+        quickvncitem.h
         vncapplication.cxx
         vncapplication.h
-        vnctoast.cxx
-        vnctoast.h
-        vncwindow.cxx
-        vncwindow.h
         vncconnection.h
         vncconnection.cxx
         vnccredential.cxx
         vnccredential.h
-        abstractvncview.h
-        abstractvncview.cxx
         keysym2ucs.c
         keysym2ucs.h
         gettext.h
