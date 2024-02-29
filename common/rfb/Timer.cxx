@@ -66,14 +66,20 @@ int Timer::checkTimeouts() {
   gettimeofday(&start, 0);
   while (pending.front()->isBefore(start)) {
     Timer* timer;
-    timeval before;
+    timeval before, dueTime;
 
     timer = pending.front();
     pending.pop_front();
 
+    dueTime = timer->dueTime;
     gettimeofday(&before, 0);
     if (timer->cb->handleTimeout(timer)) {
       timeval now;
+
+      if (msBetween(&dueTime, &timer->dueTime) != 0) {
+        vlog.error("Timer incorrectly modified whilst repeating");
+        timer->dueTime = dueTime;
+      }
 
       gettimeofday(&now, 0);
 
