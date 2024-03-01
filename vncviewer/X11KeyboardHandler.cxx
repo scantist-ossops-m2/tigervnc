@@ -203,22 +203,25 @@ bool X11KeyboardHandler::nativeEventFilter(QByteArray const& eventType, void* me
     return false;
 }
 
-void X11KeyboardHandler::handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode)
+bool X11KeyboardHandler::handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode)
 {
+    if (contextMenuVisible_)
+        return false;
+
     qDebug() << "X11KeyboardHandler::handleKeyPress: keyCode=" << keyCode << ", keySym=" << keySym;
     if (menuKeySym_ && keySym == menuKeySym_)
     {
         emit contextMenuKeyPressed(menuShortCutMode);
-        return;
+        return true;
     }
 
     if (ViewerConfig::config()->viewOnly())
-        return;
+        return true;
 
     if (keyCode == 0)
     {
         vlog.error(_("No key code specified on key press"));
-        return;
+        return false;
     }
 
     // Because of the way keyboards work, we cannot expect to have the same
@@ -244,14 +247,19 @@ void X11KeyboardHandler::handleKeyPress(int keyCode, quint32 keySym, bool menuSh
         e.abort = true;
         throw;
     }
+
+    return true;
 }
 
-void X11KeyboardHandler::handleKeyRelease(int keyCode)
+bool X11KeyboardHandler::handleKeyRelease(int keyCode)
 {
+    if (contextMenuVisible_)
+        return false;
+
     DownMap::iterator iter;
 
     if (ViewerConfig::config()->viewOnly())
-        return;
+        return true;
 
     iter = downKeySym_.find(keyCode);
     if (iter == downKeySym_.end())
@@ -259,7 +267,7 @@ void X11KeyboardHandler::handleKeyRelease(int keyCode)
         // These occur somewhat frequently so let's not spam them unless
         // logging is turned up.
         vlog.debug("Unexpected release of key code %d", keyCode);
-        return;
+        return false;
     }
 
     vlog.debug("Key released: 0x%04x => XK_%s (0x%04x)", keyCode, XKeysymToString(iter->second), iter->second);
@@ -280,6 +288,8 @@ void X11KeyboardHandler::handleKeyRelease(int keyCode)
     }
 
     downKeySym_.erase(iter);
+
+    return true;
 }
 
 void X11KeyboardHandler::setLEDState(unsigned int state)

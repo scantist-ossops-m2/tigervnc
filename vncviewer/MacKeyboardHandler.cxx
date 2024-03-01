@@ -80,20 +80,23 @@ bool MacKeyboardHandler::nativeEventFilter(const QByteArray &eventType, void *me
     return false;
 }
 
-void MacKeyboardHandler::handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode)
+bool MacKeyboardHandler::handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode)
 {
+    if (contextMenuVisible_)
+        return false;
+
     if (menuKeySym_ && keySym == menuKeySym_)
     {
         emit contextMenuKeyPressed(menuShortCutMode);
-        return;
+        return true;
     }
 
     if (ViewerConfig::config()->viewOnly())
-        return;
+        return true;
 
     if (keyCode == 0) {
         vlog.error(_("No key code specified on key press"));
-        return;
+        return false;
     }
 
            // Alt on OS X behaves more like AltGr on other systems, and to get
@@ -136,21 +139,26 @@ void MacKeyboardHandler::handleKeyPress(int keyCode, quint32 keySym, bool menuSh
         e.abort = true;
         throw;
     }
+
+    return true;
 }
 
-void MacKeyboardHandler::handleKeyRelease(int keyCode)
+bool MacKeyboardHandler::handleKeyRelease(int keyCode)
 {
+    if (contextMenuVisible_)
+        return false;
+
     DownMap::iterator iter;
 
     if (ViewerConfig::config()->viewOnly())
-        return;
+        return true;
 
     iter = downKeySym_.find(keyCode);
     if (iter == downKeySym_.end()) {
         // These occur somewhat frequently so let's not spam them unless
         // logging is turned up.
         vlog.debug("Unexpected release of key code %d", keyCode);
-        return;
+        return false;
     }
 
            //  vlog.debug("Key released: 0x%04x => XK_%s (0x%04x)", keyCode, XKeysymToString(iter->second), iter->second);
@@ -168,6 +176,8 @@ void MacKeyboardHandler::handleKeyRelease(int keyCode)
     }
 
     downKeySym_.erase(iter);
+
+    return true;
 }
 
 void MacKeyboardHandler::setLEDState(unsigned int state)

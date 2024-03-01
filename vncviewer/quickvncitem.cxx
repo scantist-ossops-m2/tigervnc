@@ -97,12 +97,7 @@ QuickVNCItem::QuickVNCItem(QQuickItem* parent) : QQuickItem(parent)
             {
                 if (ViewerConfig::config()->viewOnly())
                     return;
-                int     dummy;
-                int     keyCode;
-                quint32 keySym;
-                ::getMenuKey(&dummy, &keyCode, &keySym);
-                keyboardHandler_->handleKeyPress(keyCode, keySym, true);
-                keyboardHandler_->handleKeyRelease(keyCode);
+                menuKey();
                 setContextMenuVisible(false);
             }
         }
@@ -145,6 +140,38 @@ void QuickVNCItem::bell()
 #ifdef Q_OS_LINUX
     XBell(display_, 0 /* volume */);
 #endif
+}
+
+void QuickVNCItem::menuKey()
+{
+    int     dummy;
+    int     keyCode;
+    quint32 keySym;
+    ::getMenuKey(&dummy, &keyCode, &keySym);
+    keyboardHandler_->handleKeyPress(keyCode, keySym, true);
+    keyboardHandler_->handleKeyRelease(keyCode);
+}
+
+void QuickVNCItem::ctrlKeyToggle(bool checked)
+{
+    int     keyCode = 0x1d;
+    quint32 keySym  = XK_Control_L;
+    if (checked)
+        keyboardHandler_->handleKeyPress(keyCode, keySym);
+    else
+        keyboardHandler_->handleKeyRelease(keyCode);
+    keyboardHandler_->setMenuKeyStatus(keySym, checked);
+}
+
+void QuickVNCItem::altKeyToggle(bool checked)
+{
+    int     keyCode = 0x38;
+    quint32 keySym  = XK_Alt_L;
+    if (checked)
+        keyboardHandler_->handleKeyPress(keyCode, keySym);
+    else
+        keyboardHandler_->handleKeyRelease(keyCode);
+    keyboardHandler_->setMenuKeyStatus(keySym, checked);
 }
 
 void QuickVNCItem::updateWindow()
@@ -191,6 +218,7 @@ bool QuickVNCItem::contextMenuVisible() const
 
 void QuickVNCItem::setContextMenuVisible(bool newContextMenuVisible)
 {
+    keyboardHandler_->setContextMenuVisible(newContextMenuVisible);
     if (contextMenuVisible_ == newContextMenuVisible)
         return;
     contextMenuVisible_ = newContextMenuVisible;

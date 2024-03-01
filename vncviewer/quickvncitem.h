@@ -28,6 +28,9 @@ public:
 
 public slots:
     void bell();
+    void menuKey();
+    void ctrlKeyToggle(bool checked);
+    void altKeyToggle(bool checked);
 
 signals:
     void popupToast(QString const& text);

@@ -15,8 +15,8 @@ public:
 
     bool nativeEventFilter(QByteArray const& eventType, void* message, long*) override;
 
-    void handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode = false) override;
-    void handleKeyRelease(int keyCode) override;
+    bool handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode = false) override;
+    bool handleKeyRelease(int keyCode) override;
 
 public slots:
     void pushLEDState() override;
@@ -30,8 +30,8 @@ private:
     QTimer       altGrCtrlTimer_;
 
     void resolveAltGrDetection(bool isAltGrSequence);
-    int  handleKeyDownEvent(UINT message, WPARAM wParam, LPARAM lParam);
-    int  handleKeyUpEvent(UINT message, WPARAM wParam, LPARAM lParam);
+    bool handleKeyDownEvent(UINT message, WPARAM wParam, LPARAM lParam);
+    bool handleKeyUpEvent(UINT message, WPARAM wParam, LPARAM lParam);
 };
 
 #endif // WIN32KEYBOARDHANDLER_H

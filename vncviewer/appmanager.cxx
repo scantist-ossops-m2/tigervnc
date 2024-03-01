@@ -3,18 +3,19 @@
 #endif
 
 #include <QDebug>
-#include <QUrl>
 #include <QProcess>
 #include <QQmlEngine>
+#include <QQuickView>
 #include <QScreen>
 #include <QTcpSocket>
-#include <QQuickView>
 #include <QTimer>
+#include <QUrl>
 #if defined(Q_OS_UNIX)
 #include <QApplication>
 #endif
 
 #include "appmanager.h"
+#include "contextmenuactions.h"
 #include "i18n.h"
 #include "parameters.h"
 #include "quickvncitem.h"
@@ -64,6 +65,17 @@ int AppManager::initialize()
                                              return manager_;
                                          });
     qmlRegisterType<QuickVNCItem>("Qt.TigerVNC", 1, 0, "VNCItem");
+    ContextMenuActions* contextMenuActions = new ContextMenuActions(manager_);
+    qmlRegisterSingletonType<ContextMenuActions>("Qt.TigerVNC",
+                                                 1,
+                                                 0,
+                                                 "ContextMenuActions",
+                                                 [](QQmlEngine* engine, QJSEngine* scriptEngine) -> QObject* {
+                                                     Q_UNUSED(engine)
+                                                     Q_UNUSED(scriptEngine)
+                                                     static ContextMenuActions contextMenuActions(manager_);
+                                                     return &contextMenuActions;
+                                                 });
     return 0;
 }
 
@@ -117,6 +129,11 @@ void AppManager::openVNCWindow(int width, int height, QString name)
     }
 
     emit vncWindowOpened();
+}
+
+void AppManager::minimizeVNCWindow()
+{
+    connectionView_->showMinimized();
 }
 
 void AppManager::closeVNCWindow()

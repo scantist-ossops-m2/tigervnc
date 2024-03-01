@@ -28,14 +28,16 @@ public:
     virtual void setLEDState(unsigned int state) = 0;
     virtual void pushLEDState()                  = 0;
 
-    virtual void handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode = false) = 0;
-    virtual void handleKeyRelease(int)                                                      = 0;
+    virtual bool handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode = false) = 0;
+    virtual bool handleKeyRelease(int)                                                      = 0;
     void         resetKeyboard();
 
     void setMenuKeyStatus(quint32 keysym, bool checked);
 
     bool menuCtrlKey() const;
     bool menuAltKey() const;
+
+    void setContextMenuVisible(bool newContextMenuVisible);
 
 signals:
     void contextMenuKeyPressed(bool menuShortCutMode);
@@ -45,9 +47,10 @@ protected:
 
     DownMap downKeySym_;
 
-    quint32 menuKeySym_  = XK_F8;
-    bool    menuCtrlKey_ = false;
-    bool    menuAltKey_  = false;
+    quint32 menuKeySym_         = XK_F8;
+    bool    menuCtrlKey_        = false;
+    bool    menuAltKey_         = false;
+    bool    contextMenuVisible_ = false;
 };
 
 #endif // BASEKEYBOARDHANDLER_H

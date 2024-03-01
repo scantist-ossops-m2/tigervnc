@@ -47,6 +47,11 @@ bool BaseKeyboardHandler::menuAltKey() const
     return menuAltKey_;
 }
 
+void BaseKeyboardHandler::setContextMenuVisible(bool newContextMenuVisible)
+{
+    contextMenuVisible_ = newContextMenuVisible;
+}
+
 void BaseKeyboardHandler::resetKeyboard()
 {
     while (!downKeySym_.empty())

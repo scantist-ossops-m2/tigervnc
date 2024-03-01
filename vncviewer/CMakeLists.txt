@@ -72,6 +72,8 @@ set(PROJECT_SOURCES
         vnctranslator.h
         appmanager.h
         appmanager.cxx
+        contextmenuactions.cxx
+        contextmenuactions.h
         quickvncitem.cxx
         quickvncitem.h
         vncapplication.cxx

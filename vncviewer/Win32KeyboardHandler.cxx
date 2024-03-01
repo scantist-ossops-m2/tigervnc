@@ -53,12 +53,10 @@ bool Win32KeyboardHandler::nativeEventFilter(QByteArray const& eventType, void* 
     {
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
-        handleKeyDownEvent(windowsmsg->message, windowsmsg->wParam, windowsmsg->lParam);
-        return true;
+        return handleKeyDownEvent(windowsmsg->message, windowsmsg->wParam, windowsmsg->lParam);
     case WM_KEYUP:
     case WM_SYSKEYUP:
-        handleKeyUpEvent(windowsmsg->message, windowsmsg->wParam, windowsmsg->lParam);
-        return true;
+        return handleKeyUpEvent(windowsmsg->message, windowsmsg->wParam, windowsmsg->lParam);
     }
 
     return false;
@@ -73,21 +71,24 @@ void Win32KeyboardHandler::resolveAltGrDetection(bool isAltGrSequence)
         handleKeyPress(0x1d, XK_Control_L);
 }
 
-void Win32KeyboardHandler::handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode)
+bool Win32KeyboardHandler::handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode)
 {
+    if (contextMenuVisible_)
+        return false;
+
     if (menuKeySym_ && keySym == menuKeySym_)
     {
         emit contextMenuKeyPressed(menuShortCutMode);
-        return;
+        return true;
     }
 
     if (ViewerConfig::config()->viewOnly())
-        return;
+        return true;
 
     if (keyCode == 0)
     {
         vlog.error(_("No key code specified on key press"));
-        return;
+        return false;
     }
 
     // Because of the way keyboards work, we cannot expect to have the same
@@ -111,14 +112,19 @@ void Win32KeyboardHandler::handleKeyPress(int keyCode, quint32 keySym, bool menu
         vlog.error("%s", e.str());
         AppManager::instance()->publishError(e.str(), true);
     }
+
+    return true;
 }
 
-void Win32KeyboardHandler::handleKeyRelease(int keyCode)
+bool Win32KeyboardHandler::handleKeyRelease(int keyCode)
 {
+    if (contextMenuVisible_)
+        return false;
+
     DownMap::iterator iter;
 
     if (ViewerConfig::config()->viewOnly())
-        return;
+        return true;
 
     iter = downKeySym_.find(keyCode);
     if (iter == downKeySym_.end())
@@ -126,7 +132,7 @@ void Win32KeyboardHandler::handleKeyRelease(int keyCode)
         // These occur somewhat frequently so let's not spam them unless
         // logging is turned up.
         vlog.debug("Unexpected release of key code %d", keyCode);
-        return;
+        return false;
     }
 
     vlog.debug("Key released: 0x%04x => 0x%04x", keyCode, iter->second);
@@ -145,9 +151,11 @@ void Win32KeyboardHandler::handleKeyRelease(int keyCode)
     }
 
     downKeySym_.erase(iter);
+
+    return true;
 }
 
-int Win32KeyboardHandler::handleKeyDownEvent(UINT message, WPARAM wParam, LPARAM lParam)
+bool Win32KeyboardHandler::handleKeyDownEvent(UINT message, WPARAM wParam, LPARAM lParam)
 {
     Q_UNUSED(message);
     unsigned int timestamp  = GetMessageTime();
@@ -177,7 +185,7 @@ int Win32KeyboardHandler::handleKeyDownEvent(UINT message, WPARAM wParam, LPARAM
     if (keyCode == SCAN_FAKE)
     {
         vlog.debug("Ignoring fake key press (virtual key 0x%02x)", vKey);
-        return 1;
+        return true;
     }
 
     // Windows sets the scan code to 0x00 for multimedia keys, so we
@@ -202,7 +210,7 @@ int Win32KeyboardHandler::handleKeyDownEvent(UINT message, WPARAM wParam, LPARAM
     if (keyCode & ~0x7f)
     {
         vlog.error(_("Invalid scan code 0x%02x"), (int)keyCode);
-        return 1;
+        return true;
     }
 
     if (isExtended)
@@ -264,11 +272,12 @@ int Win32KeyboardHandler::handleKeyDownEvent(UINT message, WPARAM wParam, LPARAM
             altGrArmed_    = true;
             altGrCtrlTime_ = timestamp;
             altGrCtrlTimer_.start();
-            return 1;
+            return true;
         }
     }
 
-    handleKeyPress(keyCode, keySym);
+    if (!handleKeyPress(keyCode, keySym))
+        return false;
 
     // We don't get reliable WM_KEYUP for these
     switch (keySym)
@@ -281,10 +290,10 @@ int Win32KeyboardHandler::handleKeyDownEvent(UINT message, WPARAM wParam, LPARAM
         handleKeyRelease(keyCode);
     }
 
-    return 1;
+    return true;
 }
 
-int Win32KeyboardHandler::handleKeyUpEvent(UINT message, WPARAM wParam, LPARAM lParam)
+bool Win32KeyboardHandler::handleKeyUpEvent(UINT message, WPARAM wParam, LPARAM lParam)
 {
     Q_UNUSED(message);
     UINT vKey       = wParam;
@@ -307,7 +316,7 @@ int Win32KeyboardHandler::handleKeyUpEvent(UINT message, WPARAM wParam, LPARAM l
     if (keyCode == SCAN_FAKE)
     {
         vlog.debug("Ignoring fake key release (virtual key 0x%02x)", vKey);
-        return 1;
+        return true;
     }
 
     if (keyCode == 0x00)
@@ -331,7 +340,8 @@ int Win32KeyboardHandler::handleKeyUpEvent(UINT message, WPARAM wParam, LPARAM l
         keyCode = 0x54;
     }
 
-    handleKeyRelease(keyCode);
+    if (!handleKeyRelease(keyCode))
+        return false;
 
     // Windows has a rather nasty bug where it won't send key release
     // events for a Shift button if the other Shift is still pressed
@@ -347,7 +357,7 @@ int Win32KeyboardHandler::handleKeyUpEvent(UINT message, WPARAM wParam, LPARAM l
         }
     }
 
-    return 1;
+    return true;
 }
 
 void Win32KeyboardHandler::pushLEDState()

@@ -13,8 +13,8 @@ public:
 
     bool nativeEventFilter(QByteArray const& eventType, void* message, long*) override;
 
-    void handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode = false) override;
-    void handleKeyRelease(int keyCode) override;
+    bool handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode = false) override;
+    bool handleKeyRelease(int keyCode) override;
     void releaseKeyboard();
 
 public slots:

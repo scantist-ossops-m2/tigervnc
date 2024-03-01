@@ -15,6 +15,7 @@ class AppManager : public QObject
     Q_PROPERTY(QVNCConnection* connection READ connection CONSTANT)
     Q_PROPERTY(int remoteViewWidth READ remoteViewWidth NOTIFY remoteViewSizeChanged)
     Q_PROPERTY(int remoteViewHeight READ remoteViewHeight NOTIFY remoteViewSizeChanged)
+    Q_PROPERTY(bool visibleInfo READ visibleInfo NOTIFY visibleInfoChanged)
 
 public:
     virtual ~AppManager();
@@ -80,6 +81,7 @@ public slots:
     void cancelAuth();
     void resetConnection();
     void openVNCWindow(int width, int height, QString name);
+    void minimizeVNCWindow();
     void closeVNCWindow();
     void setWindowName(QString name);
     /**
