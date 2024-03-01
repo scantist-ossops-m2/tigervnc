@@ -185,6 +185,51 @@ void QuickVNCItem::getMouseProperties(QMouseEvent* event, int& x, int& y, int& b
     {
         buttonMask |= 4;
     }
+    if (event->buttons() & Qt::XButton1)
+    {
+        wheelMask |= 32;
+    }
+    if (event->buttons() & Qt::XButton2)
+    {
+        wheelMask |= 64;
+    }
+
+    x = event->x();
+    y = event->y();
+}
+
+void QuickVNCItem::getMouseProperties(QWheelEvent* event, int& x, int& y, int& buttonMask, int& wheelMask)
+{
+    buttonMask = 0;
+    wheelMask  = 0;
+    if (event->buttons() & Qt::LeftButton)
+    {
+        buttonMask |= 1;
+    }
+    if (event->buttons() & Qt::MiddleButton)
+    {
+        buttonMask |= 2;
+    }
+    if (event->buttons() & Qt::RightButton)
+    {
+        buttonMask |= 4;
+    }
+    if (event->buttons() & Qt::XButton1)
+    {
+        wheelMask |= 32;
+    }
+    if (event->buttons() & Qt::XButton2)
+    {
+        wheelMask |= 64;
+    }
+    if (event->delta() < 0)
+    {
+        wheelMask |= 8;
+    }
+    if (event->delta() > 0)
+    {
+        wheelMask |= 16;
+    }
 
     x = event->x();
     y = event->y();
@@ -287,4 +332,13 @@ void QuickVNCItem::mouseReleaseEvent(QMouseEvent* event)
     {
         grabPointer();
     }
+}
+
+void QuickVNCItem::wheelEvent(QWheelEvent* event)
+{
+    qDebug() << "QuickVNCItem::wheelEvent";
+
+    int x, y, buttonMask, wheelMask;
+    getMouseProperties(event, x, y, buttonMask, wheelMask);
+    filterPointerEvent(rfb::Point(x, y), buttonMask | wheelMask);
 }

@@ -29,6 +29,7 @@ protected:
     void ungrabPointer();
 
     void getMouseProperties(QMouseEvent* event, int& x, int& y, int& buttonMask, int& wheelMask);
+    void getMouseProperties(QWheelEvent* event, int& x, int& y, int& buttonMask, int& wheelMask);
 
     void focusInEvent(QFocusEvent* event);
     void focusOutEvent(QFocusEvent* event);
@@ -39,6 +40,8 @@ protected:
     void mouseMoveEvent(QMouseEvent* event);
     void mousePressEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
+
+    void wheelEvent(QWheelEvent* event);
 
     void filterPointerEvent(rfb::Point const& pos, int mask);
 
@@ -59,7 +62,7 @@ private:
     EmulateMB* mbemu_ = new EmulateMB(&mouseButtonEmulationTimer_);
 
 #ifdef Q_OS_LINUX
-    _XDisplay * display_;
+    _XDisplay* display_;
 #endif
 };
 
