@@ -29,7 +29,7 @@
 #include <QScreen>
 #include <QTime>
 
-static rfb::LogWriter vlog("Viewport");
+static rfb::LogWriter vlog("Win32KeyboardHandler");
 
 // Used to detect fake input (0xaa is not a real key)
 static const WORD SCAN_FAKE = 0xaa;

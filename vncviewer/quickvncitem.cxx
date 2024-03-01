@@ -1,28 +1,33 @@
 #include "quickvncitem.h"
 
-#include <QAbstractNativeEventFilter>
-#include <QAbstractEventDispatcher>
-#include <QDateTime>
-#include <QQuickWindow>
-#include <QSGSimpleTextureNode>
-
 #include "appmanager.h"
 #include "i18n.h"
 #include "parameters.h"
 #include "rdr/Exception.h"
 #include "rfb/LogWriter.h"
 
+#include <QAbstractEventDispatcher>
+#include <QAbstractNativeEventFilter>
+#include <QDateTime>
+#include <QQuickWindow>
+#include <QSGSimpleTextureNode>
+
 #ifdef Q_OS_WINDOWS
 #include "Win32KeyboardHandler.h"
 #endif
 
 #ifdef Q_OS_LINUX
-#include <X11/extensions/Xrender.h>
-#include <QX11Info>
 #include "X11KeyboardHandler.h"
+
+#include <QX11Info>
+#include <X11/extensions/Xrender.h>
 #endif
 
-static rfb::LogWriter vlog("Viewport");
+#ifdef Q_OS_DARWIN
+#include "MacKeyboardHandler.h"
+#endif
+
+static rfb::LogWriter vlog("QuickVNCItem");
 
 QuickVNCItem::QuickVNCItem(QQuickItem* parent) : QQuickItem(parent)
 {
@@ -77,6 +82,10 @@ QuickVNCItem::QuickVNCItem(QQuickItem* parent) : QQuickItem(parent)
     display_ = qApp->nativeInterface<QNativeInterface::QX11Application>()->display();
 #endif
     QAbstractEventDispatcher::instance()->installNativeEventFilter(new X11KeyboardHandler(this));
+#endif
+
+#ifdef Q_OS_DARWIN
+    QAbstractEventDispatcher::instance()->installNativeEventFilter(new MacKeyboardHandler(this));
 #endif
 }
 
