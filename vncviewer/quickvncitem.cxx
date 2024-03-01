@@ -222,11 +222,11 @@ void QuickVNCItem::getMouseProperties(QWheelEvent* event, int& x, int& y, int& b
     {
         wheelMask |= 64;
     }
-    if (event->delta() < 0)
+    if (event->delta() > 0)
     {
         wheelMask |= 8;
     }
-    if (event->delta() > 0)
+    if (event->delta() < 0)
     {
         wheelMask |= 16;
     }
