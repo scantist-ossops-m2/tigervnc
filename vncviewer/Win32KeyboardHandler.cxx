@@ -73,14 +73,14 @@ void Win32KeyboardHandler::resolveAltGrDetection(bool isAltGrSequence)
 
 bool Win32KeyboardHandler::handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode)
 {
-    if (contextMenuVisible_)
-        return false;
-
     if (menuKeySym_ && keySym == menuKeySym_)
     {
         emit contextMenuKeyPressed(menuShortCutMode);
         return true;
     }
+
+    if (contextMenuVisible_)
+        return false;
 
     if (ViewerConfig::config()->viewOnly())
         return true;

@@ -207,15 +207,15 @@ bool X11KeyboardHandler::nativeEventFilter(QByteArray const& eventType, void* me
 
 bool X11KeyboardHandler::handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode)
 {
-    if (contextMenuVisible_)
-        return false;
-
     qDebug() << "X11KeyboardHandler::handleKeyPress: keyCode=" << keyCode << ", keySym=" << keySym;
     if (menuKeySym_ && keySym == menuKeySym_)
     {
         emit contextMenuKeyPressed(menuShortCutMode);
         return true;
     }
+
+    if (contextMenuVisible_)
+        return false;
 
     if (ViewerConfig::config()->viewOnly())
         return true;

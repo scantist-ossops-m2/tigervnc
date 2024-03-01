@@ -84,14 +84,14 @@ bool MacKeyboardHandler::nativeEventFilter(const QByteArray &eventType, void *me
 
 bool MacKeyboardHandler::handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode)
 {
-    if (contextMenuVisible_)
-        return false;
-
     if (menuKeySym_ && keySym == menuKeySym_)
     {
         emit contextMenuKeyPressed(menuShortCutMode);
         return true;
     }
+
+    if (contextMenuVisible_)
+        return false;
 
     if (ViewerConfig::config()->viewOnly())
         return true;
