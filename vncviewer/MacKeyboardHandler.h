@@ -8,27 +8,28 @@ class NSCursor;
 
 class MacKeyboardHandler : public BaseKeyboardHandler
 {
-    Q_OBJECT
+  Q_OBJECT
+
 public:
-    MacKeyboardHandler(QObject *parent = nullptr);
+  MacKeyboardHandler(QObject* parent = nullptr);
 
-    bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) override;
+  bool nativeEventFilter(QByteArray const& eventType, void* message, long* result) override;
 
-    bool handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode = false) override;
-    bool handleKeyRelease(int keyCode) override;
+  bool handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode = false) override;
+  bool handleKeyRelease(int keyCode) override;
 
 public slots:
-    void setLEDState(unsigned int state) override;
-    void pushLEDState() override;
-    void grabKeyboard() override;
-    void ungrabKeyboard() override;
+  void setLEDState(unsigned int state) override;
+  void pushLEDState() override;
+  void grabKeyboard() override;
+  void ungrabKeyboard() override;
 
 signals:
-    void message(const QString &msg, int timeout);
+  void message(QString const& msg, int timeout);
 
 private:
-    NSView *view_;
-    NSCursor *cursor_;
+  NSView*   view_;
+  NSCursor* cursor_;
 };
 
 #endif // VNCMACVIEW_H

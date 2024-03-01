@@ -39,90 +39,90 @@ class ModifiablePixelBuffer;
 class CConn : public rfb::CConnection
 {
 public:
-    CConn(QVNCConnection* facade);
-    ~CConn();
+  CConn(QVNCConnection* facade);
+  ~CConn();
 
-    QString connectionInfo();
+  QString connectionInfo();
 
-    unsigned getUpdateCount();
-    unsigned getPixelCount();
-    unsigned getPosition();
+  unsigned getUpdateCount();
+  unsigned getPixelCount();
+  unsigned getPosition();
 
-    // CConnection callback methods
-    void initDone() override;
+  // CConnection callback methods
+  void initDone() override;
 
-    void sendClipboardContent();
+  void sendClipboardContent();
 
-    void setName(char const* name) override;
+  void setName(char const* name) override;
 
-    void setColourMapEntries(int firstColour, int nColours, uint16_t* rgbs) override;
+  void setColourMapEntries(int firstColour, int nColours, uint16_t* rgbs) override;
 
-    void bell() override;
+  void bell() override;
 
-    void framebufferUpdateStart() override;
-    void framebufferUpdateEnd() override;
-    bool dataRect(rfb::Rect const& r, int encoding) override;
+  void framebufferUpdateStart() override;
+  void framebufferUpdateEnd() override;
+  bool dataRect(rfb::Rect const& r, int encoding) override;
 
-    void setCursor(int width, int height, rfb::Point const& hotspot, uint8_t const* data) override;
-    void setCursorPos(rfb::Point const& pos) override;
+  void setCursor(int width, int height, rfb::Point const& hotspot, uint8_t const* data) override;
+  void setCursorPos(rfb::Point const& pos) override;
 
-    void fence(uint32_t flags, unsigned len, char const data[]) override;
+  void fence(uint32_t flags, unsigned len, char const data[]) override;
 
-    void setLEDState(unsigned int state) override;
+  void setLEDState(unsigned int state) override;
 
-    void handleClipboardRequest() override;
-    void handleClipboardAnnounce(bool available) override;
-    void handleClipboardData(char const* data) override;
+  void handleClipboardRequest() override;
+  void handleClipboardAnnounce(bool available) override;
+  void handleClipboardData(char const* data) override;
 
-    void resizeFramebuffer() override;
+  void resizeFramebuffer() override;
 
-    void setPixelFormat(rfb::PixelFormat const&) override
-    {
-    }
+  void setPixelFormat(rfb::PixelFormat const&) override
+  {
+  }
 
-    rfb::ModifiablePixelBuffer* framebuffer(); // public facade for the protected method.
-    void                        setProcessState(int state);
+  rfb::ModifiablePixelBuffer* framebuffer(); // public facade for the protected method.
+  void                        setProcessState(int state);
 
-    void setHost(QString host)
-    {
-        serverHost = host;
-    }
+  void setHost(QString host)
+  {
+    serverHost = host;
+  }
 
-    QString host() const
-    {
-        return serverHost;
-    }
+  QString host() const
+  {
+    return serverHost;
+  }
 
-    void setPort(int port)
-    {
-        serverPort = port;
-    }
+  void setPort(int port)
+  {
+    serverPort = port;
+  }
 
-    void updatePixelFormat();
-    void resetConnection();
-
-private:
-    void autoSelectFormatAndEncoding();
-    int  securityType();
+  void updatePixelFormat();
+  void resetConnection();
 
 private:
-    QString serverHost;
-    int     serverPort;
+  void autoSelectFormatAndEncoding();
+  int  securityType();
 
-    QVNCConnection* facade;
-    QCursor*        cursor;
+private:
+  QString serverHost;
+  int     serverPort;
 
-    unsigned updateCount;
-    unsigned pixelCount;
+  QVNCConnection* facade;
+  QCursor*        cursor;
 
-    rfb::PixelFormat* serverPF;
-    rfb::PixelFormat* fullColourPF;
+  unsigned updateCount;
+  unsigned pixelCount;
 
-    int lastServerEncoding;
+  rfb::PixelFormat* serverPF;
+  rfb::PixelFormat* fullColourPF;
 
-    struct timeval     updateStartTime;
-    size_t             updateStartPos;
-    unsigned long long bpsEstimate;
+  int lastServerEncoding;
+
+  struct timeval     updateStartTime;
+  size_t             updateStartPos;
+  unsigned long long bpsEstimate;
 };
 
 #endif

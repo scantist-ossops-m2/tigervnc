@@ -23,26 +23,27 @@
 
 class QTimer;
 
-class EmulateMB {
+class EmulateMB
+{
 public:
-  EmulateMB(QTimer *timer);
+  EmulateMB(QTimer* timer);
 
-  void filterPointerEvent(const rfb::Point& pos, int buttonMask);
+  void filterPointerEvent(rfb::Point const& pos, int buttonMask);
 
-  void sendPointerEvent(const rfb::Point& pos, int buttonMask);
+  void sendPointerEvent(rfb::Point const& pos, int buttonMask);
 
   virtual void handleTimeout();
 
-  void sendAction(const rfb::Point& pos, int buttonMask, int action);
+  void sendAction(rfb::Point const& pos, int buttonMask, int action);
 
   int createButtonMask(int buttonMask);
 
 private:
-  int state;
-  int emulatedButtonMask;
-  int lastButtonMask;
+  int        state;
+  int        emulatedButtonMask;
+  int        lastButtonMask;
   rfb::Point lastPos, origPos;
-  QTimer *timer;
+  QTimer*    timer;
 };
 
 #endif

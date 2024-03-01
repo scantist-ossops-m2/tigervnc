@@ -6,12 +6,13 @@
 class QVNCScrollBar : public QScrollBar
 {
   Q_OBJECT
+
 public:
-  QVNCScrollBar(QWidget *parent = nullptr);
+  QVNCScrollBar(QWidget* parent = nullptr);
   virtual ~QVNCScrollBar();
 
 protected:
-  void wheelEvent(QWheelEvent *e) override;
+  void wheelEvent(QWheelEvent* e) override;
 };
 
 #endif // VNCSCROLLBAR_H

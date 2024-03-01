@@ -30,19 +30,19 @@
 class PlatformPixelBuffer : public rfb::FullFramePixelBuffer, public Surface
 {
 public:
-    PlatformPixelBuffer(int width, int height);
-    ~PlatformPixelBuffer();
+  PlatformPixelBuffer(int width, int height);
+  ~PlatformPixelBuffer();
 
-    virtual void commitBufferRW(rfb::Rect const& r);
+  virtual void commitBufferRW(rfb::Rect const& r);
 
-    rfb::Rect getDamage(void);
+  rfb::Rect getDamage(void);
 
-    using rfb::FullFramePixelBuffer::height;
-    using rfb::FullFramePixelBuffer::width;
+  using rfb::FullFramePixelBuffer::height;
+  using rfb::FullFramePixelBuffer::width;
 
 protected:
-    os::Mutex   mutex;
-    rfb::Region damage;
+  os::Mutex   mutex;
+  rfb::Region damage;
 };
 
 #endif

@@ -26,33 +26,33 @@
 class Surface
 {
 public:
-    Surface(int width, int height);
-    ~Surface();
+  Surface(int width, int height);
+  ~Surface();
 
-    int width()
-    {
-        return w;
-    }
+  int width()
+  {
+    return w;
+  }
 
-    int height()
-    {
-        return h;
-    }
+  int height()
+  {
+    return h;
+  }
 
-    QImage image()
-    {
-        QImage i((unsigned char*)data.data(), w, h, QImage::Format_RGB32);
-        return i;
-    }
+  QImage image()
+  {
+    QImage i((unsigned char*)data.data(), w, h, QImage::Format_RGB32);
+    return i;
+  }
 
-    char* framebuffer()
-    {
-        return data.data();
-    }
+  char* framebuffer()
+  {
+    return data.data();
+  }
 
 protected:
-    int        w, h;
-    QByteArray data;
+  int        w, h;
+  QByteArray data;
 };
 
 #endif

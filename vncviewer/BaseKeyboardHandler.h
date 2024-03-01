@@ -16,41 +16,41 @@ using DownMap = std::map<int, quint32>;
 
 class BaseKeyboardHandler : public QObject, public QAbstractNativeEventFilter
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    BaseKeyboardHandler(QObject* parent = nullptr);
+  BaseKeyboardHandler(QObject* parent = nullptr);
 
-    virtual void maybeGrabKeyboard();
-    virtual void grabKeyboard();
-    virtual void ungrabKeyboard();
+  virtual void maybeGrabKeyboard();
+  virtual void grabKeyboard();
+  virtual void ungrabKeyboard();
 
-    virtual void setLEDState(unsigned int state) = 0;
-    virtual void pushLEDState()                  = 0;
+  virtual void setLEDState(unsigned int state) = 0;
+  virtual void pushLEDState()                  = 0;
 
-    virtual bool handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode = false) = 0;
-    virtual bool handleKeyRelease(int)                                                      = 0;
-    void         resetKeyboard();
+  virtual bool handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode = false) = 0;
+  virtual bool handleKeyRelease(int)                                                      = 0;
+  void         resetKeyboard();
 
-    void setMenuKeyStatus(quint32 keysym, bool checked);
+  void setMenuKeyStatus(quint32 keysym, bool checked);
 
-    bool menuCtrlKey() const;
-    bool menuAltKey() const;
+  bool menuCtrlKey() const;
+  bool menuAltKey() const;
 
-    void setContextMenuVisible(bool newContextMenuVisible);
+  void setContextMenuVisible(bool newContextMenuVisible);
 
 signals:
-    void contextMenuKeyPressed(bool menuShortCutMode);
+  void contextMenuKeyPressed(bool menuShortCutMode);
 
 protected:
-    bool keyboardGrabbed_ = false;
+  bool keyboardGrabbed_ = false;
 
-    DownMap downKeySym_;
+  DownMap downKeySym_;
 
-    quint32 menuKeySym_         = XK_F8;
-    bool    menuCtrlKey_        = false;
-    bool    menuAltKey_         = false;
-    bool    contextMenuVisible_ = false;
+  quint32 menuKeySym_         = XK_F8;
+  bool    menuCtrlKey_        = false;
+  bool    menuAltKey_         = false;
+  bool    contextMenuVisible_ = false;
 };
 
 #endif // BASEKEYBOARDHANDLER_H

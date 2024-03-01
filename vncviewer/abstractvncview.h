@@ -26,127 +26,127 @@ using DownMap = std::map<int, quint32>;
 
 class QAbstractVNCView : public QWidget
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    QAbstractVNCView(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::Widget);
-    virtual ~QAbstractVNCView();
-    virtual void resize(int width, int height);
-    void         popupContextMenu();
+  QAbstractVNCView(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::Widget);
+  virtual ~QAbstractVNCView();
+  virtual void resize(int width, int height);
+  void         popupContextMenu();
 
-    bool hasFocus() const
-    {
-        return QWidget::hasFocus() || isActiveWindow();
-    }
+  bool hasFocus() const
+  {
+    return QWidget::hasFocus() || isActiveWindow();
+  }
 
-    double devicePixelRatio() const
-    {
-        return devicePixelRatio_;
-    }
+  double devicePixelRatio() const
+  {
+    return devicePixelRatio_;
+  }
 
-    virtual double effectiveDevicePixelRatio(QScreen* screen = nullptr) const;
-    QScreen*       getCurrentScreen();
+  virtual double effectiveDevicePixelRatio(QScreen* screen = nullptr) const;
+  QScreen*       getCurrentScreen();
 
-    QClipboard* clipboard() const
-    {
-        return clipboard_;
-    }
+  QClipboard* clipboard() const
+  {
+    return clipboard_;
+  }
 
-    virtual QRect getExtendedFrameProperties();
-    bool          isVisibleContextMenu() const;
-    void          sendContextMenuKey();
-    void          setMenuKeyStatus(quint32 keysym, bool checked);
-    virtual void  resetKeyboard();
-    virtual void  handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode = false);
-    virtual void  handleKeyRelease(int keyCode);
+  virtual QRect getExtendedFrameProperties();
+  bool          isVisibleContextMenu() const;
+  void          sendContextMenuKey();
+  void          setMenuKeyStatus(quint32 keysym, bool checked);
+  virtual void  resetKeyboard();
+  virtual void  handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode = false);
+  virtual void  handleKeyRelease(int keyCode);
 
-    virtual void dim(bool enabled)
-    {
-    }
+  virtual void dim(bool enabled)
+  {
+  }
 
 public slots:
-    virtual void setQCursor(QCursor const& cursor);
-    virtual void setCursorPos(int x, int y);
-    virtual void pushLEDState();
-    virtual void setLEDState(unsigned int state);
-    virtual void handleClipboardData(char const* data);
-    virtual void maybeGrabKeyboard();
-    virtual void grabKeyboard();
-    virtual void ungrabKeyboard();
-    virtual void grabPointer();
-    virtual void ungrabPointer();
-    virtual bool isFullscreenEnabled();
-    virtual void bell();
-    virtual void remoteResize(int width, int height);
-    virtual void updateWindow();
-    virtual void handleDesktopSize();
-    virtual void fullscreen(bool enabled);
-    virtual void moveView(int x, int y);
-    void         postRemoteResizeRequest();
+  virtual void setQCursor(QCursor const& cursor);
+  virtual void setCursorPos(int x, int y);
+  virtual void pushLEDState();
+  virtual void setLEDState(unsigned int state);
+  virtual void handleClipboardData(char const* data);
+  virtual void maybeGrabKeyboard();
+  virtual void grabKeyboard();
+  virtual void ungrabKeyboard();
+  virtual void grabPointer();
+  virtual void ungrabPointer();
+  virtual bool isFullscreenEnabled();
+  virtual void bell();
+  virtual void remoteResize(int width, int height);
+  virtual void updateWindow();
+  virtual void handleDesktopSize();
+  virtual void fullscreen(bool enabled);
+  virtual void moveView(int x, int y);
+  void         postRemoteResizeRequest();
 
 signals:
-    void fullscreenChanged(bool enabled);
-    void delayedInitialized();
+  void fullscreenChanged(bool enabled);
+  void delayedInitialized();
 
 protected:
-    static QClipboard* clipboard_;
-    QByteArray         geometry_;
-    double             devicePixelRatio_;
+  static QClipboard* clipboard_;
+  QByteArray         geometry_;
+  double             devicePixelRatio_;
 
-    quint32         menuKeySym_;
-    QMenu*          contextMenu_;
-    QList<QAction*> actions_;
+  quint32         menuKeySym_;
+  QMenu*          contextMenu_;
+  QList<QAction*> actions_;
 
-    bool firstLEDState_;
-    bool pendingServerClipboard_;
-    bool pendingClientClipboard_;
-    int  clipboardSource_;
-    bool firstUpdate_;
-    bool delayedFullscreen_;
-    bool delayedDesktopSize_;
-    bool keyboardGrabbed_;
-    bool mouseGrabbed_;
+  bool firstLEDState_;
+  bool pendingServerClipboard_;
+  bool pendingClientClipboard_;
+  int  clipboardSource_;
+  bool firstUpdate_;
+  bool delayedFullscreen_;
+  bool delayedDesktopSize_;
+  bool keyboardGrabbed_;
+  bool mouseGrabbed_;
 
-    QTimer* resizeTimer_;
-    QTimer* delayedInitializeTimer_;
-    bool    fullscreenEnabled_;
-    bool    pendingFullscreen_;
+  QTimer* resizeTimer_;
+  QTimer* delayedInitializeTimer_;
+  bool    fullscreenEnabled_;
+  bool    pendingFullscreen_;
 
-    DownMap    downKeySym_;
-    QTimer*    mouseButtonEmulationTimer_;
-    EmulateMB* mbemu_;
-    int        fw_;
-    int        fh_;
-    int        fxmin_;
-    int        fymin_;
-    QScreen*   fscreen_;
+  DownMap    downKeySym_;
+  QTimer*    mouseButtonEmulationTimer_;
+  EmulateMB* mbemu_;
+  int        fw_;
+  int        fh_;
+  int        fxmin_;
+  int        fymin_;
+  QScreen*   fscreen_;
 
-    rfb::Point* lastPointerPos_;
-    int         lastButtonMask_;
-    QTimer*     mousePointerTimer_;
-    bool        menuCtrlKey_;
-    bool        menuAltKey_;
+  rfb::Point* lastPointerPos_;
+  int         lastButtonMask_;
+  QTimer*     mousePointerTimer_;
+  bool        menuCtrlKey_;
+  bool        menuAltKey_;
 
-    void       createContextMenu();
-    QList<int> fullscreenScreens();
-    void       filterPointerEvent(rfb::Point const& pos, int buttonMask);
-    void       handleMouseButtonEmulationTimeout();
-    void       sendPointerEvent(rfb::Point const& pos, int buttonMask);
+  void       createContextMenu();
+  QList<int> fullscreenScreens();
+  void       filterPointerEvent(rfb::Point const& pos, int buttonMask);
+  void       handleMouseButtonEmulationTimeout();
+  void       sendPointerEvent(rfb::Point const& pos, int buttonMask);
 
-    virtual bool bypassWMHintingEnabled() const
-    {
-        return false;
-    }
+  virtual bool bypassWMHintingEnabled() const
+  {
+    return false;
+  }
 
-    virtual void setWindowManager()
-    {
-    }
+  virtual void setWindowManager()
+  {
+  }
 
-    virtual void fullscreenOnCurrentDisplay();
-    virtual void fullscreenOnSelectedDisplay(QScreen* screen, int vx, int vy, int vwidth, int vheight);
-    virtual void fullscreenOnSelectedDisplays(int vx, int vy, int vwidth, int vheight);
-    virtual void exitFullscreen();
-    bool         eventFilter(QObject* watched, QEvent* event) override;
+  virtual void fullscreenOnCurrentDisplay();
+  virtual void fullscreenOnSelectedDisplay(QScreen* screen, int vx, int vy, int vwidth, int vheight);
+  virtual void fullscreenOnSelectedDisplays(int vx, int vy, int vwidth, int vheight);
+  virtual void exitFullscreen();
+  bool         eventFilter(QObject* watched, QEvent* event) override;
 };
 
 #endif // ABSTRACTVNCVIEW_H

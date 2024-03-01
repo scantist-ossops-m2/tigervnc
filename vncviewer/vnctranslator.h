@@ -1,13 +1,17 @@
 #ifndef VNCTRANSLATOR_H
 #define VNCTRANSLATOR_H
 
-#include <QTranslator>
 #include "gettext.h"
+
+#include <QTranslator>
 
 class VNCTranslator : public QTranslator
 {
 public:
-  QString translate(const char *context, const char *sourceText, const char *disambiguation = nullptr, int n = -1) const override
+  QString translate(char const* context,
+                    char const* sourceText,
+                    char const* disambiguation = nullptr,
+                    int         n              = -1) const override
   {
     Q_UNUSED(context)
     Q_UNUSED(disambiguation)

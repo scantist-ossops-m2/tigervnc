@@ -39,126 +39,126 @@ class Socket;
 
 class QVNCConnection : public QObject
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    QVNCConnection();
-    virtual ~QVNCConnection();
+  QVNCConnection();
+  virtual ~QVNCConnection();
 
-    rfb::ServerParams* server()
-    {
-        return &rfbcon_->server;
-    }
+  rfb::ServerParams* server()
+  {
+    return &rfbcon_->server;
+  }
 
-    void setState(int state);
+  void setState(int state);
 
-    rdr::InStream* istream()
-    {
-        return rfbcon_->getInStream();
-    }
+  rdr::InStream* istream()
+  {
+    return rfbcon_->getInStream();
+  }
 
-    rdr::OutStream* ostream()
-    {
-        return rfbcon_->getOutStream();
-    }
+  rdr::OutStream* ostream()
+  {
+    return rfbcon_->getOutStream();
+  }
 
-    rfb::CMsgReader* reader()
-    {
-        return rfbcon_->reader();
-    }
+  rfb::CMsgReader* reader()
+  {
+    return rfbcon_->reader();
+  }
 
-    rfb::CMsgWriter* writer()
-    {
-        return rfbcon_->writer();
-    }
+  rfb::CMsgWriter* writer()
+  {
+    return rfbcon_->writer();
+  }
 
-    void setQualityLevel(int level)
-    {
-        rfbcon_->setQualityLevel(level);
-    }
+  void setQualityLevel(int level)
+  {
+    rfbcon_->setQualityLevel(level);
+  }
 
-    rfb::ModifiablePixelBuffer* framebuffer()
-    {
-        return rfbcon_->framebuffer();
-    }
+  rfb::ModifiablePixelBuffer* framebuffer()
+  {
+    return rfbcon_->framebuffer();
+  }
 
-    void setCompressLevel(int level)
-    {
-        rfbcon_->setCompressLevel(level);
-    }
+  void setCompressLevel(int level)
+  {
+    rfbcon_->setCompressLevel(level);
+  }
 
-    QTimer* updateTimer() const
-    {
-        return updateTimer_;
-    }
+  QTimer* updateTimer() const
+  {
+    return updateTimer_;
+  }
 
-    void updatePixelFormat()
-    {
-        rfbcon_->updatePixelFormat();
-    }
+  void updatePixelFormat()
+  {
+    rfbcon_->updatePixelFormat();
+  }
 
-    void announceClipboard(bool available);
+  void announceClipboard(bool available);
 
-    void setPreferredEncoding(int encoding)
-    {
-        rfbcon_->setPreferredEncoding(encoding);
-    }
+  void setPreferredEncoding(int encoding)
+  {
+    rfbcon_->setPreferredEncoding(encoding);
+  }
 
 signals:
-    void socketNotified();
-    void newVncWindowRequested(int width, int height, QString name);
-    void cursorChanged(QCursor const& cursor);
-    void cursorPositionChanged(int x, int y);
-    void ledStateChanged(unsigned int state);
-    void clipboardAnnounced(bool available);
-    void clipboardDataReceived(char const* data);
-    void framebufferResized(int width, int height);
-    void refreshFramebufferStarted();
-    void refreshFramebufferEnded();
-    void bellRequested();
+  void socketNotified();
+  void newVncWindowRequested(int width, int height, QString name);
+  void cursorChanged(QCursor const& cursor);
+  void cursorPositionChanged(int x, int y);
+  void ledStateChanged(unsigned int state);
+  void clipboardAnnounced(bool available);
+  void clipboardDataReceived(char const* data);
+  void framebufferResized(int width, int height);
+  void refreshFramebufferStarted();
+  void refreshFramebufferEnded();
+  void bellRequested();
 
-    void writePointerEvent(rfb::Point const& pos, int buttonMask);
-    void writeSetDesktopSize(int width, int height, rfb::ScreenSet const& layout);
-    void writeKeyEvent(uint32_t keysym, uint32_t keycode, bool down);
+  void writePointerEvent(rfb::Point const& pos, int buttonMask);
+  void writeSetDesktopSize(int width, int height, rfb::ScreenSet const& layout);
+  void writeKeyEvent(uint32_t keysym, uint32_t keycode, bool down);
 
 public slots:
-    void listen();
-    void connectToServer(QString addressport = "");
-    void resetConnection();
-    void startProcessing();
-    void refreshFramebuffer();
+  void listen();
+  void connectToServer(QString addressport = "");
+  void resetConnection();
+  void startProcessing();
+  void refreshFramebuffer();
 
-    QString infoText()
-    {
-        return rfbcon_ ? rfbcon_->connectionInfo() : "";
-    }
+  QString infoText()
+  {
+    return rfbcon_ ? rfbcon_->connectionInfo() : "";
+  }
 
-    QString host()
-    {
-        return rfbcon_ ? rfbcon_->host() : "";
-    }
+  QString host()
+  {
+    return rfbcon_ ? rfbcon_->host() : "";
+  }
 
 private:
-    CConn*           rfbcon_;
-    network::Socket* socket_;
-    QSocketNotifier* socketNotifier_;
-    QSocketNotifier* socketErrorNotifier_;
-    QTimer*          updateTimer_;
-    TunnelFactory*   tunnelFactory_;
-    bool             closing_;
-    QString          addressport_;
+  CConn*           rfbcon_;
+  network::Socket* socket_;
+  QSocketNotifier* socketNotifier_;
+  QSocketNotifier* socketErrorNotifier_;
+  QTimer*          updateTimer_;
+  TunnelFactory*   tunnelFactory_;
+  bool             closing_;
+  QString          addressport_;
 
-    void bind(int fd);
+  void bind(int fd);
 
-    void setHost(QString host)
-    {
-        rfbcon_->setHost(host);
-    }
+  void setHost(QString host)
+  {
+    rfbcon_->setHost(host);
+  }
 
-    void setPort(int port)
-    {
-        rfbcon_->setPort(port);
-    }
+  void setPort(int port)
+  {
+    rfbcon_->setPort(port);
+  }
 };
 
 #endif // VNCCONNECTION_H

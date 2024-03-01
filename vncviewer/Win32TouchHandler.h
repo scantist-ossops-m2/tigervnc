@@ -19,42 +19,42 @@
 #ifndef __WIN32TOUCHHANDLER_H__
 #define __WIN32TOUCHHANDLER_H__
 
-#include <windows.h>
-
 #include "BaseTouchHandler.h"
 #include "GestureEvent.h"
 
-class Win32TouchHandler: public BaseTouchHandler {
-  public:
-    Win32TouchHandler(HWND hWnd);
+#include <windows.h>
 
-    bool processEvent(UINT Msg, WPARAM wParam, LPARAM lParam);
+class Win32TouchHandler : public BaseTouchHandler
+{
+public:
+  Win32TouchHandler(HWND hWnd);
 
-  private:
-    void handleWin32GestureEvent(GESTUREINFO gi);
-    bool isSinglePan(GESTUREINFO gi);
+  bool processEvent(UINT Msg, WPARAM wParam, LPARAM lParam);
 
-  protected:
-    virtual void fakeMotionEvent(const GestureEvent origEvent);
-    virtual void fakeButtonEvent(bool press, int button,
-                                 const GestureEvent origEvent);
-    virtual void fakeKeyEvent(bool press, int keycode,
-                              const GestureEvent origEvent);
-  private:
-    void pushFakeEvent(UINT Msg, WPARAM wParam, LPARAM lParam);
+private:
+  void handleWin32GestureEvent(GESTUREINFO gi);
+  bool isSinglePan(GESTUREINFO gi);
 
-  private:
-    HWND hWnd;
+protected:
+  virtual void fakeMotionEvent(GestureEvent const origEvent);
+  virtual void fakeButtonEvent(bool press, int button, GestureEvent const origEvent);
+  virtual void fakeKeyEvent(bool press, int keycode, GestureEvent const origEvent);
 
-    bool gesturesConfigured;
-    bool startedSinglePan;
-    POINT gestureStart;
+private:
+  void pushFakeEvent(UINT Msg, WPARAM wParam, LPARAM lParam);
 
-    bool gestureActive;
-    bool ignoringGesture;
+private:
+  HWND hWnd;
 
-    int fakeButtonMask;
-    POINT lastFakeMotionPos;
+  bool  gesturesConfigured;
+  bool  startedSinglePan;
+  POINT gestureStart;
+
+  bool gestureActive;
+  bool ignoringGesture;
+
+  int   fakeButtonMask;
+  POINT lastFakeMotionPos;
 };
 
 #endif // __WIN32TOUCHHANDLER_H__

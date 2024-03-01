@@ -13,73 +13,73 @@ struct _XDisplay;
 
 class QuickVNCItem : public QQuickItem
 {
-    Q_OBJECT
-    Q_PROPERTY(bool contextMenuVisible READ contextMenuVisible WRITE setContextMenuVisible NOTIFY
-                   contextMenuVisibleChanged FINAL)
+  Q_OBJECT
+  Q_PROPERTY(bool contextMenuVisible READ contextMenuVisible WRITE setContextMenuVisible NOTIFY
+                 contextMenuVisibleChanged FINAL)
 
 public:
-    QuickVNCItem(QQuickItem* parent = nullptr);
-    QSGNode* updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* updatePaintNodeData);
+  QuickVNCItem(QQuickItem* parent = nullptr);
+  QSGNode* updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* updatePaintNodeData);
 
-    bool contextMenuVisible() const;
-    void setContextMenuVisible(bool newContextMenuVisible);
+  bool contextMenuVisible() const;
+  void setContextMenuVisible(bool newContextMenuVisible);
 
-    Q_INVOKABLE QPointF cursorPos() const;
+  Q_INVOKABLE QPointF cursorPos() const;
 
 public slots:
-    void bell();
-    void menuKey();
-    void ctrlKeyToggle(bool checked);
-    void altKeyToggle(bool checked);
+  void bell();
+  void menuKey();
+  void ctrlKeyToggle(bool checked);
+  void altKeyToggle(bool checked);
 
 signals:
-    void popupToast(QString const& text);
-    void contextMenuVisibleChanged();
+  void popupToast(QString const& text);
+  void contextMenuVisibleChanged();
 
 protected:
-    void grabPointer();
-    void ungrabPointer();
+  void grabPointer();
+  void ungrabPointer();
 
-    void getMouseProperties(QMouseEvent* event, int& x, int& y, int& buttonMask, int& wheelMask);
-    void getMouseProperties(QWheelEvent* event, int& x, int& y, int& buttonMask, int& wheelMask);
+  void getMouseProperties(QMouseEvent* event, int& x, int& y, int& buttonMask, int& wheelMask);
+  void getMouseProperties(QWheelEvent* event, int& x, int& y, int& buttonMask, int& wheelMask);
 
-    void focusInEvent(QFocusEvent* event);
-    void focusOutEvent(QFocusEvent* event);
-    void hoverEnterEvent(QHoverEvent* event);
-    void hoverLeaveEvent(QHoverEvent* event);
-    void hoverMoveEvent(QHoverEvent* event);
+  void focusInEvent(QFocusEvent* event);
+  void focusOutEvent(QFocusEvent* event);
+  void hoverEnterEvent(QHoverEvent* event);
+  void hoverLeaveEvent(QHoverEvent* event);
+  void hoverMoveEvent(QHoverEvent* event);
 
-    void mouseMoveEvent(QMouseEvent* event);
-    void mousePressEvent(QMouseEvent* event);
-    void mouseReleaseEvent(QMouseEvent* event);
+  void mouseMoveEvent(QMouseEvent* event);
+  void mousePressEvent(QMouseEvent* event);
+  void mouseReleaseEvent(QMouseEvent* event);
 
-    void wheelEvent(QWheelEvent* event);
+  void wheelEvent(QWheelEvent* event);
 
-    void filterPointerEvent(rfb::Point const& pos, int mask);
+  void filterPointerEvent(rfb::Point const& pos, int mask);
 
 private:
-    void updateWindow();
+  void updateWindow();
 
-    bool                 firstUpdate_ = true;
-    PlatformPixelBuffer* framebuffer_;
-    QRect                rect_;
-    QImage               image_;
+  bool                 firstUpdate_ = true;
+  PlatformPixelBuffer* framebuffer_;
+  QRect                rect_;
+  QImage               image_;
 
-    bool       mouseGrabbed_ = false;
-    rfb::Point lastPointerPos_;
-    int        lastButtonMask_;
-    QTimer     mousePointerTimer_;
-    QTimer     mouseButtonEmulationTimer_;
-    QTimer     delayedInitializeTimer_;
-    EmulateMB* mbemu_ = new EmulateMB(&mouseButtonEmulationTimer_);
+  bool       mouseGrabbed_ = false;
+  rfb::Point lastPointerPos_;
+  int        lastButtonMask_;
+  QTimer     mousePointerTimer_;
+  QTimer     mouseButtonEmulationTimer_;
+  QTimer     delayedInitializeTimer_;
+  EmulateMB* mbemu_ = new EmulateMB(&mouseButtonEmulationTimer_);
 
-    BaseKeyboardHandler* keyboardHandler_;
+  BaseKeyboardHandler* keyboardHandler_;
 
 #ifdef Q_OS_LINUX
-    _XDisplay* display_;
+  _XDisplay* display_;
 #endif
 
-    bool contextMenuVisible_ = false;
+  bool contextMenuVisible_ = false;
 };
 
 #endif // QUICKVNCITEM_H

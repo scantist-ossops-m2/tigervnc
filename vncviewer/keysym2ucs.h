@@ -4,13 +4,14 @@
  */
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-unsigned keysym2ucs(unsigned keysym);
-unsigned ucs2keysym(unsigned ucs);
+  unsigned keysym2ucs(unsigned keysym);
+  unsigned ucs2keysym(unsigned ucs);
 
-unsigned ucs2combining(unsigned spacing);
+  unsigned ucs2combining(unsigned spacing);
 
 #ifdef __cplusplus
 }
