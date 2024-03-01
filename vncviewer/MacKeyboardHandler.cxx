@@ -63,7 +63,8 @@ bool MacKeyboardHandler::nativeEventFilter(const QByteArray &eventType, void *me
                     vlog.error(_("No symbol for key code 0x%02x (in the current state)"), (int)keyCode);
                 }
 
-                handleKeyPress(keyCode, keySym);
+                if (!handleKeyPress(keyCode, keySym))
+                    return false;
 
                        // We don't get any release events for CapsLock, so we have to
                        // send the release right away.
@@ -72,7 +73,8 @@ bool MacKeyboardHandler::nativeEventFilter(const QByteArray &eventType, void *me
                 }
             }
             else {
-                handleKeyRelease(keyCode);
+                if (!handleKeyRelease(keyCode))
+                    return false;
             }
             return true;
         }

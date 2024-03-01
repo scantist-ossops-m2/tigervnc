@@ -179,7 +179,8 @@ bool X11KeyboardHandler::nativeEventFilter(QByteArray const& eventType, void* me
                 break;
             }
 
-            handleKeyPress(keycode, keysym);
+            if (!handleKeyPress(keycode, keysym))
+                return false;
             return true;
         }
         else if (xcbEventType == XCB_KEY_RELEASE)
@@ -189,7 +190,8 @@ bool X11KeyboardHandler::nativeEventFilter(QByteArray const& eventType, void* me
             // int keycode = xevent->detail;
             if (keycode == 0)
                 keycode = 0x100 | xevent->detail;
-            handleKeyRelease(keycode);
+            if (!handleKeyRelease(keycode))
+                return false;
             return true;
         }
         else if (xcbEventType == XCB_EXPOSE)
