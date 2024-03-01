@@ -25,6 +25,7 @@
 
 #ifdef Q_OS_DARWIN
 #include "MacKeyboardHandler.h"
+#include "cocoa.h"
 #endif
 
 static rfb::LogWriter vlog("QuickVNCItem");
