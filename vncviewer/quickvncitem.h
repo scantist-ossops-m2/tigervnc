@@ -1,6 +1,7 @@
 #ifndef QUICKVNCITEM_H
 #define QUICKVNCITEM_H
 
+#include "BaseKeyboardHandler.h"
 #include "EmulateMB.h"
 #include "PlatformPixelBuffer.h"
 
@@ -13,16 +14,24 @@ struct _XDisplay;
 class QuickVNCItem : public QQuickItem
 {
     Q_OBJECT
+    Q_PROPERTY(bool contextMenuVisible READ contextMenuVisible WRITE setContextMenuVisible NOTIFY
+                   contextMenuVisibleChanged FINAL)
 
 public:
     QuickVNCItem(QQuickItem* parent = nullptr);
     QSGNode* updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* updatePaintNodeData);
+
+    bool contextMenuVisible() const;
+    void setContextMenuVisible(bool newContextMenuVisible);
+
+    Q_INVOKABLE QPointF cursorPos() const;
 
 public slots:
     void bell();
 
 signals:
     void popupToast(QString const& text);
+    void contextMenuVisibleChanged();
 
 protected:
     void grabPointer();
@@ -61,9 +70,13 @@ private:
     QTimer     delayedInitializeTimer_;
     EmulateMB* mbemu_ = new EmulateMB(&mouseButtonEmulationTimer_);
 
+    BaseKeyboardHandler* keyboardHandler_;
+
 #ifdef Q_OS_LINUX
     _XDisplay* display_;
 #endif
+
+    bool contextMenuVisible_ = false;
 };
 
 #endif // QUICKVNCITEM_H

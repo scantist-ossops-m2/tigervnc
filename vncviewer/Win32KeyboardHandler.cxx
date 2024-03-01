@@ -59,31 +59,6 @@ bool Win32KeyboardHandler::nativeEventFilter(QByteArray const& eventType, void* 
     case WM_SYSKEYUP:
         handleKeyUpEvent(windowsmsg->message, windowsmsg->wParam, windowsmsg->lParam);
         return true;
-    case WM_SETFOCUS:
-        maybeGrabKeyboard();
-
-        // We may have gotten our lock keys out of sync with the server
-        // whilst we didn't have focus. Try to sort this out.
-        pushLEDState();
-
-        // Resend Ctrl/Alt if needed
-        if (menuCtrlKey_)
-        {
-            handleKeyPress(0x1d, XK_Control_L);
-        }
-        if (menuAltKey_)
-        {
-            handleKeyPress(0x38, XK_Alt_L);
-        }
-        return true;
-    case WM_KILLFOCUS:
-        if (ViewerConfig::config()->fullscreenSystemKeys())
-        {
-            ungrabKeyboard();
-        }
-        // We won't get more key events, so reset our knowledge about keys
-        resetKeyboard();
-        return true;
     }
 
     return false;
@@ -102,19 +77,8 @@ void Win32KeyboardHandler::handleKeyPress(int keyCode, quint32 keySym, bool menu
 {
     if (menuKeySym_ && keySym == menuKeySym_)
     {
-        // if (isVisibleContextMenu())
-        // {
-        //     if (!menuShortCutMode)
-        //     {
-        //         sendContextMenuKey();
-        //         return;
-        //     }
-        // }
-        // else
-        // {
-        //     popupContextMenu();
-        // }
-        // return;
+        emit contextMenuKeyPressed(menuShortCutMode);
+        return;
     }
 
     if (ViewerConfig::config()->viewOnly())

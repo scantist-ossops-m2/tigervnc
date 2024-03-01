@@ -80,53 +80,12 @@ bool MacKeyboardHandler::nativeEventFilter(const QByteArray &eventType, void *me
     return false;
 }
 
-// void MacKeyboardHandler::focusInEvent(QFocusEvent *e)
-// {
-//   qDebug() << "MacKeyboardHandler::focusInEvent";
-//   maybeGrabKeyboard();
-//   disableIM();
-
-//   //flushPendingClipboard();
-
-//   // We may have gotten our lock keys out of sync with the server
-//   // whilst we didn't have focus. Try to sort this out.
-//   pushLEDState();
-
-//   // Resend Ctrl/Alt if needed
-//   if (menuCtrlKey_) {
-//     handleKeyPress(0x1d, XK_Control_L);
-//   }
-//   if (menuAltKey_) {
-//     handleKeyPress(0x38, XK_Alt_L);
-//   }
-//   QWidget::focusInEvent(e);
-// }
-
-// void MacKeyboardHandler::focusOutEvent(QFocusEvent *e)
-// {
-//   qDebug() << "MacKeyboardHandler::focusOutEvent";
-//   if (ViewerConfig::config()->fullscreenSystemKeys()) {
-//     ungrabKeyboard();
-//   }
-//   // We won't get more key events, so reset our knowledge about keys
-//   resetKeyboard();
-//   enableIM();
-//   QWidget::focusOutEvent(e);
-// }
-
 void MacKeyboardHandler::handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode)
 {
-    if (menuKeySym_ && keySym == menuKeySym_) {
-        // if (isVisibleContextMenu()) {
-        //     if (!menuShortCutMode) {
-        //         sendContextMenuKey();
-        //         return;
-        //     }
-        // }
-        // else {
-        //     popupContextMenu();
-        // }
-        // return;
+    if (menuKeySym_ && keySym == menuKeySym_)
+    {
+        emit contextMenuKeyPressed(menuShortCutMode);
+        return;
     }
 
     if (ViewerConfig::config()->viewOnly())

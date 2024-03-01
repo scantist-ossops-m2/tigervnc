@@ -195,36 +195,6 @@ bool X11KeyboardHandler::nativeEventFilter(QByteArray const& eventType, void* me
         else if (xcbEventType == XCB_EXPOSE)
         {
         }
-        else if (xcbEventType == XCB_FOCUS_IN)
-        {
-            // qDebug() << "nativeEvent: XCB_FOCUS_IN";
-            // maybeGrabKeyboard();
-            // // flushPendingClipboard();
-
-            // // We may have gotten our lock keys out of sync with the server
-            // // whilst we didn't have focus. Try to sort this out.
-            // pushLEDState();
-
-            // // Resend Ctrl/Alt if needed
-            // if (menuCtrlKey_)
-            // {
-            //     handleKeyPress(0x1d, XK_Control_L);
-            // }
-            // if (menuAltKey_)
-            // {
-            //     handleKeyPress(0x38, XK_Alt_L);
-            // }
-        }
-        else if (xcbEventType == XCB_FOCUS_OUT)
-        {
-            // qDebug() << "nativeEvent: XCB_FOCUS_OUT";
-            // if (ViewerConfig::config()->fullscreenSystemKeys())
-            // {
-            //     ungrabKeyboard();
-            // }
-            // // We won't get more key events, so reset our knowledge about keys
-            // resetKeyboard();
-        }
         else
         {
             // qDebug() << "nativeEvent: eventtype=" << xcbEventType;
@@ -238,16 +208,8 @@ void X11KeyboardHandler::handleKeyPress(int keyCode, quint32 keySym, bool menuSh
     qDebug() << "X11KeyboardHandler::handleKeyPress: keyCode=" << keyCode << ", keySym=" << keySym;
     if (menuKeySym_ && keySym == menuKeySym_)
     {
-        // if (isVisibleContextMenu()) {
-        //     if (!menuShortCutMode) {
-        //         sendContextMenuKey();
-        //         return;
-        //     }
-        // }
-        // else {
-        //     popupContextMenu();
-        // }
-        // return;
+        emit contextMenuKeyPressed(menuShortCutMode);
+        return;
     }
 
     if (ViewerConfig::config()->viewOnly())

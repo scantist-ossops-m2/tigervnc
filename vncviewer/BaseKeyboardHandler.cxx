@@ -37,6 +37,16 @@ void BaseKeyboardHandler::setMenuKeyStatus(quint32 keysym, bool checked)
     }
 }
 
+bool BaseKeyboardHandler::menuCtrlKey() const
+{
+    return menuCtrlKey_;
+}
+
+bool BaseKeyboardHandler::menuAltKey() const
+{
+    return menuAltKey_;
+}
+
 void BaseKeyboardHandler::resetKeyboard()
 {
     while (!downKeySym_.empty())

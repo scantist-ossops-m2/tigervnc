@@ -15,6 +15,7 @@
         <file>qml/InfoDialogContent.qml</file>
         <file>qml/MessageDialog.qml</file>
         <file>qml/ConnectionView.qml</file>
+        <file>qml/Toast.qml</file>
         <file alias="insecure.svg">../media/insecure.svg</file>
         <file alias="secure.svg">../media/secure.svg</file>
     </qresource>

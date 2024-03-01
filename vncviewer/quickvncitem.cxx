@@ -2,6 +2,7 @@
 
 #include "appmanager.h"
 #include "i18n.h"
+#include "menukey.h"
 #include "parameters.h"
 #include "rdr/Exception.h"
 #include "rfb/LogWriter.h"
@@ -73,7 +74,7 @@ QuickVNCItem::QuickVNCItem(QQuickItem* parent) : QQuickItem(parent)
     });
 
 #ifdef Q_OS_WINDOWS
-    QAbstractEventDispatcher::instance()->installNativeEventFilter(new Win32KeyboardHandler(this));
+    keyboardHandler_ = new Win32KeyboardHandler(this);
 #endif
 
 #ifdef Q_OS_LINUX
@@ -82,12 +83,36 @@ QuickVNCItem::QuickVNCItem(QQuickItem* parent) : QQuickItem(parent)
 #else
     display_ = qApp->nativeInterface<QNativeInterface::QX11Application>()->display();
 #endif
-    QAbstractEventDispatcher::instance()->installNativeEventFilter(new X11KeyboardHandler(this));
+    keyboardHandler_ = new X11KeyboardHandler(this);
 #endif
 
 #ifdef Q_OS_DARWIN
-    QAbstractEventDispatcher::instance()->installNativeEventFilter(new MacKeyboardHandler(this));
+    keyboardHandler_ = new MacKeyboardHandler(this);
 #endif
+
+    connect(keyboardHandler_, &BaseKeyboardHandler::contextMenuKeyPressed, this, [=](bool menuShortCutMode) {
+        if (contextMenuVisible())
+        {
+            if (!menuShortCutMode)
+            {
+                if (ViewerConfig::config()->viewOnly())
+                    return;
+                int     dummy;
+                int     keyCode;
+                quint32 keySym;
+                ::getMenuKey(&dummy, &keyCode, &keySym);
+                keyboardHandler_->handleKeyPress(keyCode, keySym, true);
+                keyboardHandler_->handleKeyRelease(keyCode);
+                setContextMenuVisible(false);
+            }
+        }
+        else
+        {
+            setContextMenuVisible(true);
+        }
+    });
+
+    QAbstractEventDispatcher::instance()->installNativeEventFilter(keyboardHandler_);
 }
 
 QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* updatePaintNodeData)
@@ -154,9 +179,27 @@ void QuickVNCItem::updateWindow()
         if (!image_.isNull())
         {
             update();
-            qDebug() << QDateTime::currentDateTimeUtc() << "QuickVNCItem::updateWindow" << rect_ << image_.rect();
+            // qDebug() << QDateTime::currentDateTimeUtc() << "QuickVNCItem::updateWindow" << rect_ << image_.rect();
         }
     }
+}
+
+bool QuickVNCItem::contextMenuVisible() const
+{
+    return contextMenuVisible_;
+}
+
+void QuickVNCItem::setContextMenuVisible(bool newContextMenuVisible)
+{
+    if (contextMenuVisible_ == newContextMenuVisible)
+        return;
+    contextMenuVisible_ = newContextMenuVisible;
+    emit contextMenuVisibleChanged();
+}
+
+QPointF QuickVNCItem::cursorPos() const
+{
+    return QCursor::pos();
 }
 
 void QuickVNCItem::grabPointer()
@@ -238,12 +281,28 @@ void QuickVNCItem::getMouseProperties(QWheelEvent* event, int& x, int& y, int& b
 void QuickVNCItem::focusInEvent(QFocusEvent* event)
 {
     grabPointer();
+    keyboardHandler_->maybeGrabKeyboard();
+    // We may have gotten our lock keys out of sync with the server
+    // whilst we didn't have focus. Try to sort this out.
+    keyboardHandler_->pushLEDState();
+    // Resend Ctrl/Alt if needed
+    if (keyboardHandler_->menuCtrlKey())
+    {
+        keyboardHandler_->handleKeyPress(0x1d, XK_Control_L);
+    }
+    if (keyboardHandler_->menuAltKey())
+    {
+        keyboardHandler_->handleKeyPress(0x38, XK_Alt_L);
+    }
     QQuickItem::focusInEvent(event);
 }
 
 void QuickVNCItem::focusOutEvent(QFocusEvent* event)
 {
     grabPointer();
+    if (ViewerConfig::config()->fullscreenSystemKeys())
+        keyboardHandler_->ungrabKeyboard();
+    keyboardHandler_->resetKeyboard();
     QQuickItem::focusOutEvent(event);
 }
 

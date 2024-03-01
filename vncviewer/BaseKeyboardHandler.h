@@ -2,9 +2,9 @@
 #define BASEKEYBOARDHANDLER_H
 
 #include <QAbstractNativeEventFilter>
-#include <QTimer>
 #include <QDataStream>
 #include <QTextStream>
+#include <QTimer>
 #include <QUrl>
 
 #define XK_LATIN1
@@ -33,6 +33,12 @@ public:
     void         resetKeyboard();
 
     void setMenuKeyStatus(quint32 keysym, bool checked);
+
+    bool menuCtrlKey() const;
+    bool menuAltKey() const;
+
+signals:
+    void contextMenuKeyPressed(bool menuShortCutMode);
 
 protected:
     bool keyboardGrabbed_ = false;
