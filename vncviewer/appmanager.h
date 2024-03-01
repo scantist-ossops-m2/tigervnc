@@ -4,10 +4,8 @@
 #include "vncconnection.h"
 
 #include <QObject>
-#include <QQuickView>
 
-class QAbstractVNCView;
-class QVNCWindow;
+class QQuickView;
 class QTimer;
 
 class AppManager : public QObject

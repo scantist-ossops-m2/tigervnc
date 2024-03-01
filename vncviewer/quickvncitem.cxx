@@ -1,17 +1,26 @@
 #include "quickvncitem.h"
 
-#include "Win32KeyboardHandler.h"
-#include "appmanager.h"
-#include "i18n.h"
-#include "parameters.h"
-#include "qabstracteventdispatcher.h"
-#include "rdr/Exception.h"
-#include "rfb/LogWriter.h"
-
 #include <QAbstractNativeEventFilter>
+#include <QAbstractEventDispatcher>
 #include <QDateTime>
 #include <QQuickWindow>
 #include <QSGSimpleTextureNode>
+
+#include "appmanager.h"
+#include "i18n.h"
+#include "parameters.h"
+#include "rdr/Exception.h"
+#include "rfb/LogWriter.h"
+
+#ifdef Q_OS_WINDOWS
+#include "Win32KeyboardHandler.h"
+#endif
+
+#ifdef Q_OS_LINUX
+#include <X11/extensions/Xrender.h>
+#include <QX11Info>
+#include "X11KeyboardHandler.h"
+#endif
 
 static rfb::LogWriter vlog("Viewport");
 
@@ -60,6 +69,15 @@ QuickVNCItem::QuickVNCItem(QQuickItem* parent) : QQuickItem(parent)
 #ifdef Q_OS_WINDOWS
     QAbstractEventDispatcher::instance()->installNativeEventFilter(new Win32KeyboardHandler(this));
 #endif
+
+#ifdef Q_OS_LINUX
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    display_ = QX11Info::display();
+#else
+    display_ = qApp->nativeInterface<QNativeInterface::QX11Application>()->display();
+#endif
+    QAbstractEventDispatcher::instance()->installNativeEventFilter(new X11KeyboardHandler(this));
+#endif
 }
 
 QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* updatePaintNodeData)
@@ -83,9 +101,13 @@ void QuickVNCItem::bell()
 {
 #if defined(Q_OS_WINDOWS)
     MessageBeep(0xFFFFFFFF); // cf. fltk/src/drivers/WinAPI/Fl_WinAPI_Screen_Driver.cxx:245
-#elif defined(__APPLE__)
+#endif
+
+#ifdef Q_OS_DARWIN
     cocoa_beep();
-#elif defined(Q_OS_UNIX)
+#endif
+
+#ifdef Q_OS_LINUX
     XBell(display_, 0 /* volume */);
 #endif
 }

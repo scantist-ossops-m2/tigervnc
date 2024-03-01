@@ -21,7 +21,8 @@
 
 #include "Surface.h"
 
-#include <list>
+#include <QDataStream>
+#include <QTextStream>
 #include <os/Mutex.h>
 #include <rfb/PixelBuffer.h>
 #include <rfb/Region.h>

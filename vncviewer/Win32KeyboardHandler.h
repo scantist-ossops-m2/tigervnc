@@ -3,7 +3,6 @@
 
 #include "BaseKeyboardHandler.h"
 
-#include <QQuickView>
 #include <QTimer>
 #include <windows.h>
 
@@ -16,12 +15,12 @@ public:
 
     bool nativeEventFilter(QByteArray const& eventType, void* message, long*) override;
 
-    void handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode = false);
+    void handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode = false) override;
     void handleKeyRelease(int keyCode) override;
 
 public slots:
-    void pushLEDState();
-    void setLEDState(unsigned int state);
+    void pushLEDState() override;
+    void setLEDState(unsigned int state) override;
     void grabKeyboard() override;
     void ungrabKeyboard() override;
 

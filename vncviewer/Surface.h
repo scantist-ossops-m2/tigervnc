@@ -19,10 +19,9 @@
 #ifndef __SURFACE_H__
 #define __SURFACE_H__
 
-#include "qpixmap.h"
-
 #include <QByteArray>
 #include <QDebug>
+#include <QImage>
 
 class Surface
 {

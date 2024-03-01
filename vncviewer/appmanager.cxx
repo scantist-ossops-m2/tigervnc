@@ -3,10 +3,12 @@
 #endif
 
 #include <QDebug>
+#include <QUrl>
 #include <QProcess>
 #include <QQmlEngine>
 #include <QScreen>
 #include <QTcpSocket>
+#include <QQuickView>
 #include <QTimer>
 #if defined(Q_OS_UNIX)
 #include <QApplication>

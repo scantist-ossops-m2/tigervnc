@@ -8,6 +8,8 @@
 #include <QQuickItem>
 #include <QTimer>
 
+struct _XDisplay;
+
 class QuickVNCItem : public QQuickItem
 {
     Q_OBJECT
@@ -55,6 +57,10 @@ private:
     QTimer     mouseButtonEmulationTimer_;
     QTimer     delayedInitializeTimer_;
     EmulateMB* mbemu_ = new EmulateMB(&mouseButtonEmulationTimer_);
+
+#ifdef Q_OS_LINUX
+    _XDisplay * display_;
+#endif
 };
 
 #endif // QUICKVNCITEM_H

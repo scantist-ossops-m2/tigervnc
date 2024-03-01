@@ -25,11 +25,6 @@ void BaseKeyboardHandler::ungrabKeyboard()
     keyboardGrabbed_ = true;
 }
 
-void BaseKeyboardHandler::handleKeyRelease(int)
-{
-
-}
-
 void BaseKeyboardHandler::setMenuKeyStatus(quint32 keysym, bool checked)
 {
     if (keysym == XK_Control_L)

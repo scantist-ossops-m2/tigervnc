@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickImageProvider>
+#include <QUrl>
 #include <QStyle>
 #include "parameters.h"
 #include "appmanager.h"

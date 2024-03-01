@@ -29,7 +29,6 @@
 #include <rfb/keysymdef.h>
 #include <rfb/util.h>
 
-#include "GestureHandler.h"
 #include "BaseTouchHandler.h"
 
 // Sensitivity threshold for gestures

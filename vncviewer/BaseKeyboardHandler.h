@@ -3,6 +3,9 @@
 
 #include <QAbstractNativeEventFilter>
 #include <QTimer>
+#include <QDataStream>
+#include <QTextStream>
+#include <QUrl>
 
 #define XK_LATIN1
 #define XK_MISCELLANY
@@ -22,7 +25,11 @@ public:
     virtual void grabKeyboard();
     virtual void ungrabKeyboard();
 
-    virtual void handleKeyRelease(int);
+    virtual void setLEDState(unsigned int state) = 0;
+    virtual void pushLEDState()                  = 0;
+
+    virtual void handleKeyPress(int keyCode, quint32 keySym, bool menuShortCutMode = false) = 0;
+    virtual void handleKeyRelease(int)                                                      = 0;
     void         resetKeyboard();
 
     void setMenuKeyStatus(quint32 keysym, bool checked);

@@ -16,22 +16,16 @@
  * USA.
  */
 
+#include <QDataStream>
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 
 #include <QCursor>
 #include <QEvent>
-#include <QTextStream>
 #include <assert.h>
 #include <stdlib.h>
-
-#if !defined(WIN32) && !defined(__APPLE__)
-#include <X11/Xlib.h>
-#include <X11/extensions/XShm.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#endif
 
 #include "PlatformPixelBuffer.h"
 #include "Surface.h"
@@ -40,6 +34,13 @@
 #include <QDebug>
 #include <rdr/Exception.h>
 #include <rfb/LogWriter.h>
+
+#ifdef Q_OS_LINUX
+#include <X11/Xlib.h>
+#include <X11/extensions/XShm.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#endif
 
 static rfb::LogWriter vlog("PlatformPixelBuffer");
 

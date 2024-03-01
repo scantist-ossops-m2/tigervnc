@@ -43,7 +43,6 @@ elseif(APPLE)
       MacKeyboardHandler.h
       vncscrollbar.cxx
       vncscrollbar.h
-      Surface_OSX.cxx
       cocoa.h
       cocoa.mm
       osx_to_qnum.c
@@ -52,13 +51,12 @@ else()
   set(OS_DEP_SOURCES
       vncscrollbar.cxx
       vncscrollbar.h
-      Surface_X11.cxx
-      X11TouchHandler.cxx
-      X11TouchHandler.h
+      # X11TouchHandler.cxx
+      # X11TouchHandler.h
       X11KeyboardHandler.cxx
       X11KeyboardHandler.h
-      GestureHandler.cxx
-      GestureHandler.h
+      # GestureHandler.cxx
+      # GestureHandler.h
       vncgesture.h
       vncgesture.cxx
       vncgesturerecognizer.h
