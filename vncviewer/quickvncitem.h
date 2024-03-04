@@ -31,6 +31,7 @@ public slots:
   void menuKey();
   void ctrlKeyToggle(bool checked);
   void altKeyToggle(bool checked);
+  void ctrlAltDel();
 
 signals:
   void popupToast(QString const& text);

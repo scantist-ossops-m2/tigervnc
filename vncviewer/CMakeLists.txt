@@ -76,6 +76,8 @@ set(PROJECT_SOURCES
         contextmenuactions.h
         quickvncitem.cxx
         quickvncitem.h
+        quickvncview.cxx
+        quickvncview.h
         vncapplication.cxx
         vncapplication.h
         vncconnection.h

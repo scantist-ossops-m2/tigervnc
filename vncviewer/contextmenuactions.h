@@ -27,10 +27,8 @@ public:
 
 public slots:
   void disconnect();
-  void fullScreen();
   void minimize();
   void revertSize();
-  void ctrlAltDel();
   void refresh();
 
 private:

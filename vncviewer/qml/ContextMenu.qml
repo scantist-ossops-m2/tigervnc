@@ -8,6 +8,7 @@ Menu {
     signal menuKey
     signal ctrlKeyToggle(bool checked)
     signal altKeyToggle(bool checked)
+    signal ctrlAltDel
 
     signal optionDialogAction
     signal infoDialogAction
@@ -22,7 +23,9 @@ Menu {
 
     Action {
         text: ContextMenuActions.fullScreenAction
-        onTriggered: ContextMenuActions.fullScreen()
+        checkable: true
+        checked: AppManager.isFullscreen
+        onTriggered: AppManager.toggleFullscreen()
     }
 
     Action {
@@ -56,7 +59,7 @@ Menu {
 
     Action {
         text: ContextMenuActions.ctrlAltDelAction
-        onTriggered: ContextMenuActions.ctrlAltDel()
+        onTriggered: ctrlAltDel()
     }
 
     MenuSeparator {}

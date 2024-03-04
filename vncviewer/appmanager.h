@@ -5,7 +5,7 @@
 
 #include <QObject>
 
-class QQuickView;
+class QuickVNCView;
 class QTimer;
 
 class AppManager : public QObject
@@ -16,6 +16,7 @@ class AppManager : public QObject
   Q_PROPERTY(int remoteViewWidth READ remoteViewWidth NOTIFY remoteViewSizeChanged)
   Q_PROPERTY(int remoteViewHeight READ remoteViewHeight NOTIFY remoteViewSizeChanged)
   Q_PROPERTY(bool visibleInfo READ visibleInfo NOTIFY visibleInfoChanged)
+  Q_PROPERTY(bool isFullscreen READ isFullscreen WRITE setIsFullscreen NOTIFY isFullscreenChanged)
 
 public:
   virtual ~AppManager();
@@ -52,6 +53,9 @@ public:
     return remoteViewHeight_;
   }
 
+  bool isFullscreen() const;
+  void setIsFullscreen(bool newIsFullscreen);
+
 signals:
   void errorOcurred(int seq, QString message, bool quit = false);
   void credentialRequested(bool secured, bool userNeeded, bool passwordNeeded);
@@ -74,6 +78,8 @@ signals:
   void visibleInfoChanged();
   void remoteViewSizeChanged(int width, int height);
 
+  void isFullscreenChanged();
+
 public slots:
   void publishError(QString const message, bool quit = false);
   void connectToServer(QString const addressport);
@@ -83,6 +89,7 @@ public slots:
   void openVNCWindow(int width, int height, QString name);
   void minimizeVNCWindow();
   void closeVNCWindow();
+  void updateWindow();
   void setWindowName(QString name);
   /**
    * @brief Request the framebuffer to add the given dirty region. Typically, called
@@ -100,17 +107,20 @@ public slots:
   void openAboutDialog();
   void respondToMessage(int response);
   void closeOverlay();
+  void toggleFullscreen();
 
 private:
+  AppManager();
+
   static AppManager* manager_;
   int                error_;
   QVNCConnection*    facade_;
-  QQuickView*        connectionView_;
+  QuickVNCView*      connectionView_;
   QTimer*            rfbTimerProxy_;
   bool               visibleInfo_;
   int                remoteViewWidth_  = 0;
   int                remoteViewHeight_ = 0;
-  AppManager();
+  bool               isFullscreen_;
 };
 
 #endif // APPMANAGER_H

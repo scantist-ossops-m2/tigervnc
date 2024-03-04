@@ -1,5 +1,6 @@
 #include "BaseKeyboardHandler.h"
 
+#include "appmanager.h"
 #include "parameters.h"
 
 BaseKeyboardHandler::BaseKeyboardHandler(QObject* parent) : QObject(parent)
@@ -8,54 +9,53 @@ BaseKeyboardHandler::BaseKeyboardHandler(QObject* parent) : QObject(parent)
 
 void BaseKeyboardHandler::maybeGrabKeyboard()
 {
-    if (ViewerConfig::config()
-            ->fullscreenSystemKeys()) //&& (isFullscreenEnabled() || pendingFullscreen_) && hasFocus()) // xTODO
-    {
-        grabKeyboard();
-    }
+  if (ViewerConfig::config()->fullscreenSystemKeys() && AppManager::instance()->isFullscreen())
+  {
+    grabKeyboard();
+  }
 }
 
 void BaseKeyboardHandler::grabKeyboard()
 {
-    keyboardGrabbed_ = true;
+  keyboardGrabbed_ = true;
 }
 
 void BaseKeyboardHandler::ungrabKeyboard()
 {
-    keyboardGrabbed_ = true;
+  keyboardGrabbed_ = true;
 }
 
 void BaseKeyboardHandler::setMenuKeyStatus(quint32 keysym, bool checked)
 {
-    if (keysym == XK_Control_L)
-    {
-        menuCtrlKey_ = checked;
-    }
-    else if (keysym == XK_Alt_L)
-    {
-        menuAltKey_ = checked;
-    }
+  if (keysym == XK_Control_L)
+  {
+    menuCtrlKey_ = checked;
+  }
+  else if (keysym == XK_Alt_L)
+  {
+    menuAltKey_ = checked;
+  }
 }
 
 bool BaseKeyboardHandler::menuCtrlKey() const
 {
-    return menuCtrlKey_;
+  return menuCtrlKey_;
 }
 
 bool BaseKeyboardHandler::menuAltKey() const
 {
-    return menuAltKey_;
+  return menuAltKey_;
 }
 
 void BaseKeyboardHandler::setContextMenuVisible(bool newContextMenuVisible)
 {
-    contextMenuVisible_ = newContextMenuVisible;
+  contextMenuVisible_ = newContextMenuVisible;
 }
 
 void BaseKeyboardHandler::resetKeyboard()
 {
-    while (!downKeySym_.empty())
-    {
-        handleKeyRelease(downKeySym_.begin()->first);
-    }
+  while (!downKeySym_.empty())
+  {
+    handleKeyRelease(downKeySym_.begin()->first);
+  }
 }

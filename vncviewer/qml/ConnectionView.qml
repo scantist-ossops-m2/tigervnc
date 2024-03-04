@@ -58,6 +58,7 @@ Item {
         onMenuKey: remoteView.menuKey()
         onCtrlKeyToggle: remoteView.ctrlKeyToggle(checked)
         onAltKeyToggle: remoteView.altKeyToggle(checked)
+        onCtrlAltDel: remoteView.ctrlAltDel()
 
         onOptionDialogAction: optionsDialog.open()
         onInfoDialogAction: infoDialog.open()
