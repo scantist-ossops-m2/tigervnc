@@ -2,18 +2,6 @@
 #include "config.h"
 #endif
 
-#include <QDebug>
-#include <QProcess>
-#include <QQmlEngine>
-#include <QQuickView>
-#include <QScreen>
-#include <QTcpSocket>
-#include <QTimer>
-#include <QUrl>
-#if defined(Q_OS_UNIX)
-#include <QApplication>
-#endif
-
 #include "appmanager.h"
 #include "contextmenuactions.h"
 #include "i18n.h"
@@ -22,6 +10,17 @@
 #include "quickvncview.h"
 #include "rfb/Timer.h"
 #include "vncconnection.h"
+
+#include <QAbstractEventDispatcher>
+#include <QApplication>
+#include <QDebug>
+#include <QProcess>
+#include <QQmlEngine>
+#include <QQuickView>
+#include <QScreen>
+#include <QTcpSocket>
+#include <QTimer>
+#include <QUrl>
 #undef asprintf
 
 AppManager* AppManager::manager_;
