@@ -34,11 +34,14 @@ AppManager::AppManager()
   connect(facade_, &QVNCConnection::newVncWindowRequested, this, &AppManager::openVNCWindow);
   connect(this, &AppManager::resetConnectionRequested, facade_, &QVNCConnection::resetConnection);
   connect(rfbTimerProxy_, &QTimer::timeout, this, [this]() {
-    rfbTimerProxy_->setInterval(rfb::Timer::checkTimeouts());
+    rfb::Timer::checkTimeouts();
   });
-  rfbTimerProxy_->setSingleShot(false);
-  rfbTimerProxy_->setInterval(0);
-  rfbTimerProxy_->start();
+  connect(QApplication::eventDispatcher(), &QAbstractEventDispatcher::aboutToBlock, this, [this]() {
+    int next = rfb::Timer::checkTimeouts();
+    if (next != 0)
+      rfbTimerProxy_->start(next);
+  });
+  rfbTimerProxy_->setSingleShot(true);
 
   connect(ViewerConfig::config(), &ViewerConfig::fullScreenChanged, this, [this](bool enabled) {
     setIsFullscreen(enabled);
