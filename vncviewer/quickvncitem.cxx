@@ -36,6 +36,7 @@ QuickVNCItem::QuickVNCItem(QQuickItem* parent) : QQuickItem(parent)
   setFlag(QQuickItem::ItemHasContents, true);
   setAcceptHoverEvents(true);
   setAcceptedMouseButtons(Qt::AllButtons);
+  setKeepMouseGrab(true);
 
   connect(AppManager::instance()->connection(),
           &QVNCConnection::refreshFramebufferEnded,
