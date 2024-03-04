@@ -1,4 +1,4 @@
-AccessModifierOffset: -4
+AccessModifierOffset: -2
 AlignAfterOpenBracket: Align
 AlignArrayOfStructures: Left
 AlignConsecutiveAssignments: true
@@ -16,6 +16,7 @@ BreakBeforeTernaryOperators: true
 ColumnLimit: 120
 EmptyLineBeforeAccessModifier: Always
 IncludeBlocks: Regroup
+IndentWidth: 2
 Language: Cpp
 NamespaceIndentation: None
 PointerBindsToType: true
