@@ -27,7 +27,7 @@
 #include <rfb/PixelBuffer.h>
 #include <rfb/Region.h>
 
-class PlatformPixelBuffer : public rfb::FullFramePixelBuffer, public Surface
+class PlatformPixelBuffer : public rfb::FullFramePixelBuffer
 {
 public:
   PlatformPixelBuffer(int width, int height);
@@ -37,12 +37,18 @@ public:
 
   rfb::Rect getDamage(void);
 
+  QImage image()
+  {
+    return surface->image();
+  }
+
   using rfb::FullFramePixelBuffer::height;
   using rfb::FullFramePixelBuffer::width;
 
 protected:
   os::Mutex   mutex;
   rfb::Region damage;
+  Surface *surface;
 };
 
-#endif
+#endif

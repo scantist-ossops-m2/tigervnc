@@ -27,7 +27,9 @@ class Surface
 {
 public:
   Surface(int width, int height);
-  ~Surface();
+
+  void attach();
+  void detach();
 
   int width()
   {
@@ -41,7 +43,8 @@ public:
 
   QImage image()
   {
-    QImage i((unsigned char*)data.data(), w, h, QImage::Format_RGB32);
+    attach();
+    QImage i((unsigned char*)data.data(), w, h, QImage::Format_RGB32, imageCleanup, this);
     return i;
   }
 
@@ -51,8 +54,18 @@ public:
   }
 
 protected:
+  ~Surface();
+
+  static void imageCleanup(void* info)
+  {
+    Surface* self = (Surface*)info;
+    self->detach();
+  }
+
+protected:
   int        w, h;
   QByteArray data;
+  QAtomicInt refs;
 };
 
 #endif

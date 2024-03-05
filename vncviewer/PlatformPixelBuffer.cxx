@@ -46,13 +46,16 @@ static rfb::LogWriter vlog("PlatformPixelBuffer");
 
 PlatformPixelBuffer::PlatformPixelBuffer(int width, int height)
     : FullFramePixelBuffer(rfb::PixelFormat(32, 24, false, true, 255, 255, 255, 16, 8, 0), 0, 0, NULL, 0),
-      Surface(width, height)
+      surface(new Surface(width, height))
 {
-    setBuffer(width, height, (uint8_t*)framebuffer(), width);
+    vlog.error("Pixel buffer: 0x%p (%dx%d)", surface->framebuffer(), width, height);
+    setBuffer(width, height, (uint8_t*)surface->framebuffer(), width);
 }
 
 PlatformPixelBuffer::~PlatformPixelBuffer()
 {
+    vlog.error("Destroy: 0x%p", surface->framebuffer());
+    surface->detach();
 }
 
 void PlatformPixelBuffer::commitBufferRW(rfb::Rect const& r)
