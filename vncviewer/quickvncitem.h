@@ -63,7 +63,7 @@ private:
   void updateWindow();
 
   bool                 firstUpdate_ = true;
-  PlatformPixelBuffer* framebuffer_;
+  PlatformPixelBuffer* framebuffer_ = nullptr;
   QRect                rect_;
   QImage               image_;
   QSGTexture*          texture = nullptr;
