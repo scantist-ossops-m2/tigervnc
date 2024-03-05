@@ -7,7 +7,7 @@ Item {
     id: root
     anchors.fill: parent
 
-    ScrollView {
+    Flickable {
         anchors.fill: parent
         clip: true
         contentWidth: container.width
@@ -36,6 +36,35 @@ Item {
                     var pos = root.mapFromGlobal(cursorPos().x, cursorPos().y)
                     contextMenu.x = pos.x
                     contextMenu.y = pos.y
+                }
+            }
+        }
+
+        ScrollBar.vertical: ScrollBar {
+            id: verticalScrollbar
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.NoButton
+                onWheel: {
+                    if (wheel.angleDelta.y > 0) {
+                        verticalScrollbar.decrease()
+                    } else {
+                        verticalScrollbar.increase()
+                    }
+                }
+            }
+        }
+        ScrollBar.horizontal: ScrollBar {
+            id: horizontalScrollbar
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.NoButton
+                onWheel: {
+                    if (wheel.angleDelta.y > 0) {
+                        horizontalScrollbar.decrease()
+                    } else {
+                        horizontalScrollbar.increase()
+                    }
                 }
             }
         }
