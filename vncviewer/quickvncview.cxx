@@ -321,7 +321,10 @@ void QuickVNCView::fullscreenOnSelectedDisplays(int vx, int vy, int vwidth, int 
 void QuickVNCView::exitFullscreen()
 {
   setFlags(flags() & ~Qt::BypassWindowManagerHint & ~Qt::FramelessWindowHint);
-  setScreen(previousScreen_);
-  setGeometry(previousGeometry_);
+  if (previousScreen_)
+  {
+    setScreen(previousScreen_);
+    setGeometry(previousGeometry_);
+  }
   showNormal();
 }

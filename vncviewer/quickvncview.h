@@ -26,7 +26,7 @@ private:
   int      fw_    = 0;
   int      fh_    = 0;
   QRect    previousGeometry_;
-  QScreen* previousScreen_;
+  QScreen* previousScreen_ = nullptr;
 };
 
 #endif // QUICKVNCVIEW_H
