@@ -8,31 +8,35 @@ Item {
     anchors.fill: parent
 
     ScrollView {
-        anchors.centerIn: parent
-        width: remoteView.width < root.width ? remoteView.width : root.width
-        height: remoteView.height < root.height ? remoteView.height : root.height
+        anchors.fill: parent
         clip: true
-        contentWidth: remoteView.width
-        contentHeight: remoteView.height
+        contentWidth: container.width
+        contentHeight: container.height
 
-        VNCItem {
-            id: remoteView
-            anchors.centerIn: parent
-            width: AppManager.remoteViewWidth
-            height: AppManager.remoteViewHeight
-            focus: true
+        Item {
+            id: container
+            width: Math.max(remoteView.width, root.width)
+            height: Math.max(remoteView.height, root.height)
 
-            onPopupToast: function (text) {
-                toast.text = text
-                toast.start()
-                toast.state = "$VISIBLE"
-            }
+            VNCItem {
+                id: remoteView
+                anchors.centerIn: parent
+                width: AppManager.remoteViewWidth
+                height: AppManager.remoteViewHeight
+                focus: true
 
-            onContextMenuVisibleChanged: function () {
-                contextMenu.visible = contextMenuVisible
-                var pos = root.mapFromGlobal(cursorPos().x, cursorPos().y)
-                contextMenu.x = pos.x
-                contextMenu.y = pos.y
+                onPopupToast: function (text) {
+                    toast.text = text
+                    toast.start()
+                    toast.state = "$VISIBLE"
+                }
+
+                onContextMenuVisibleChanged: function () {
+                    contextMenu.visible = contextMenuVisible
+                    var pos = root.mapFromGlobal(cursorPos().x, cursorPos().y)
+                    contextMenu.x = pos.x
+                    contextMenu.y = pos.y
+                }
             }
         }
     }
