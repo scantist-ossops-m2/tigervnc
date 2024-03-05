@@ -109,6 +109,14 @@ QuickVNCItem::QuickVNCItem(QQuickItem* parent) : QQuickItem(parent)
   });
 
   QAbstractEventDispatcher::instance()->installNativeEventFilter(keyboardHandler_);
+  connect(
+      AppManager::instance(),
+      &AppManager::vncWindowClosed,
+      this,
+      [=]() {
+        QAbstractEventDispatcher::instance()->removeNativeEventFilter(keyboardHandler_);
+      },
+      Qt::QueuedConnection);
 }
 
 QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* updatePaintNodeData)
@@ -200,7 +208,7 @@ void QuickVNCItem::updateWindow()
     if (!image_.isNull())
     {
       update();
-      // qDebug() << QDateTime::currentDateTimeUtc() << "QuickVNCItem::updateWindow" << rect_ << image_.rect();
+      qDebug() << QDateTime::currentDateTimeUtc() << "QuickVNCItem::updateWindow" << rect_ << image_.rect();
     }
   }
 }

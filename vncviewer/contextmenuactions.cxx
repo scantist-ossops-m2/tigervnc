@@ -3,9 +3,27 @@
 #include "appmanager.h"
 
 #include <QApplication>
+#include <QQmlEngine>
+
+ContextMenuActions* ContextMenuActions::contextMenuActions_;
 
 ContextMenuActions::ContextMenuActions(QObject* parent) : QObject(parent)
 {
+}
+
+int ContextMenuActions::initialize()
+{
+  contextMenuActions_ = new ContextMenuActions();
+  qmlRegisterSingletonType<ContextMenuActions>("Qt.TigerVNC",
+                                               1,
+                                               0,
+                                               "ContextMenuActions",
+                                               [](QQmlEngine* engine, QJSEngine* scriptEngine) -> QObject* {
+                                                 Q_UNUSED(engine)
+                                                 Q_UNUSED(scriptEngine)
+                                                 return contextMenuActions_;
+                                               });
+  return 0;
 }
 
 void ContextMenuActions::disconnect()

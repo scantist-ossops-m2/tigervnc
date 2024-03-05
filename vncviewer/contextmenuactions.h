@@ -23,7 +23,7 @@ class ContextMenuActions : public QObject
   Q_PROPERTY(QString aboutDialogAction MEMBER aboutDialogAction CONSTANT)
 
 public:
-  ContextMenuActions(QObject* parent = nullptr);
+  static int initialize();
 
 public slots:
   void disconnect();
@@ -32,6 +32,9 @@ public slots:
   void refresh();
 
 private:
+  ContextMenuActions(QObject* parent = nullptr);
+  static ContextMenuActions* contextMenuActions_;
+
   QString disconnectAction    = p_("ContextMenu|", "Dis&connect");
   QString fullScreenAction    = p_("ContextMenu|", "&Full screen");
   QString minimizeAction      = p_("ContextMenu|", "Minimi&ze");

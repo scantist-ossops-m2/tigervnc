@@ -10,6 +10,7 @@
 #include <QTimer>
 
 struct _XDisplay;
+class QSGTexture;
 
 class QuickVNCItem : public QQuickItem
 {
@@ -65,6 +66,7 @@ private:
   PlatformPixelBuffer* framebuffer_;
   QRect                rect_;
   QImage               image_;
+  QSGTexture*          texture = nullptr;
 
   bool       mouseGrabbed_ = false;
   rfb::Point lastPointerPos_;
@@ -74,7 +76,7 @@ private:
   QTimer     delayedInitializeTimer_;
   EmulateMB* mbemu_ = new EmulateMB(&mouseButtonEmulationTimer_);
 
-  BaseKeyboardHandler* keyboardHandler_;
+  BaseKeyboardHandler* keyboardHandler_ = nullptr;
 
 #ifdef Q_OS_LINUX
   _XDisplay* display_;

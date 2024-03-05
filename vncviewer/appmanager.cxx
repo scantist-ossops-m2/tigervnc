@@ -99,16 +99,6 @@ int AppManager::initialize()
                                          return manager_;
                                        });
   qmlRegisterType<QuickVNCItem>("Qt.TigerVNC", 1, 0, "VNCItem");
-  qmlRegisterSingletonType<ContextMenuActions>("Qt.TigerVNC",
-                                               1,
-                                               0,
-                                               "ContextMenuActions",
-                                               [](QQmlEngine* engine, QJSEngine* scriptEngine) -> QObject* {
-                                                 Q_UNUSED(engine)
-                                                 Q_UNUSED(scriptEngine)
-                                                 static ContextMenuActions contextMenuActions;
-                                                 return &contextMenuActions;
-                                               });
   return 0;
 }
 
@@ -166,9 +156,12 @@ void AppManager::minimizeVNCWindow()
 
 void AppManager::closeVNCWindow()
 {
-  connectionView_->deleteLater();
-  connectionView_ = nullptr;
-  emit vncWindowClosed();
+  if (connectionView_)
+  {
+    connectionView_->close();
+    connectionView_ = nullptr;
+    emit vncWindowClosed();
+  }
 }
 
 void AppManager::updateWindow()
