@@ -4,6 +4,7 @@
 #include "vncconnection.h"
 
 #include <QObject>
+#include <QQmlApplicationEngine>
 
 class QuickVNCView;
 class QTimer;
@@ -26,7 +27,7 @@ public:
     return manager_;
   }
 
-  static int initialize();
+  static int initialize(QQmlApplicationEngine* engine);
 
   QVNCConnection* connection() const
   {
@@ -111,15 +112,16 @@ public slots:
 private:
   AppManager();
 
-  static AppManager* manager_;
-  int                error_;
-  QVNCConnection*    facade_;
-  QuickVNCView*      connectionView_;
-  QTimer*            rfbTimerProxy_;
-  bool               visibleInfo_;
-  int                remoteViewWidth_  = 0;
-  int                remoteViewHeight_ = 0;
-  bool               isFullscreen_;
+  static AppManager*     manager_;
+  QQmlApplicationEngine* qmlEngine_;
+  int                    error_;
+  QVNCConnection*        facade_;
+  QuickVNCView*          connectionView_;
+  QTimer*                rfbTimerProxy_;
+  bool                   visibleInfo_;
+  int                    remoteViewWidth_  = 0;
+  int                    remoteViewHeight_ = 0;
+  bool                   isFullscreen_;
 };
 
 #endif // APPMANAGER_H

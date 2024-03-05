@@ -82,13 +82,14 @@ AppManager::~AppManager()
   rfbTimerProxy_->deleteLater();
 }
 
-int AppManager::initialize()
+int AppManager::initialize(QQmlApplicationEngine* engine)
 {
   qRegisterMetaType<QAbstractSocket::SocketError>("QAbstractSocket::SocketError");
   qRegisterMetaType<QAbstractSocket::SocketState>("QAbstractSocket::SocketState");
   qRegisterMetaType<QProcess::ProcessError>("QProcess::ProcessError");
   qmlRegisterType<QVNCConnection>("Qt.TigerVNC", 1, 0, "VNCConnection");
-  manager_ = new AppManager();
+  manager_             = new AppManager();
+  manager_->qmlEngine_ = engine;
   qmlRegisterSingletonType<AppManager>("Qt.TigerVNC",
                                        1,
                                        0,
@@ -134,7 +135,7 @@ void AppManager::publishError(QString const message, bool quit)
 
 void AppManager::openVNCWindow(int width, int height, QString name)
 {
-  connectionView_ = new QuickVNCView;
+  connectionView_ = new QuickVNCView(qmlEngine_);
   connectionView_->resize(width, height);
   remoteViewWidth_  = width;
   remoteViewHeight_ = height;
@@ -156,9 +157,10 @@ void AppManager::minimizeVNCWindow()
 
 void AppManager::closeVNCWindow()
 {
+  qDebug() << "AppManager::closeVNCWindow";
   if (connectionView_)
   {
-    connectionView_->close();
+    connectionView_->deleteLater();
     connectionView_ = nullptr;
     emit vncWindowClosed();
   }

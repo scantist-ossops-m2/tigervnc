@@ -133,6 +133,8 @@ QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaint
   node->setRect(image_.rect());
   node->markDirty(QSGNode::DirtyForceUpdate);
   node->setTexture(texture);
+  // qDebug() << this << QDateTime::currentDateTimeUtc() << "QuickVNCItem::updatePaintNode" << rect_ <<
+  image_.rect();
   return node;
 }
 
@@ -208,7 +210,8 @@ void QuickVNCItem::updateWindow()
     if (!image_.isNull())
     {
       update();
-      qDebug() << QDateTime::currentDateTimeUtc() << "QuickVNCItem::updateWindow" << rect_ << image_.rect();
+      // qDebug() << QDateTime::currentDateTimeUtc() << "QuickVNCItem::updateWindow" << rect_ << image_.rect();
+      // qDebug() << this;
     }
   }
 }

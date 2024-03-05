@@ -58,14 +58,15 @@ int main(int argc, char* argv[])
   app.setOrganizationDomain("tigervnc.org");
   app.setApplicationName("TigerVNC Viewer");
 
+  QQmlApplicationEngine engine;
+
   ViewerConfig::initialize();
-  AppManager::initialize();
+  AppManager::initialize(&engine);
   ContextMenuActions::initialize();
 
   VNCTranslator translator;
   app.installTranslator(&translator);
 
-  QQmlApplicationEngine engine;
   engine.addImageProvider(QLatin1String("qticons"), new StandardIconProvider(app.style()));
   QUrl const url(QStringLiteral("qrc:/qml/main.qml"));
   QObject::connect(

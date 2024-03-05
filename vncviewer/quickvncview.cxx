@@ -12,8 +12,14 @@
 
 static rfb::LogWriter vlog("QuickVNCView");
 
-QuickVNCView::QuickVNCView(QWindow* parent) : QQuickView(QUrl("qrc:/qml/ConnectionView.qml"), parent)
+QuickVNCView::QuickVNCView(QQmlEngine* engine, QWindow* parent) : QQuickView(engine, parent)
 {
+  setSource(QUrl("qrc:/qml/ConnectionView.qml"));
+}
+
+QuickVNCView::~QuickVNCView()
+{
+  qDebug() << "~QuickVNCView";
 }
 
 void QuickVNCView::remoteResize(int w, int h)

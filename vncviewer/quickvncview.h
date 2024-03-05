@@ -8,7 +8,8 @@ class QuickVNCView : public QQuickView
   Q_OBJECT
 
 public:
-  QuickVNCView(QWindow* parent = nullptr);
+  QuickVNCView(QQmlEngine* engine, QWindow* parent = nullptr);
+  ~QuickVNCView();
 
   void       remoteResize(int width, int height);
   void       handleDesktopSize();
