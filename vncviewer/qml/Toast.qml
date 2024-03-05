@@ -4,8 +4,8 @@ import Qt.TigerVNC 1.0
 
 Rectangle {
     id: toast
-    width: 300
-    height: 40
+    width: toastLabel.width + 20 * 2
+    height: toastLabel.height + 20 * 2
     color: "#96101010"
     radius: 5
     opacity: 0
@@ -66,7 +66,7 @@ Rectangle {
 
     Label {
         id: toastLabel
-        anchors.fill: parent
+        anchors.centerIn: parent
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         color: "#e0ffffff"
