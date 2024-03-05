@@ -121,19 +121,25 @@ QuickVNCItem::QuickVNCItem(QQuickItem* parent) : QQuickItem(parent)
 
 QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* updatePaintNodeData)
 {
-  auto node = dynamic_cast<QSGSimpleTextureNode*>(oldNode);
-
-  if (!node)
+  if (texture)
   {
-    node = new QSGSimpleTextureNode();
-  }
+    auto node = dynamic_cast<QSGSimpleTextureNode*>(oldNode);
 
-  QSGTexture* texture = window()->createTextureFromImage(image_, QQuickWindow::TextureIsOpaque);
-  node->setOwnsTexture(true);
-  node->setRect(image_.rect());
-  node->markDirty(QSGNode::DirtyForceUpdate);
-  node->setTexture(texture);
-  return node;
+    if (!node)
+    {
+      node = new QSGSimpleTextureNode();
+    }
+
+    node->setOwnsTexture(true);
+    node->setRect(image_.rect());
+    node->markDirty(QSGNode::DirtyForceUpdate);
+    node->setTexture(texture);
+    return node;
+  }
+  else
+  {
+    return oldNode;
+  }
 }
 
 void QuickVNCItem::bell()
@@ -207,6 +213,7 @@ void QuickVNCItem::updateWindow()
     image_ = framebuffer_->image();
     if (!image_.isNull())
     {
+      texture = window()->createTextureFromImage(image_, QQuickWindow::TextureIsOpaque);
       update();
       // qDebug() << QDateTime::currentDateTimeUtc() << "QuickVNCItem::updateWindow" << rect_ << image_.rect();
     }
