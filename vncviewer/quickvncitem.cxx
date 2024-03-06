@@ -128,7 +128,14 @@ QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaint
 {
   if (texture)
   {
-    glBindTexture(GL_TEXTURE_2D, texture->textureId());
+    // qDebug() << "QuickVNCItem::updatePaintNode"
+    //          << "texture"
+    //          << "BEGIN";
+    if (rect_.isEmpty())
+      return oldNode;
+    // qDebug() << "QuickVNCItem::updatePaintNode"
+    //          << "texture" << rect_;
+    texture->bind();
     glTexSubImage2D(GL_TEXTURE_2D,
                     0,
                     rect_.x(),
@@ -137,7 +144,7 @@ QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaint
                     rect_.height(),
                     GL_BGRA,
                     GL_UNSIGNED_BYTE,
-                    image_.constBits());
+                    image_.copy(rect_).constBits());
     // glTexImage2D(GL_TEXTURE_2D,
     //              0,
     //              GL_RGBA,
@@ -147,14 +154,24 @@ QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaint
     //              GL_BGRA,
     //              GL_UNSIGNED_BYTE,
     //              image_.constBits());
+    rect_ = QRect();
 
-    oldNode->markDirty(QSGNode::DirtyForceUpdate);
-    return oldNode;
+    auto node = dynamic_cast<QSGSimpleTextureNode*>(oldNode);
+    node->markDirty(QSGNode::DirtyForceUpdate);
+    // qDebug() << "QuickVNCItem::updatePaintNode"
+    //          << "texture" << rect_;
+    update();
+    return node;
   }
   else
   {
+    qDebug() << "QuickVNCItem::updatePaintNode"
+             << "!texture"
+             << "BEGIN";
     if (rect_.isEmpty())
       return oldNode;
+    qDebug() << "QuickVNCItem::updatePaintNode"
+             << "!texture" << rect_;
 
     auto node = dynamic_cast<QSGSimpleTextureNode*>(oldNode);
 
@@ -164,14 +181,47 @@ QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaint
     }
 
     initializeOpenGLFunctions();
+    if (texture)
+      texture->deleteLater();
     texture = window()->createTextureFromImage(image_, QQuickWindow::TextureIsOpaque);
     node->setOwnsTexture(true);
     node->setRect(image_.rect());
     node->markDirty(QSGNode::DirtyForceUpdate);
     node->setTexture(texture);
+    rect_ = QRect();
 
     return node;
   }
+}
+
+void QuickVNCItem::updateWindow()
+{
+  // qDebug() << /*QDateTime::currentDateTimeUtc() << */ "QuickVNCItem::updateWindow"
+  //          << "BEGIN";
+  framebuffer_ = (PlatformPixelBuffer*)AppManager::instance()->connection()->framebuffer();
+  if (!framebuffer_)
+    return;
+
+  rfb::Rect r      = framebuffer_->getDamage();
+  int       x      = r.tl.x;
+  int       y      = r.tl.y;
+  int       width  = r.br.x - x;
+  int       height = r.br.y - y;
+  QRect     rect   = QRect{x, y, x + width, y + height};
+  // qDebug() << "QuickVNCItem::updateWindow"
+  //          << "rect" << rect;
+  if (rect.isEmpty())
+    rect = image_.rect();
+
+  if (rect_.isNull())
+    rect_ = rect;
+  else
+    rect_ = rect_.united(rect);
+
+  image_ = framebuffer_->image().convertToFormat(QImage::Format_ARGB32_Premultiplied);
+  update();
+  // qDebug() << /*QDateTime::currentDateTimeUtc() << */ "QuickVNCItem::updateWindow"
+  //          << "rect_" << rect_;
 }
 
 void QuickVNCItem::bell()
@@ -229,26 +279,6 @@ void QuickVNCItem::ctrlAltDel()
   keyboardHandler_->handleKeyRelease(0xd3);
   keyboardHandler_->handleKeyRelease(0x38);
   keyboardHandler_->handleKeyRelease(0x1d);
-}
-
-void QuickVNCItem::updateWindow()
-{
-  framebuffer_ = (PlatformPixelBuffer*)AppManager::instance()->connection()->framebuffer();
-  if (!framebuffer_)
-    return;
-
-  rfb::Rect r      = framebuffer_->getDamage();
-  int       x      = r.tl.x;
-  int       y      = r.tl.y;
-  int       width  = r.br.x - x;
-  int       height = r.br.y - y;
-  rect_            = QRect{x, y, x + width, y + height};
-  if (!rect_.isEmpty())
-  {
-    image_ = framebuffer_->image().copy(rect_).convertToFormat(QImage::Format_ARGB32_Premultiplied);
-    update();
-    // qDebug() << QDateTime::currentDateTimeUtc() << "QuickVNCItem::updateWindow" << rect_ << image_.rect();
-  }
 }
 
 bool QuickVNCItem::contextMenuVisible() const
