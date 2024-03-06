@@ -13,7 +13,7 @@
 struct _XDisplay;
 class QSGTexture;
 
-class QuickVNCItem : public QQuickItem, protected QOpenGLFunctions
+class QuickVNCItem : public QQuickItem
 {
   Q_OBJECT
   Q_PROPERTY(bool contextMenuVisible READ contextMenuVisible WRITE setContextMenuVisible NOTIFY
