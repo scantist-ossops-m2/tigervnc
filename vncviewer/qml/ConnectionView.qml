@@ -8,6 +8,7 @@ Item {
     anchors.fill: parent
 
     Flickable {
+        id: flickable
         anchors.fill: parent
         clip: true
         contentWidth: container.width
@@ -43,6 +44,13 @@ Item {
 
         ScrollBar.vertical: ScrollBar {
             id: verticalScrollbar
+            policy: flickable.contentHeight > flickable.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+            contentItem: Rectangle {
+                implicitWidth: 8
+                color: "lightgray"
+                border.width: 2
+                border.color: "gray"
+            }
             MouseArea {
                 anchors.fill: parent
                 acceptedButtons: Qt.NoButton
@@ -57,6 +65,13 @@ Item {
         }
         ScrollBar.horizontal: ScrollBar {
             id: horizontalScrollbar
+            policy: flickable.contentWidth > flickable.width ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+            contentItem: Rectangle {
+                implicitHeight: 8
+                color: "lightgray"
+                border.width: 2
+                border.color: "gray"
+            }
             MouseArea {
                 anchors.fill: parent
                 acceptedButtons: Qt.NoButton
