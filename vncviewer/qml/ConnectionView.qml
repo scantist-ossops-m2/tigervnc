@@ -24,6 +24,7 @@ Item {
                 width: AppManager.remoteViewWidth
                 height: AppManager.remoteViewHeight
                 focus: true
+                clip: true
 
                 onPopupToast: function (text) {
                     toast.text = text

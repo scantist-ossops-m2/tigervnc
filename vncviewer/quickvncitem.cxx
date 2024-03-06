@@ -128,70 +128,64 @@ QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaint
 {
   if (texture)
   {
-    // qDebug() << "QuickVNCItem::updatePaintNode"
-    //          << "texture"
-    //          << "BEGIN";
     if (rect_.isEmpty())
       return oldNode;
-    // qDebug() << "QuickVNCItem::updatePaintNode"
-    //          << "texture" << rect_;
-    texture->bind();
-    glTexSubImage2D(GL_TEXTURE_2D,
-                    0,
-                    rect_.x(),
-                    rect_.y(),
-                    rect_.width(),
-                    rect_.height(),
-                    GL_BGRA,
-                    GL_UNSIGNED_BYTE,
-                    image_.copy(rect_).constBits());
-    // glTexImage2D(GL_TEXTURE_2D,
-    //              0,
-    //              GL_RGBA,
-    //              image_.width(),
-    //              image_.height(),
-    //              0,
-    //              GL_BGRA,
-    //              GL_UNSIGNED_BYTE,
-    //              image_.constBits());
-    rect_ = QRect();
-
-    auto node = dynamic_cast<QSGSimpleTextureNode*>(oldNode);
-    node->markDirty(QSGNode::DirtyForceUpdate);
-    // qDebug() << "QuickVNCItem::updatePaintNode"
-    //          << "texture" << rect_;
-    update();
-    return node;
-  }
-  else
-  {
-    qDebug() << "QuickVNCItem::updatePaintNode"
-             << "!texture"
-             << "BEGIN";
-    if (rect_.isEmpty())
-      return oldNode;
-    qDebug() << "QuickVNCItem::updatePaintNode"
-             << "!texture" << rect_;
 
     auto node = dynamic_cast<QSGSimpleTextureNode*>(oldNode);
 
-    if (!node)
+    if (node->rect() == image_.rect())
     {
-      node = new QSGSimpleTextureNode();
+      texture->bind();
+      glPixelStorei(GL_UNPACK_ROW_LENGTH, image_.bytesPerLine() / 4);
+      glTexSubImage2D(GL_TEXTURE_2D,
+                      0,
+                      rect_.x(),
+                      rect_.y(),
+                      rect_.width(),
+                      rect_.height(),
+                      GL_BGRA,
+                      GL_UNSIGNED_BYTE,
+                      image_.constScanLine(rect_.y()) + rect_.x() * 4);
+      glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+      // glTexImage2D(GL_TEXTURE_2D,
+      //              0,
+      //              GL_RGBA,
+      //              image_.width(),
+      //              image_.height(),
+      //              0,
+      //              GL_BGRA,
+      //              GL_UNSIGNED_BYTE,
+      //              image_.constBits());
+      rect_ = QRect();
+
+      node->markDirty(QSGNode::DirtyForceUpdate);
+
+      update();
+      return node;
     }
-
-    initializeOpenGLFunctions();
-    if (texture)
-      texture->deleteLater();
-    texture = window()->createTextureFromImage(image_, QQuickWindow::TextureIsOpaque);
-    node->setOwnsTexture(true);
-    node->setRect(image_.rect());
-    node->markDirty(QSGNode::DirtyForceUpdate);
-    node->setTexture(texture);
-    rect_ = QRect();
-
-    return node;
   }
+
+  if (rect_.isEmpty())
+    return oldNode;
+
+  auto node = dynamic_cast<QSGSimpleTextureNode*>(oldNode);
+
+  if (!node)
+  {
+    node = new QSGSimpleTextureNode();
+  }
+
+  initializeOpenGLFunctions();
+  if (texture)
+    texture->deleteLater();
+  texture = window()->createTextureFromImage(image_, QQuickWindow::TextureIsOpaque);
+  node->setOwnsTexture(true);
+  node->setRect(image_.rect());
+  node->markDirty(QSGNode::DirtyForceUpdate);
+  node->setTexture(texture);
+  rect_ = QRect();
+
+  return node;
 }
 
 void QuickVNCItem::updateWindow()
@@ -218,7 +212,7 @@ void QuickVNCItem::updateWindow()
   else
     rect_ = rect_.united(rect);
 
-  image_ = framebuffer_->image().convertToFormat(QImage::Format_ARGB32_Premultiplied);
+  image_ = framebuffer_->image();
   update();
   // qDebug() << /*QDateTime::currentDateTimeUtc() << */ "QuickVNCItem::updateWindow"
   //          << "rect_" << rect_;
