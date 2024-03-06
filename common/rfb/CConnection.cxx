@@ -54,6 +54,7 @@ CConnection::CConnection()
 
 CConnection::~CConnection()
 {
+  vlog.debug("~CConnection");
   if (framebuffer)
   {
     delete framebuffer;

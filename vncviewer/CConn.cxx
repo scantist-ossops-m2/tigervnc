@@ -1,17 +1,17 @@
 /* Copyright (C) 2002-2005 RealVNC Ltd.  All Rights Reserved.
  * Copyright (C) 2011 D. R. Commander.  All Rights Reserved.
  * Copyright 2009-2014 Pierre Ossman for Cendio AB
- * 
+ *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this software; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
@@ -22,23 +22,24 @@
 #include "config.h"
 #endif
 
-#include <QGuiApplication>
-#include <QTimer>
-#include <QCursor>
-#include <QClipboard>
-#include <QPixmap>
-#include <time.h>
-#include "rfb/LogWriter.h"
-#include "rfb/fenceTypes.h"
-#include "rfb/CMsgWriter.h"
+#include "CConn.h"
+#include "PlatformPixelBuffer.h"
+#include "appmanager.h"
+#include "i18n.h"
 #include "network/TcpSocket.h"
 #include "parameters.h"
-#include "PlatformPixelBuffer.h"
-#include "i18n.h"
-#include "appmanager.h"
-#include "vnccredential.h"
+#include "rfb/CMsgWriter.h"
+#include "rfb/LogWriter.h"
+#include "rfb/fenceTypes.h"
 #include "vncconnection.h"
-#include "CConn.h"
+#include "vnccredential.h"
+
+#include <QClipboard>
+#include <QCursor>
+#include <QGuiApplication>
+#include <QPixmap>
+#include <QTimer>
+#include <time.h>
 #undef asprintf
 
 using namespace rdr;
@@ -47,59 +48,52 @@ using namespace rfb;
 static LogWriter vlog("CConn");
 
 // 8 colours (1 bit per component)
-static const PixelFormat verylowColourPF(8, 3,false, true,
-                                         1, 1, 1, 2, 1, 0);
+static const PixelFormat verylowColourPF(8, 3, false, true, 1, 1, 1, 2, 1, 0);
 // 64 colours (2 bits per component)
-static const PixelFormat lowColourPF(8, 6, false, true,
-                                     3, 3, 3, 4, 2, 0);
+static const PixelFormat lowColourPF(8, 6, false, true, 3, 3, 3, 4, 2, 0);
 // 256 colours (2-3 bits per component)
-static const PixelFormat mediumColourPF(8, 8, false, true,
-                                        7, 7, 3, 5, 2, 0);
+static const PixelFormat mediumColourPF(8, 8, false, true, 7, 7, 3, 5, 2, 0);
 
 // Time new bandwidth estimates are weighted against (in ms)
-static const unsigned bpsEstimateWindow = 1000;
+static unsigned const bpsEstimateWindow = 1000;
 
-CConn::CConn(QVNCConnection *cfacade)
- : CConnection()
- , serverHost("")
- , serverPort(5900)
- , facade(cfacade)
- , cursor(nullptr)
- , updateCount(0)
- , pixelCount(0)
- , serverPF(new PixelFormat)
- , fullColourPF(new PixelFormat(32, 24, false, true, 255, 255, 255, 16, 8, 0))
- , lastServerEncoding((unsigned int)-1)
- , updateStartPos(0)
- , bpsEstimate(20000000)
+CConn::CConn(QVNCConnection* cfacade)
+    : CConnection(), serverHost(""), serverPort(5900), facade(cfacade), cursor(nullptr), updateCount(0), pixelCount(0),
+      serverPF(new PixelFormat), fullColourPF(new PixelFormat(32, 24, false, true, 255, 255, 255, 16, 8, 0)),
+      lastServerEncoding((unsigned int)-1), updateStartPos(0), bpsEstimate(20000000)
 {
   setShared(ViewerConfig::config()->shared());
-  
-  supportsLocalCursor = true;
+
+  supportsLocalCursor    = true;
   supportsCursorPosition = true;
-  supportsDesktopResize = true;
-  supportsLEDState = true;
-  
+  supportsDesktopResize  = true;
+  supportsLEDState       = true;
+
   initialiseProtocol();
-  if (!CSecurity::upg) {
+  if (!CSecurity::upg)
+  {
     CSecurity::upg = new VNCCredential;
   }
 #if defined(HAVE_GNUTLS) || defined(HAVE_NETTLE)
-  if (!CSecurity::msg) {
+  if (!CSecurity::msg)
+  {
     CSecurity::msg = new VNCCredential;
   }
 #endif
-  if (ViewerConfig::config()->customCompressLevel()) {
+  if (ViewerConfig::config()->customCompressLevel())
+  {
     setCompressLevel(ViewerConfig::config()->compressLevel());
   }
 
-  if (!ViewerConfig::config()->noJpeg()) {
+  if (!ViewerConfig::config()->noJpeg())
+  {
     setQualityLevel(ViewerConfig::config()->qualityLevel());
   }
 }
 
 CConn::~CConn()
 {
+  qDebug() << "~CConn";
   resetConnection();
   delete serverPF;
   delete fullColourPF;
@@ -108,7 +102,7 @@ CConn::~CConn()
 QString CConn::connectionInfo()
 {
   QString infoText;
-  char pfStr[100];
+  char    pfStr[100];
 
   infoText += QString::asprintf(_("Desktop name: %.80s"), server.name()) + "\n";
   infoText += QString::asprintf(_("Host: %.80s port: %d"), serverHost.toStdString().c_str(), serverPort) + "\n";
@@ -124,7 +118,7 @@ QString CConn::connectionInfo()
   infoText += QString::asprintf(_("(server default %s)"), pfStr) + "\n";
   infoText += QString::asprintf(_("Requested encoding: %s"), encodingName(getPreferredEncoding())) + "\n";
   infoText += QString::asprintf(_("Last used encoding: %s"), encodingName(lastServerEncoding)) + "\n";
-  infoText += QString::asprintf(_("Line speed estimate: %d kbit/s"), (int)(bpsEstimate/1000)) + "\n";
+  infoText += QString::asprintf(_("Line speed estimate: %d kbit/s"), (int)(bpsEstimate / 1000)) + "\n";
   infoText += QString::asprintf(_("Protocol version: %d.%d"), server.majorVersion, server.minorVersion) + "\n";
   infoText += QString::asprintf(_("Security method: %s"), secTypeName(securityType())) + "\n";
 
@@ -151,7 +145,7 @@ int CConn::securityType()
   return csecurity ? csecurity->getType() : -1;
 }
 
-ModifiablePixelBuffer *CConn::framebuffer()
+ModifiablePixelBuffer* CConn::framebuffer()
 {
   return getFramebuffer();
 }
@@ -200,7 +194,7 @@ void CConn::initDone()
 }
 
 // setName() is called when the desktop name changes
-void CConn::setName(const char* name)
+void CConn::setName(char const* name)
 {
   CConnection::setName(name);
   AppManager::instance()->setWindowName(name);
@@ -230,7 +224,7 @@ void CConn::framebufferUpdateStart()
 void CConn::framebufferUpdateEnd()
 {
   unsigned long long elapsed, bps, weight;
-  struct timeval now;
+  struct timeval     now;
 
   CConnection::framebufferUpdateEnd();
 
@@ -242,16 +236,13 @@ void CConn::framebufferUpdateEnd()
   elapsed += now.tv_usec - updateStartTime.tv_usec;
   if (elapsed == 0)
     elapsed = 1;
-  bps = (unsigned long long)(getInStream()->pos() -
-                             updateStartPos) * 8 *
-                            1000000 / elapsed;
+  bps = (unsigned long long)(getInStream()->pos() - updateStartPos) * 8 * 1000000 / elapsed;
   // Allow this update to influence things more the longer it took, to a
   // maximum of 20% of the new value.
   weight = elapsed * 1000 / bpsEstimateWindow;
   if (weight > 200000)
     weight = 200000;
-  bpsEstimate = ((bpsEstimate * (1000000 - weight)) +
-                 (bps * weight)) / 1000000;
+  bpsEstimate = ((bpsEstimate * (1000000 - weight)) + (bps * weight)) / 1000000;
 
   facade->updateTimer()->stop();
   emit facade->refreshFramebufferEnded();
@@ -263,7 +254,7 @@ void CConn::framebufferUpdateEnd()
 
 // The rest of the callbacks are fairly self-explanatory...
 
-void CConn::setColourMapEntries(int firstColour, int nColours, uint16_t *rgbs)
+void CConn::setColourMapEntries(int firstColour, int nColours, uint16_t* rgbs)
 {
   Q_UNUSED(firstColour)
   Q_UNUSED(nColours)
@@ -276,7 +267,7 @@ void CConn::bell()
   emit facade->bellRequested();
 }
 
-bool CConn::dataRect(const Rect& r, int encoding)
+bool CConn::dataRect(Rect const& r, int encoding)
 {
   bool ret;
 
@@ -291,42 +282,36 @@ bool CConn::dataRect(const Rect& r, int encoding)
   return ret;
 }
 
-void CConn::setCursor(int width, int height, const Point &hotspot,
-                      const uint8_t *data)
+void CConn::setCursor(int width, int height, Point const& hotspot, uint8_t const* data)
 {
   bool emptyCursor = true;
-  for (int i = 0; i < width * height; i++) {
-    if (data[i*4 + 3] != 0) {
+  for (int i = 0; i < width * height; i++)
+  {
+    if (data[i * 4 + 3] != 0)
+    {
       emptyCursor = false;
       break;
     }
   }
-  if (emptyCursor) {
-    if (ViewerConfig::config()->dotWhenNoCursor()) {
-      static const char * dotcursor_xpm[] = {
-        "5 5 2 1",
-        ".	c #000000",
-        " 	c #FFFFFF",
-        "     ",
-        " ... ",
-        " ... ",
-        " ... ",
-        "     "};
+  if (emptyCursor)
+  {
+    if (ViewerConfig::config()->dotWhenNoCursor())
+    {
+      static char const* dotcursor_xpm[] =
+          {"5 5 2 1", ".	c #000000", " 	c #FFFFFF", "     ", " ... ", " ... ", " ... ", "     "};
       delete cursor;
       cursor = new QCursor(QPixmap(dotcursor_xpm), 2, 2);
     }
-    else {
-      static const char * emptycursor_xpm[] = {
-        "2 2 1 1",
-        ".	c None",
-        "..",
-        ".."};
+    else
+    {
+      static char const* emptycursor_xpm[] = {"2 2 1 1", ".	c None", "..", ".."};
       delete cursor;
       cursor = new QCursor(QPixmap(emptycursor_xpm), 0, 0);
     }
   }
-  else {
-    //qDebug() << "QVNCConnection::setCursor: w=" << width << ", h=" << height << ", data=" << data;
+  else
+  {
+    // qDebug() << "QVNCConnection::setCursor: w=" << width << ", h=" << height << ", data=" << data;
     QImage image(data, width, height, QImage::Format_RGBA8888);
     delete cursor;
     cursor = new QCursor(QPixmap::fromImage(image), hotspot.x, hotspot.y);
@@ -334,16 +319,17 @@ void CConn::setCursor(int width, int height, const Point &hotspot,
   emit facade->cursorChanged(*cursor);
 }
 
-void CConn::setCursorPos(const Point &pos)
+void CConn::setCursorPos(Point const& pos)
 {
   emit facade->cursorPositionChanged(pos.x, pos.y);
 }
 
-void CConn::fence(uint32_t flags, unsigned len, const char data[])
+void CConn::fence(uint32_t flags, unsigned len, char const data[])
 {
   CMsgHandler::fence(flags, len, data);
 
-  if (flags & fenceFlagRequest) {
+  if (flags & fenceFlagRequest)
+  {
     // We handle everything synchronously so we trivially honor these modes
     flags = flags & (fenceFlagBlockBefore | fenceFlagBlockAfter);
 
@@ -354,7 +340,7 @@ void CConn::fence(uint32_t flags, unsigned len, const char data[])
 
 void CConn::setLEDState(unsigned int state)
 {
-//  qDebug() << "QVNCConnection::setLEDState";
+  //  qDebug() << "QVNCConnection::setLEDState";
   vlog.debug("Got server LED state: 0x%08x", state);
   CConnection::setLEDState(state);
 
@@ -372,18 +358,17 @@ void CConn::handleClipboardAnnounce(bool available)
   requestClipboard();
 }
 
-void CConn::handleClipboardData(const char* data)
+void CConn::handleClipboardData(char const* data)
 {
   emit facade->clipboardDataReceived(data);
 }
-
 
 ////////////////////// Internal methods //////////////////////
 
 void CConn::resizeFramebuffer()
 {
-  //qDebug() << "QVNCConnection::resizeFramebuffer(): width=" << server.width() << ",height=" << server.height();
-  PlatformPixelBuffer *framebuffer = new PlatformPixelBuffer(server.width(), server.height());
+  // qDebug() << "QVNCConnection::resizeFramebuffer(): width=" << server.width() << ",height=" << server.height();
+  PlatformPixelBuffer* framebuffer = new PlatformPixelBuffer(server.width(), server.height());
   setFramebuffer(framebuffer);
 
   emit facade->framebufferResized(server.width(), server.height());
@@ -406,28 +391,30 @@ void CConn::resizeFramebuffer()
 //
 void CConn::autoSelectFormatAndEncoding()
 {
-  //qDebug() << "QVNCConnection::autoSelectFormatAndEncoding";
+  // qDebug() << "QVNCConnection::autoSelectFormatAndEncoding";
 
   // Always use Tight
   setPreferredEncoding(encodingTight);
 
   // Select appropriate quality level
-  if (!ViewerConfig::config()->noJpeg()) {
+  if (!ViewerConfig::config()->noJpeg())
+  {
     int newQualityLevel;
     if (bpsEstimate > 16000000)
       newQualityLevel = 8;
     else
       newQualityLevel = 6;
 
-    if (newQualityLevel != ViewerConfig::config()->qualityLevel()) {
-      vlog.info(_("Throughput %d kbit/s - changing to quality %d"),
-                (int)(bpsEstimate/1000), newQualityLevel);
+    if (newQualityLevel != ViewerConfig::config()->qualityLevel())
+    {
+      vlog.info(_("Throughput %d kbit/s - changing to quality %d"), (int)(bpsEstimate / 1000), newQualityLevel);
       ViewerConfig::config()->setQualityLevel(newQualityLevel);
       setQualityLevel(newQualityLevel);
     }
   }
 
-  if (server.beforeVersion(3, 8)) {
+  if (server.beforeVersion(3, 8))
+  {
     // Xvnc from TightVNC 1.2.9 sends out FramebufferUpdates with
     // cursors "asynchronously". If this happens in the middle of a
     // pixel format change, the server will encode the cursor with
@@ -437,19 +424,18 @@ void CConn::autoSelectFormatAndEncoding()
     // old servers.
     return;
   }
-  
+
   // Select best color level
   bool newFullColour = (bpsEstimate > 256000);
-  if (newFullColour != ViewerConfig::config()->fullColour()) {
+  if (newFullColour != ViewerConfig::config()->fullColour())
+  {
     if (newFullColour)
-      vlog.info(_("Throughput %d kbit/s - full color is now enabled"),
-                (int)(bpsEstimate/1000));
+      vlog.info(_("Throughput %d kbit/s - full color is now enabled"), (int)(bpsEstimate / 1000));
     else
-      vlog.info(_("Throughput %d kbit/s - full color is now disabled"),
-                (int)(bpsEstimate/1000));
+      vlog.info(_("Throughput %d kbit/s - full color is now disabled"), (int)(bpsEstimate / 1000));
     ViewerConfig::config()->setFullColour(newFullColour);
     updatePixelFormat();
-  } 
+  }
 }
 
 // requestNewUpdate() requests an update from the server, having set the
@@ -458,22 +444,27 @@ void CConn::updatePixelFormat()
 {
   PixelFormat pf;
 
-  if (ViewerConfig::config()->fullColour()) {
+  if (ViewerConfig::config()->fullColour())
+  {
     pf = *fullColourPF;
   }
-  else {
-    if (ViewerConfig::config()->lowColourLevel() == 0) {
+  else
+  {
+    if (ViewerConfig::config()->lowColourLevel() == 0)
+    {
       pf = verylowColourPF;
     }
-    else if (ViewerConfig::config()->lowColourLevel() == 1) {
+    else if (ViewerConfig::config()->lowColourLevel() == 1)
+    {
       pf = lowColourPF;
     }
-    else {
+    else
+    {
       pf = mediumColourPF;
     }
   }
   char str[256];
   pf.print(str, 256);
-  vlog.info(_("Using pixel format %s"),str);
+  vlog.info(_("Using pixel format %s"), str);
   setPF(pf);
 }

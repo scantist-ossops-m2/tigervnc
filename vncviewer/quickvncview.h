@@ -21,6 +21,9 @@ public:
   void fullscreenOnSelectedDisplays(int vx, int vy, int vwidth, int vheight);
   void exitFullscreen();
 
+protected:
+  void hideEvent(QHideEvent* event);
+
 private:
   int      fxmin_ = 0;
   int      fymin_ = 0;

@@ -334,3 +334,9 @@ void QuickVNCView::exitFullscreen()
   }
   showNormal();
 }
+
+void QuickVNCView::hideEvent(QHideEvent* event)
+{
+  qDebug() << "QuickVNCView::hideEvent";
+  AppManager::instance()->resetConnection();
+}

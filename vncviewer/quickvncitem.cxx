@@ -119,6 +119,11 @@ QuickVNCItem::QuickVNCItem(QQuickItem* parent) : QQuickItem(parent)
       Qt::QueuedConnection);
 }
 
+QuickVNCItem::~QuickVNCItem()
+{
+  qDebug() << "~QuickVNCItem";
+}
+
 QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* updatePaintNodeData)
 {
   if (framebuffer_)

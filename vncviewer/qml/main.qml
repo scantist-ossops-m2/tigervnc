@@ -10,8 +10,7 @@ Item {
     Component.onCompleted: {
         if (Config.serverName.length > 0) {
             AppManager.connectToServer(Config.serverName)
-        }
-        else {
+        } else {
             serverDialog.visible = true
         }
     }
@@ -20,7 +19,8 @@ Item {
         target: AppManager
         function onErrorOcurred(seq, message, quit) {
             alertDialog.text = message
-            alertDialog.quit = quit
+            alertDialog.quit = !serverDialog.visible
+            alertDialog.showClose = quit
             alertDialog.open()
         }
 
@@ -29,15 +29,15 @@ Item {
         }
 
         function onInfoDialogRequested() {
-            infoDialog.open();
+            infoDialog.open()
         }
 
         function onOptionDialogRequested() {
-            optionDialog.open();
+            optionDialog.open()
         }
 
         function onAboutDialogRequested() {
-            aboutDialog.open();
+            aboutDialog.open()
         }
 
         function onMessageDialogRequested(flags, title, text) {

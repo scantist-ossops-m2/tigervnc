@@ -5,8 +5,9 @@ import Qt.TigerVNC 1.0
 
 GridLayout {
     id: container
-    
+
     property bool quit: false
+    property bool showClose: false
     property alias text: messageText.text
 
     rows: 2
@@ -14,7 +15,7 @@ GridLayout {
     rowSpacing: 0
     columnSpacing: 0
 
-    signal closeRequested()
+    signal closeRequested
 
     function close() {
         closeRequested()
@@ -64,14 +65,14 @@ GridLayout {
         Button {
             id: noButton
             width: 72
-            visible: Config.reconnectOnError && !quit
+            visible: Config.reconnectOnError && !showClose
             text: qsTr("No")
             onClicked: close()
         }
         Button {
             id: yesButton
             width: 72
-            visible: Config.reconnectOnError && !quit
+            visible: Config.reconnectOnError && !showClose
             focus: true
             text: qsTr("Yes")
             onClicked: reconnect()
@@ -79,7 +80,7 @@ GridLayout {
         Button {
             id: closeButton
             width: 72
-            visible: !Config.reconnectOnError || quit
+            visible: !Config.reconnectOnError || showClose
             focus: true
             text: qsTr("Close")
             onClicked: close()

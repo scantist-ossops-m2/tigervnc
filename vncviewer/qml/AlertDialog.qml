@@ -9,6 +9,7 @@ Window {
 
     objectName: "AlertDialog"
     property alias quit: container.quit
+    property alias showClose: container.showClose
     property alias text: container.text
 
     width: container.implicitWidth
@@ -24,7 +25,7 @@ Window {
     function close() {
         visible = false
     }
-    
+
     AlertDialogContent {
         id: container
         onCloseRequested: root.close()

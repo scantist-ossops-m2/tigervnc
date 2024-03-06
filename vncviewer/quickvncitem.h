@@ -20,6 +20,7 @@ class QuickVNCItem : public QQuickItem
 
 public:
   QuickVNCItem(QQuickItem* parent = nullptr);
+  ~QuickVNCItem();
   QSGNode* updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* updatePaintNodeData);
 
   bool contextMenuVisible() const;
