@@ -57,6 +57,7 @@ int main(int argc, char* argv[])
   app.setOrganizationName("TigerVNC Team");
   app.setOrganizationDomain("tigervnc.org");
   app.setApplicationName("TigerVNC Viewer");
+  app.setWindowIcon(QIcon(":/tigervnc.ico"));
 
   QQmlApplicationEngine engine;
 

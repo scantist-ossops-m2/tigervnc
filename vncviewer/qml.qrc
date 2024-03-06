@@ -19,5 +19,6 @@
         <file>qml/ContextMenu.qml</file>
         <file alias="insecure.svg">../media/insecure.svg</file>
         <file alias="secure.svg">../media/secure.svg</file>
+        <file alias="tigervnc.ico">../media/icons/tigervnc.ico</file>
     </qresource>
 </RCC>
