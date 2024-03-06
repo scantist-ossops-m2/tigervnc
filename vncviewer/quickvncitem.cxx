@@ -379,7 +379,8 @@ void QuickVNCItem::filterPointerEvent(rfb::Point const& pos, int mask)
   }
   else
   {
-    mousePointerTimer_.start();
+    if (!mousePointerTimer_.isActive())
+      mousePointerTimer_.start();
   }
 }
 
@@ -391,6 +392,7 @@ void QuickVNCItem::hoverMoveEvent(QHoverEvent* event)
 
 void QuickVNCItem::mouseMoveEvent(QMouseEvent* event)
 {
+  // qDebug() << "QuickVNCItem::mousePressEvent" << event->x() << event->y();
   grabPointer();
   int x, y, buttonMask, wheelMask;
   getMouseProperties(event, x, y, buttonMask, wheelMask);
