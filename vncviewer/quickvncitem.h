@@ -6,13 +6,14 @@
 #include "PlatformPixelBuffer.h"
 
 #include <QImage>
+#include <QOpenGLFunctions>
 #include <QQuickItem>
 #include <QTimer>
 
 struct _XDisplay;
 class QSGTexture;
 
-class QuickVNCItem : public QQuickItem
+class QuickVNCItem : public QQuickItem, protected QOpenGLFunctions
 {
   Q_OBJECT
   Q_PROPERTY(bool contextMenuVisible READ contextMenuVisible WRITE setContextMenuVisible NOTIFY

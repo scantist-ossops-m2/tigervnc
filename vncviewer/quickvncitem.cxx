@@ -126,14 +126,36 @@ QuickVNCItem::~QuickVNCItem()
 
 QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* updatePaintNodeData)
 {
-  if (framebuffer_)
-  {
-    image_  = framebuffer_->image();
-    texture = window()->createTextureFromImage(image_, QQuickWindow::TextureIsOpaque);
-  }
-
   if (texture)
   {
+    glBindTexture(GL_TEXTURE_2D, texture->textureId());
+    glTexSubImage2D(GL_TEXTURE_2D,
+                    0,
+                    rect_.x(),
+                    rect_.y(),
+                    rect_.width(),
+                    rect_.height(),
+                    GL_BGRA,
+                    GL_UNSIGNED_BYTE,
+                    image_.constBits());
+    // glTexImage2D(GL_TEXTURE_2D,
+    //              0,
+    //              GL_RGBA,
+    //              image_.width(),
+    //              image_.height(),
+    //              0,
+    //              GL_BGRA,
+    //              GL_UNSIGNED_BYTE,
+    //              image_.constBits());
+
+    oldNode->markDirty(QSGNode::DirtyForceUpdate);
+    return oldNode;
+  }
+  else
+  {
+    if (rect_.isEmpty())
+      return oldNode;
+
     auto node = dynamic_cast<QSGSimpleTextureNode*>(oldNode);
 
     if (!node)
@@ -141,15 +163,14 @@ QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaint
       node = new QSGSimpleTextureNode();
     }
 
+    initializeOpenGLFunctions();
+    texture = window()->createTextureFromImage(image_, QQuickWindow::TextureIsOpaque);
     node->setOwnsTexture(true);
     node->setRect(image_.rect());
     node->markDirty(QSGNode::DirtyForceUpdate);
     node->setTexture(texture);
+
     return node;
-  }
-  else
-  {
-    return oldNode;
   }
 }
 
@@ -224,6 +245,7 @@ void QuickVNCItem::updateWindow()
   rect_            = QRect{x, y, x + width, y + height};
   if (!rect_.isEmpty())
   {
+    image_ = framebuffer_->image().copy(rect_).convertToFormat(QImage::Format_ARGB32_Premultiplied);
     update();
     // qDebug() << QDateTime::currentDateTimeUtc() << "QuickVNCItem::updateWindow" << rect_ << image_.rect();
   }
