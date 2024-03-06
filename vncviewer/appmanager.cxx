@@ -70,6 +70,13 @@ void AppManager::setIsFullscreen(bool newIsFullscreen)
     connectionView_->fullscreen(isFullscreen());
 }
 
+void AppManager::setRemoteViewSize(int w, int h)
+{
+  remoteViewWidth_  = w;
+  remoteViewHeight_ = h;
+  emit remoteViewSizeChanged(remoteViewWidth_, remoteViewHeight_);
+}
+
 void AppManager::toggleFullscreen()
 {
   setIsFullscreen(!isFullscreen());
@@ -137,9 +144,7 @@ void AppManager::openVNCWindow(int width, int height, QString name)
 {
   connectionView_ = new QuickVNCView(qmlEngine_);
   connectionView_->resize(width, height);
-  remoteViewWidth_  = width;
-  remoteViewHeight_ = height;
-  emit remoteViewSizeChanged(remoteViewWidth_, remoteViewHeight_);
+  setRemoteViewSize(width, height);
   connectionView_->setTitle(QString::asprintf(_("%s - TigerVNC"), name.toStdString().c_str()));
   connectionView_->show();
 

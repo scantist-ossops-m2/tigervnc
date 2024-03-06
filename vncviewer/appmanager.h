@@ -56,6 +56,7 @@ public:
 
   bool isFullscreen() const;
   void setIsFullscreen(bool newIsFullscreen);
+  void setRemoteViewSize(int w, int h);
 
 signals:
   void errorOcurred(int seq, QString message, bool quit = false);

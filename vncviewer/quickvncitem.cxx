@@ -190,8 +190,6 @@ QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaint
 
 void QuickVNCItem::updateWindow()
 {
-  // qDebug() << /*QDateTime::currentDateTimeUtc() << */ "QuickVNCItem::updateWindow"
-  //          << "BEGIN";
   framebuffer_ = (PlatformPixelBuffer*)AppManager::instance()->connection()->framebuffer();
   if (!framebuffer_)
     return;
@@ -202,8 +200,7 @@ void QuickVNCItem::updateWindow()
   int       width  = r.br.x - x;
   int       height = r.br.y - y;
   QRect     rect   = QRect{x, y, x + width, y + height};
-  // qDebug() << "QuickVNCItem::updateWindow"
-  //          << "rect" << rect;
+
   if (rect.isEmpty())
     rect = image_.rect();
 
@@ -212,10 +209,11 @@ void QuickVNCItem::updateWindow()
   else
     rect_ = rect_.united(rect);
 
+  if (boundingRect() != image_.rect())
+    AppManager::instance()->setRemoteViewSize(image_.width(), image_.height());
+
   image_ = framebuffer_->image();
   update();
-  // qDebug() << /*QDateTime::currentDateTimeUtc() << */ "QuickVNCItem::updateWindow"
-  //          << "rect_" << rect_;
 }
 
 void QuickVNCItem::bell()
