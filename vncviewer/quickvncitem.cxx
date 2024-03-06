@@ -212,7 +212,10 @@ void QuickVNCItem::ctrlAltDel()
 
 void QuickVNCItem::updateWindow()
 {
-  framebuffer_     = (PlatformPixelBuffer*)AppManager::instance()->connection()->framebuffer();
+  framebuffer_ = (PlatformPixelBuffer*)AppManager::instance()->connection()->framebuffer();
+  if (!framebuffer_)
+    return;
+
   rfb::Rect r      = framebuffer_->getDamage();
   int       x      = r.tl.x;
   int       y      = r.tl.y;

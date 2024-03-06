@@ -79,7 +79,10 @@ public:
 
   rfb::ModifiablePixelBuffer* framebuffer()
   {
-    return rfbcon_->framebuffer();
+    if (rfbcon_)
+      return rfbcon_->framebuffer();
+    else
+      return nullptr;
   }
 
   void setCompressLevel(int level)
