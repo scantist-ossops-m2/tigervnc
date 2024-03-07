@@ -22,7 +22,9 @@ public:
   void exitFullscreen();
 
 protected:
+  void showEvent(QShowEvent* event);
   void hideEvent(QHideEvent* event);
+  void resizeEvent(QResizeEvent* event);
 
 private:
   int      fxmin_ = 0;

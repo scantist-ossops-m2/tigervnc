@@ -142,6 +142,7 @@ void AppManager::publishError(QString const message, bool quit)
 
 void AppManager::openVNCWindow(int width, int height, QString name)
 {
+  qDebug() << "AppManager::openVNCWindow" << width << height;
   connectionView_ = new QuickVNCView(qmlEngine_);
   connectionView_->resize(width, height);
   setRemoteViewSize(width, height);

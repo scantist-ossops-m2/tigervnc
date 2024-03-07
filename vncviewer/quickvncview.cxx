@@ -335,8 +335,21 @@ void QuickVNCView::exitFullscreen()
   showNormal();
 }
 
+void QuickVNCView::showEvent(QShowEvent* event)
+{
+  qDebug() << "QuickVNCView::showEvent" << size();
+  QQuickView::showEvent(event);
+}
+
 void QuickVNCView::hideEvent(QHideEvent* event)
 {
   qDebug() << "QuickVNCView::hideEvent";
   AppManager::instance()->resetConnection();
+  QQuickView::hideEvent(event);
+}
+
+void QuickVNCView::resizeEvent(QResizeEvent* event)
+{
+  qDebug() << "QuickVNCView::resizeEvent" << event->size() << event->spontaneous();
+  QQuickView::resizeEvent(event);
 }

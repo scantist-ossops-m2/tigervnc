@@ -20,13 +20,13 @@
 #include <config.h>
 #endif
 
-#include <stdio.h>
-
 #include "Surface.h"
+
+#include <stdio.h>
 
 Surface::Surface(int width, int height) : w(width), h(height), refs(1)
 {
-    data.resize(w * h * 4);
+  data.resize(w * h * 4);
 }
 
 Surface::~Surface()
@@ -35,16 +35,16 @@ Surface::~Surface()
 
 void Surface::attach()
 {
-    refs++;
-    fprintf(stderr, "%p + %d\n", framebuffer(), (int)refs);
+  refs++;
+  // fprintf(stderr, "%p + %d\n", framebuffer(), (int)refs);
 }
 
 void Surface::detach()
 {
-    refs--;
-    fprintf(stderr, "%p - %d\n", framebuffer(), (int)refs);
-    if (refs > 0)
-        return;
-    fprintf(stderr, "%p XXX\n", framebuffer());
-    delete this;
+  refs--;
+  // fprintf(stderr, "%p - %d\n", framebuffer(), (int)refs);
+  if (refs > 0)
+    return;
+  fprintf(stderr, "%p XXX\n", framebuffer());
+  delete this;
 }
