@@ -6,6 +6,7 @@
 #include "parameters.h"
 #include "rdr/Exception.h"
 #include "rfb/LogWriter.h"
+#include "rfb/util.h"
 
 #include <QAbstractEventDispatcher>
 #include <QAbstractNativeEventFilter>
@@ -31,7 +32,7 @@
 
 static rfb::LogWriter vlog("QuickVNCItem");
 
-QuickVNCItem::QuickVNCItem(QQuickItem* parent) : QQuickItem(parent)
+QuickVNCItem::QuickVNCItem(QQuickItem* parent) : QQuickItem(parent), fpsTimer(this)
 {
   setFlag(QQuickItem::ItemHasContents, true);
   setAcceptHoverEvents(true);
@@ -118,7 +119,8 @@ QuickVNCItem::QuickVNCItem(QQuickItem* parent) : QQuickItem(parent)
       },
       Qt::QueuedConnection);
 
-  qDebug() << "QuickVNCItem";
+  gettimeofday(&fpsLast, NULL);
+  fpsTimer.start(5000);
 }
 
 QuickVNCItem::~QuickVNCItem()
@@ -133,27 +135,30 @@ QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaint
     if (rect_.isEmpty())
       return oldNode;
 
+    fpsCounter++;
+
     auto node = dynamic_cast<QSGSimpleTextureNode*>(oldNode);
 
     if (node->rect() == image_.rect())
     {
-      QOpenGLContext *glContext = QOpenGLContext::currentContext();
+      QOpenGLContext* glContext = QOpenGLContext::currentContext();
 
-      if (glContext) {
-        QOpenGLFunctions *glFuncs = glContext->functions();
+      if (glContext)
+      {
+        QOpenGLFunctions* glFuncs = glContext->functions();
         assert(glFuncs);
 
         texture->bind();
         glFuncs->glPixelStorei(GL_UNPACK_ROW_LENGTH, image_.bytesPerLine() / 4);
         glFuncs->glTexSubImage2D(GL_TEXTURE_2D,
-                                0,
-                                rect_.x(),
-                                rect_.y(),
-                                rect_.width(),
-                                rect_.height(),
-                                GL_BGRA,
-                                GL_UNSIGNED_BYTE,
-                                image_.constScanLine(rect_.y()) + rect_.x() * 4);
+                                 0,
+                                 rect_.x(),
+                                 rect_.y(),
+                                 rect_.width(),
+                                 rect_.height(),
+                                 GL_BGRA,
+                                 GL_UNSIGNED_BYTE,
+                                 image_.constScanLine(rect_.y()) + rect_.x() * 4);
         glFuncs->glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
         // glFuncs->glTexImage2D(GL_TEXTURE_2D,
         //                       0,
@@ -164,7 +169,9 @@ QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaint
         //                       GL_BGRA,
         //                       GL_UNSIGNED_BYTE,
         //                       image_.constBits());
-      } else {
+      }
+      else
+      {
         texture = window()->createTextureFromImage(image_, QQuickWindow::TextureIsOpaque);
         node->setOwnsTexture(true);
         node->setTexture(texture);
@@ -224,6 +231,25 @@ void QuickVNCItem::updateWindow()
 
   image_ = framebuffer_->image();
   update();
+}
+
+bool QuickVNCItem::handleTimeout(rfb::Timer* t)
+{
+  struct timeval now;
+  int            count;
+
+  gettimeofday(&now, NULL);
+  count = fpsCounter;
+
+  vlog.info("%d frames in %g seconds = %g FPS",
+            count,
+            rfb::msSince(&fpsLast) / 1000.0,
+            count * 1000.0 / rfb::msSince(&fpsLast));
+
+  fpsCounter -= count;
+  fpsLast = now;
+
+  return true;
 }
 
 void QuickVNCItem::bell()

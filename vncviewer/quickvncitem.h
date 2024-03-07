@@ -5,6 +5,8 @@
 #include "EmulateMB.h"
 #include "PlatformPixelBuffer.h"
 
+#include <rfb/Timer.h>
+
 #include <QImage>
 #include <QOpenGLFunctions>
 #include <QQuickItem>
@@ -13,7 +15,7 @@
 struct _XDisplay;
 class QSGTexture;
 
-class QuickVNCItem : public QQuickItem
+class QuickVNCItem : public QQuickItem, public rfb::Timer::Callback
 {
   Q_OBJECT
   Q_PROPERTY(bool contextMenuVisible READ contextMenuVisible WRITE setContextMenuVisible NOTIFY
@@ -64,6 +66,8 @@ protected:
 private:
   void updateWindow();
 
+  virtual bool handleTimeout(rfb::Timer* t);
+
   bool                 firstUpdate_ = true;
   PlatformPixelBuffer* framebuffer_ = nullptr;
   QRect                rect_;
@@ -79,6 +83,10 @@ private:
   EmulateMB* mbemu_ = new EmulateMB(&mouseButtonEmulationTimer_);
 
   BaseKeyboardHandler* keyboardHandler_ = nullptr;
+
+  QAtomicInt fpsCounter;
+  struct timeval fpsLast;
+  rfb::Timer fpsTimer;
 
 #ifdef Q_OS_LINUX
   _XDisplay* display_;

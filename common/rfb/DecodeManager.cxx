@@ -41,7 +41,7 @@ using namespace rfb;
 static LogWriter vlog("DecodeManager");
 
 DecodeManager::DecodeManager(CConnection *conn) :
-  conn(conn), threadException(NULL)
+  conn(conn), fpsCounter(0), fpsTimer(this), threadException(NULL)
 {
   size_t cpuCount;
 
@@ -75,6 +75,9 @@ DecodeManager::DecodeManager(CConnection *conn) :
 
     threads.push_back(new DecodeThread(this));
   }
+
+  gettimeofday(&fpsLast, NULL);
+  fpsTimer.start(5000);
 }
 
 DecodeManager::~DecodeManager()
@@ -199,6 +202,8 @@ void DecodeManager::flush()
 
   queueMutex->unlock();
 
+  fpsCounter++;
+
   throwThreadException();
 }
 
@@ -241,6 +246,22 @@ void DecodeManager::logStats()
             siPrefix(pixels, "pixels").c_str());
   vlog.info("         %s (1:%g ratio)",
             iecPrefix(bytes, "B").c_str(), ratio);
+}
+
+bool DecodeManager::handleTimeout(Timer* t)
+{
+  struct timeval now;
+
+  gettimeofday(&now, NULL);
+
+  vlog.info("%d frames in %g seconds = %g FPS", fpsCounter,
+            msSince(&fpsLast) / 1000.0,
+            fpsCounter * 1000.0 / msSince(&fpsLast));
+
+  fpsCounter = 0;
+  fpsLast = now;
+
+  return true;
 }
 
 void DecodeManager::setThreadException(const rdr::Exception& e)

@@ -24,6 +24,7 @@
 #include <os/Thread.h>
 
 #include <rfb/Region.h>
+#include <rfb/Timer.h>
 #include <rfb/encodings.h>
 
 namespace os {
@@ -42,7 +43,7 @@ namespace rfb {
   class ModifiablePixelBuffer;
   struct Rect;
 
-  class DecodeManager {
+  class DecodeManager : public Timer::Callback {
   public:
     DecodeManager(CConnection *conn);
     ~DecodeManager();
@@ -54,6 +55,8 @@ namespace rfb {
 
   private:
     void logStats();
+
+    virtual bool handleTimeout(Timer* t);
 
     void setThreadException(const rdr::Exception& e);
     void throwThreadException();
@@ -70,6 +73,10 @@ namespace rfb {
     };
 
     DecoderStats stats[encodingMax+1];
+
+    int fpsCounter;
+    struct timeval fpsLast;
+    Timer fpsTimer;
 
     struct QueueEntry {
       bool active;
