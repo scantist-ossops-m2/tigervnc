@@ -318,6 +318,7 @@ void QuickVNCView::fullscreenOnSelectedDisplay(QScreen* screen)
 {
   qDebug() << "QuickVNCView::fullscreenOnSelectedDisplay" << screen->geometry();
   setScreen(screen);
+  show();
   setX(screen->geometry().x());
   setY(screen->geometry().y());
   resize(screen->geometry().size());
