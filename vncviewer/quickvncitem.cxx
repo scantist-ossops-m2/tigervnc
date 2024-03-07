@@ -199,7 +199,7 @@ void QuickVNCItem::updateWindow()
   int       y      = r.tl.y;
   int       width  = r.br.x - x;
   int       height = r.br.y - y;
-  QRect     rect   = QRect{x, y, x + width, y + height};
+  QRect     rect   = QRect{x, y, width, height};
 
   if (rect.isEmpty())
     rect = image_.rect();
