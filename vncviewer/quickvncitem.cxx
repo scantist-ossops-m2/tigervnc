@@ -138,31 +138,38 @@ QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaint
     if (node->rect() == image_.rect())
     {
       QOpenGLContext *glContext = QOpenGLContext::currentContext();
-      assert(glContext);
-      QOpenGLFunctions *glFuncs = glContext->functions();
-      assert(glFuncs);
 
-      texture->bind();
-      glFuncs->glPixelStorei(GL_UNPACK_ROW_LENGTH, image_.bytesPerLine() / 4);
-      glFuncs->glTexSubImage2D(GL_TEXTURE_2D,
-                               0,
-                               rect_.x(),
-                               rect_.y(),
-                               rect_.width(),
-                               rect_.height(),
-                               GL_BGRA,
-                               GL_UNSIGNED_BYTE,
-                               image_.constScanLine(rect_.y()) + rect_.x() * 4);
-      glFuncs->glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-      // glFuncs->glTexImage2D(GL_TEXTURE_2D,
-      //                       0,
-      //                       GL_RGBA,
-      //                       image_.width(),
-      //                       image_.height(),
-      //                       0,
-      //                       GL_BGRA,
-      //                       GL_UNSIGNED_BYTE,
-      //                       image_.constBits());
+      if (glContext) {
+        QOpenGLFunctions *glFuncs = glContext->functions();
+        assert(glFuncs);
+
+        texture->bind();
+        glFuncs->glPixelStorei(GL_UNPACK_ROW_LENGTH, image_.bytesPerLine() / 4);
+        glFuncs->glTexSubImage2D(GL_TEXTURE_2D,
+                                0,
+                                rect_.x(),
+                                rect_.y(),
+                                rect_.width(),
+                                rect_.height(),
+                                GL_BGRA,
+                                GL_UNSIGNED_BYTE,
+                                image_.constScanLine(rect_.y()) + rect_.x() * 4);
+        glFuncs->glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+        // glFuncs->glTexImage2D(GL_TEXTURE_2D,
+        //                       0,
+        //                       GL_RGBA,
+        //                       image_.width(),
+        //                       image_.height(),
+        //                       0,
+        //                       GL_BGRA,
+        //                       GL_UNSIGNED_BYTE,
+        //                       image_.constBits());
+      } else {
+        texture = window()->createTextureFromImage(image_, QQuickWindow::TextureIsOpaque);
+        node->setOwnsTexture(true);
+        node->setTexture(texture);
+      }
+
       rect_ = QRect();
 
       node->markDirty(QSGNode::DirtyForceUpdate);
