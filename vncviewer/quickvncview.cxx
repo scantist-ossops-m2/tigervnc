@@ -16,6 +16,7 @@ static rfb::LogWriter vlog("QuickVNCView");
 QuickVNCView::QuickVNCView(QQmlEngine* engine, QWindow* parent) : QQuickView(engine, parent)
 {
   setSource(QUrl("qrc:/qml/ConnectionView.qml"));
+  setMinimumSize(QSize(1024, 720));
 }
 
 QuickVNCView::~QuickVNCView()
@@ -239,8 +240,7 @@ void QuickVNCView::fullscreen(bool enabled)
     // cf. DesktopWindow::fullscreen_on()
     if (AppManager::instance()->isFullscreen())
     {
-      previousGeometry_ = geometry();
-      previousScreen_   = screen();
+      previousScreen_ = screen();
     }
 
     auto       mode            = ViewerConfig::config()->fullScreenMode();
@@ -329,7 +329,7 @@ void QuickVNCView::fullscreenOnSelectedDisplay(QScreen* screen)
 void QuickVNCView::fullscreenOnSelectedDisplays(QScreen* screen, int vx, int vy, int vwidth, int vheight)
 {
   qDebug() << "QuickVNCView::fullscreenOnSelectedDisplays" << screen->geometry() << vx << vy << vwidth << vheight;
-  setFlags(flags() | Qt::WindowStaysOnTopHint);
+  setFlag(Qt::WindowStaysOnTopHint, true);
   show();
   setScreen(screen);
   setX(vx);
@@ -342,19 +342,16 @@ void QuickVNCView::fullscreenOnSelectedDisplays(QScreen* screen, int vx, int vy,
 
 void QuickVNCView::exitFullscreen()
 {
-  qDebug() << "QuickVNCView::exitFullscreen" << previousScreen_ << previousGeometry_;
-  setFlags(flags() & ~Qt::WindowStaysOnTopHint);
+  qDebug() << "QuickVNCView::exitFullscreen" << previousScreen_;
+  setFlag(Qt::WindowStaysOnTopHint, false);
   show();
-  setMinimumSize(QSize());
+  setMinimumSize(QSize(1024, 720));
   setMaximumSize(QSize(16777215, 16777215));
-  if (previousScreen_ && !previousGeometry_.isEmpty())
+  if (previousScreen_)
   {
     setScreen(previousScreen_);
-    setGeometry(previousGeometry_);
   }
-  else
-    resize(QSize(AppManager::instance()->remoteViewWidth(), AppManager::instance()->remoteViewHeight()));
-  show();
+  showMaximized();
 }
 
 void QuickVNCView::showEvent(QShowEvent* event)
@@ -374,12 +371,5 @@ void QuickVNCView::resizeEvent(QResizeEvent* event)
 {
   qDebug() << "QuickVNCView::resizeEvent" << event->size() << event->spontaneous();
   qDebug() << "QuickVNCView::resizeEvent" << geometry() << frameGeometry() << screen()->availableGeometry();
-  if (!AppManager::instance()->isFullscreen())
-  {
-    if (frameGeometry().x() < screen()->availableGeometry().x())
-      setX(screen()->availableGeometry().x() - frameGeometry().x());
-    if (frameGeometry().y() < screen()->availableGeometry().y())
-      setY(screen()->availableGeometry().y() - frameGeometry().y());
-  }
   QQuickView::resizeEvent(event);
 }

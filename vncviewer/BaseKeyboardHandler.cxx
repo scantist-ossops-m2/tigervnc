@@ -3,6 +3,8 @@
 #include "appmanager.h"
 #include "parameters.h"
 
+#include <QDebug>
+
 BaseKeyboardHandler::BaseKeyboardHandler(QObject* parent) : QObject(parent)
 {
 }

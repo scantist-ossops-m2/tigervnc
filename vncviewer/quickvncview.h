@@ -27,11 +27,10 @@ protected:
   void resizeEvent(QResizeEvent* event);
 
 private:
-  int      fxmin_ = 0;
-  int      fymin_ = 0;
-  int      fw_    = 0;
-  int      fh_    = 0;
-  QRect    previousGeometry_;
+  int      fxmin_          = 0;
+  int      fymin_          = 0;
+  int      fw_             = 0;
+  int      fh_             = 0;
   QScreen* previousScreen_ = nullptr;
 };
 
