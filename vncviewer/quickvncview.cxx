@@ -3,6 +3,7 @@
 #include "appmanager.h"
 #include "i18n.h"
 #include "parameters.h"
+#include "qstyle.h"
 #include "rfb/LogWriter.h"
 
 #include <QApplication>
@@ -190,7 +191,10 @@ QList<int> QuickVNCView::fullscreenScreens()
 {
   QApplication*   app     = static_cast<QApplication*>(QApplication::instance());
   QList<QScreen*> screens = app->screens();
-  QList<int>      applicableScreens;
+  std::sort(screens.begin(), screens.end(), [](QScreen* a, QScreen* b) {
+    return a->geometry().x() < b->geometry().x() ? true : (a->geometry().y() < b->geometry().y());
+  });
+  QList<int> applicableScreens;
   if (ViewerConfig::config()->fullScreenMode() == ViewerConfig::FSAll)
   {
     for (int i = 0; i < screens.length(); i++)
@@ -227,7 +231,7 @@ QList<int> QuickVNCView::fullscreenScreens()
 
 void QuickVNCView::fullscreen(bool enabled)
 {
-  // qDebug() << "QuickVNCView::fullscreen: enabled=" << enabled;
+  qDebug() << "QuickVNCView::fullscreen: enabled=" << enabled;
   QApplication*   app     = static_cast<QApplication*>(QApplication::instance());
   QList<QScreen*> screens = app->screens();
   if (enabled)
@@ -285,7 +289,7 @@ void QuickVNCView::fullscreen(bool enabled)
       }
       else
       { // Fullscreen on multiple displays.
-        fullscreenOnSelectedDisplays(xmin, ymin, w, h);
+        fullscreenOnSelectedDisplays(selectedPrimaryScreen, xmin, ymin, w, h);
       }
     }
     else
@@ -306,33 +310,51 @@ void QuickVNCView::fullscreen(bool enabled)
 
 void QuickVNCView::fullscreenOnCurrentDisplay()
 {
+  qDebug() << "QuickVNCView::fullscreenOnCurrentDisplay";
   showFullScreen();
 }
 
 void QuickVNCView::fullscreenOnSelectedDisplay(QScreen* screen)
 {
+  qDebug() << "QuickVNCView::fullscreenOnSelectedDisplay" << screen->geometry();
   setScreen(screen);
+  setX(screen->geometry().x());
+  setY(screen->geometry().y());
+  resize(screen->geometry().size());
+  setMinimumSize(screen->geometry().size());
+  setMaximumSize(screen->geometry().size());
   showFullScreen();
 }
 
-void QuickVNCView::fullscreenOnSelectedDisplays(int vx, int vy, int vwidth, int vheight)
+void QuickVNCView::fullscreenOnSelectedDisplays(QScreen* screen, int vx, int vy, int vwidth, int vheight)
 {
-  setFlags(flags() | Qt::BypassWindowManagerHint | Qt::FramelessWindowHint);
+  qDebug() << "QuickVNCView::fullscreenOnSelectedDisplays" << screen->geometry() << vx << vy << vwidth << vheight;
+  setFlags(flags() | Qt::WindowStaysOnTopHint);
+  show();
+  setScreen(screen);
   setX(vx);
   setY(vy);
   resize(vwidth, vheight);
-  showNormal();
+  setMinimumSize({vwidth, vheight});
+  setMaximumSize({vwidth, vheight});
+  show();
 }
 
 void QuickVNCView::exitFullscreen()
 {
-  setFlags(flags() & ~Qt::BypassWindowManagerHint & ~Qt::FramelessWindowHint);
-  if (previousScreen_)
+  qDebug() << "QuickVNCView::exitFullscreen" << previousScreen_ << previousGeometry_;
+  setFlags(flags() & ~Qt::WindowStaysOnTopHint);
+  show();
+  setMinimumSize(QSize());
+  setMaximumSize(QSize(16777215, 16777215));
+  if (previousScreen_ && !previousGeometry_.isEmpty())
   {
     setScreen(previousScreen_);
     setGeometry(previousGeometry_);
   }
-  showNormal();
+  else
+    resize(QSize(AppManager::instance()->remoteViewWidth(), AppManager::instance()->remoteViewHeight()));
+  show();
 }
 
 void QuickVNCView::showEvent(QShowEvent* event)
@@ -351,5 +373,13 @@ void QuickVNCView::hideEvent(QHideEvent* event)
 void QuickVNCView::resizeEvent(QResizeEvent* event)
 {
   qDebug() << "QuickVNCView::resizeEvent" << event->size() << event->spontaneous();
+  qDebug() << "QuickVNCView::resizeEvent" << geometry() << frameGeometry() << screen()->availableGeometry();
+  if (!AppManager::instance()->isFullscreen())
+  {
+    if (frameGeometry().x() < screen()->availableGeometry().x())
+      setX(screen()->availableGeometry().x() - frameGeometry().x());
+    if (frameGeometry().y() < screen()->availableGeometry().y())
+      setY(screen()->availableGeometry().y() - frameGeometry().y());
+  }
   QQuickView::resizeEvent(event);
 }

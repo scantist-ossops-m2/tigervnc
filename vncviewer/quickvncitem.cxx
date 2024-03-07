@@ -117,6 +117,8 @@ QuickVNCItem::QuickVNCItem(QQuickItem* parent) : QQuickItem(parent)
         QAbstractEventDispatcher::instance()->removeNativeEventFilter(keyboardHandler_);
       },
       Qt::QueuedConnection);
+
+  qDebug() << "QuickVNCItem";
 }
 
 QuickVNCItem::~QuickVNCItem()
@@ -438,6 +440,7 @@ void QuickVNCItem::mouseMoveEvent(QMouseEvent* event)
 {
   // qDebug() << "QuickVNCItem::mousePressEvent" << event->x() << event->y();
   grabPointer();
+  keyboardHandler_->maybeGrabKeyboard();
   int x, y, buttonMask, wheelMask;
   getMouseProperties(event, x, y, buttonMask, wheelMask);
   filterPointerEvent(rfb::Point(x, y), buttonMask | wheelMask);
@@ -458,10 +461,8 @@ void QuickVNCItem::mousePressEvent(QMouseEvent* event)
   getMouseProperties(event, x, y, buttonMask, wheelMask);
   filterPointerEvent(rfb::Point(x, y), buttonMask);
 
-  if (!mouseGrabbed_)
-  {
-    grabPointer();
-  }
+  grabPointer();
+  keyboardHandler_->maybeGrabKeyboard();
 }
 
 void QuickVNCItem::mouseReleaseEvent(QMouseEvent* event)
@@ -479,10 +480,8 @@ void QuickVNCItem::mouseReleaseEvent(QMouseEvent* event)
   getMouseProperties(event, x, y, buttonMask, wheelMask);
   filterPointerEvent(rfb::Point(x, y), buttonMask);
 
-  if (!mouseGrabbed_)
-  {
-    grabPointer();
-  }
+  grabPointer();
+  keyboardHandler_->maybeGrabKeyboard();
 }
 
 void QuickVNCItem::wheelEvent(QWheelEvent* event)

@@ -9,6 +9,7 @@ BaseKeyboardHandler::BaseKeyboardHandler(QObject* parent) : QObject(parent)
 
 void BaseKeyboardHandler::maybeGrabKeyboard()
 {
+  qDebug() << "BaseKeyboardHandler::maybeGrabKeyboard";
   if (ViewerConfig::config()->fullscreenSystemKeys() && AppManager::instance()->isFullscreen())
   {
     grabKeyboard();

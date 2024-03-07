@@ -18,7 +18,7 @@ public:
 
   void fullscreenOnCurrentDisplay();
   void fullscreenOnSelectedDisplay(QScreen* screen);
-  void fullscreenOnSelectedDisplays(int vx, int vy, int vwidth, int vheight);
+  void fullscreenOnSelectedDisplays(QScreen* screen, int vx, int vy, int vwidth, int vheight);
   void exitFullscreen();
 
 protected:

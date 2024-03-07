@@ -11,6 +11,7 @@ class X11KeyboardHandler : public BaseKeyboardHandler
 
 public:
   X11KeyboardHandler(QObject* parent = nullptr);
+  ~X11KeyboardHandler();
 
   bool nativeEventFilter(QByteArray const& eventType, void* message, long*) override;
 
