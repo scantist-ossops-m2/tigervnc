@@ -5,12 +5,11 @@
 #include "EmulateMB.h"
 #include "PlatformPixelBuffer.h"
 
-#include <rfb/Timer.h>
-
 #include <QImage>
 #include <QOpenGLFunctions>
 #include <QQuickItem>
 #include <QTimer>
+#include <rfb/Timer.h>
 
 struct _XDisplay;
 class QSGTexture;
@@ -72,7 +71,6 @@ private:
   PlatformPixelBuffer* framebuffer_ = nullptr;
   QRect                rect_;
   QImage               image_;
-  QSGTexture*          texture = nullptr;
 
   bool       mouseGrabbed_ = false;
   rfb::Point lastPointerPos_;
@@ -84,9 +82,9 @@ private:
 
   BaseKeyboardHandler* keyboardHandler_ = nullptr;
 
-  QAtomicInt fpsCounter;
+  QAtomicInt     fpsCounter;
   struct timeval fpsLast;
-  rfb::Timer fpsTimer;
+  rfb::Timer     fpsTimer;
 
 #ifdef Q_OS_LINUX
   _XDisplay* display_;

@@ -130,82 +130,82 @@ QuickVNCItem::~QuickVNCItem()
 
 QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* updatePaintNodeData)
 {
-  if (texture)
-  {
-    if (rect_.isEmpty())
-      return oldNode;
-
-    fpsCounter++;
-
-    auto node = dynamic_cast<QSGSimpleTextureNode*>(oldNode);
-
-    if (node->rect() == image_.rect())
-    {
-      QOpenGLContext* glContext = QOpenGLContext::currentContext();
-
-      if (glContext)
-      {
-        QOpenGLFunctions* glFuncs = glContext->functions();
-        assert(glFuncs);
-
-        texture->bind();
-        glFuncs->glPixelStorei(GL_UNPACK_ROW_LENGTH, image_.bytesPerLine() / 4);
-        glFuncs->glTexSubImage2D(GL_TEXTURE_2D,
-                                 0,
-                                 rect_.x(),
-                                 rect_.y(),
-                                 rect_.width(),
-                                 rect_.height(),
-                                 GL_BGRA,
-                                 GL_UNSIGNED_BYTE,
-                                 image_.constScanLine(rect_.y()) + rect_.x() * 4);
-        glFuncs->glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-        // glFuncs->glTexImage2D(GL_TEXTURE_2D,
-        //                       0,
-        //                       GL_RGBA,
-        //                       image_.width(),
-        //                       image_.height(),
-        //                       0,
-        //                       GL_BGRA,
-        //                       GL_UNSIGNED_BYTE,
-        //                       image_.constBits());
-      }
-      else
-      {
-        texture = window()->createTextureFromImage(image_, QQuickWindow::TextureIsOpaque);
-        node->setOwnsTexture(true);
-        node->setTexture(texture);
-      }
-
-      rect_ = QRect();
-
-      node->markDirty(QSGNode::DirtyForceUpdate);
-
-      update();
-      return node;
-    }
-  }
-
   if (rect_.isEmpty())
     return oldNode;
 
-  auto node = dynamic_cast<QSGSimpleTextureNode*>(oldNode);
+  int divider = 3;
 
-  if (!node)
+  auto rootNode = oldNode;
+
+  if (boundingRect() != image_.rect())
   {
-    node = new QSGSimpleTextureNode();
+    // rootNode->removeAllChildNodes();
+    delete rootNode;
+    rootNode = nullptr;
   }
 
-  if (texture)
-    texture->deleteLater();
-  texture = window()->createTextureFromImage(image_, QQuickWindow::TextureIsOpaque);
-  node->setOwnsTexture(true);
-  node->setRect(image_.rect());
-  node->markDirty(QSGNode::DirtyForceUpdate);
-  node->setTexture(texture);
-  rect_ = QRect();
+  if (!rootNode)
+  {
+    rootNode = new QSGNode;
+    for (int i = 0; i < divider; ++i)
+    {
+      for (int j = 0; j < divider; ++j)
+      {
+        auto  node = new QSGSimpleTextureNode();
+        QRect r    = image_.rect();
+        r.setTopLeft(QPoint(image_.rect().width() * i / divider, image_.rect().height() * j / divider));
+        r.setBottomRight(QPoint(image_.rect().width() * (i + 1) / divider, image_.rect().height() * (j + 1) / divider));
+        node->setRect(r);
+        rootNode->appendChildNode(node);
+      }
+    }
+  }
 
-  return node;
+  fpsCounter++;
+
+  for (int i = 0; i < divider; ++i)
+  {
+    for (int j = 0; j < divider; ++j)
+    {
+      auto node   = dynamic_cast<QSGSimpleTextureNode*>(rootNode->childAtIndex(i * divider + j));
+      int  width  = image_.rect().width() / divider;
+      int  height = image_.rect().height() / divider;
+      int  x      = i * width;
+      int  y      = j * height;
+
+      if (node->texture())
+      {
+        if (!node->rect().intersects(rect_))
+          continue;
+
+        QOpenGLContext* glContext = QOpenGLContext::currentContext();
+
+        if (glContext)
+        {
+          QOpenGLFunctions* glFuncs = glContext->functions();
+          assert(glFuncs);
+
+          node->texture()->bind();
+          glFuncs->glPixelStorei(GL_UNPACK_ROW_LENGTH, image_.bytesPerLine() / 4);
+          uchar const* data = image_.constScanLine(y) + x * 4;
+          glFuncs->glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_BGRA, GL_UNSIGNED_BYTE, data);
+          glFuncs->glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+        }
+      }
+      else
+      {
+        uchar const* data    = image_.constScanLine(y) + x * 4;
+        auto         texture = window()->createTextureFromImage(QImage(data, width, height, image_.format()),
+                                                        QQuickWindow::TextureIsOpaque);
+        node->setOwnsTexture(true);
+        node->setTexture(texture);
+      }
+      node->markDirty(QSGNode::DirtyForceUpdate);
+    }
+  }
+
+  rect_ = QRect();
+  return rootNode;
 }
 
 void QuickVNCItem::updateWindow()
