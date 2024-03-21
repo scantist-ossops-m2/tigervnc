@@ -91,6 +91,8 @@ private:
 #endif
 
   bool contextMenuVisible_ = false;
+  int  widthDivider        = 1;
+  int  heightDivider       = 1;
 };
 
 #endif // QUICKVNCITEM_H

@@ -133,8 +133,7 @@ QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaint
   if (rect_.isEmpty())
     return oldNode;
 
-  int divider = 3;
-
+  int  size     = 64;
   auto rootNode = oldNode;
 
   if (boundingRect() != image_.rect())
@@ -146,15 +145,19 @@ QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaint
 
   if (!rootNode)
   {
-    rootNode = new QSGNode;
-    for (int i = 0; i < divider; ++i)
+    widthDivider  = (image_.width() / size);  //+ (image_.width() % size == 0 ? 0 : 1));
+    heightDivider = (image_.height() / size); //+ (image_.height() % size == 0 ? 0 : 1));
+    rootNode      = new QSGNode;
+    for (int i = 0; i < widthDivider; ++i)
     {
-      for (int j = 0; j < divider; ++j)
+      for (int j = 0; j < heightDivider; ++j)
       {
         auto  node = new QSGSimpleTextureNode();
         QRect r    = image_.rect();
-        r.setTopLeft(QPoint(image_.rect().width() * i / divider, image_.rect().height() * j / divider));
-        r.setBottomRight(QPoint(image_.rect().width() * (i + 1) / divider, image_.rect().height() * (j + 1) / divider));
+        r.setTopLeft(QPoint(size * i, size * j));
+        r.setWidth(size);
+        r.setHeight(size);
+        // qDebug() << "A" << i << j << r;
         node->setRect(r);
         rootNode->appendChildNode(node);
       }
@@ -163,15 +166,16 @@ QSGNode* QuickVNCItem::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaint
 
   fpsCounter++;
 
-  for (int i = 0; i < divider; ++i)
+  for (int i = 0; i < widthDivider; ++i)
   {
-    for (int j = 0; j < divider; ++j)
+    for (int j = 0; j < heightDivider; ++j)
     {
-      auto node   = dynamic_cast<QSGSimpleTextureNode*>(rootNode->childAtIndex(i * divider + j));
-      int  width  = image_.rect().width() / divider;
-      int  height = image_.rect().height() / divider;
+      auto node   = dynamic_cast<QSGSimpleTextureNode*>(rootNode->childAtIndex(i * heightDivider + j));
+      int  width  = size;
+      int  height = size;
       int  x      = i * width;
       int  y      = j * height;
+      // qDebug() << "B" << i << j << QRect(x, y, width, height);
 
       if (node->texture())
       {
