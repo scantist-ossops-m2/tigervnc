@@ -1,17 +1,17 @@
 /* Copyright (C) 2002-2005 RealVNC Ltd.  All Rights Reserved.
  * Copyright 2011 Pierre Ossman <ossman@cendio.se> for Cendio AB
  * Copyright 2012 Samuel Mannehed <samuel@cendio.se> for Cendio AB
- * 
+ *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this software; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
@@ -23,9 +23,9 @@
 #endif
 
 #include <QApplication>
+#include <QDate>
 #include <QDir>
 #include <QTextStream>
-#include <QDate>
 
 #if !defined(WIN32)
 #include <sys/stat.h>
@@ -33,28 +33,28 @@
 #include <QThread>
 #endif
 #if defined(__APPLE__)
-#include <Carbon/Carbon.h>
 #include "cocoa.h"
+
+#include <Carbon/Carbon.h>
 #endif
 
-#include "parameters.h"
-#include "parameters.h"
-#include "menukey.h"
 #include "appmanager.h"
-#include "vncconnection.h"
-#include "rfb/encodings.h"
+#include "menukey.h"
+#include "parameters.h"
+#include "rfb/Configuration.h"
+#include "rfb/LogWriter.h"
+#include "rfb/Logger_stdio.h"
 #include "rfb/Security.h"
 #include "rfb/SecurityClient.h"
-#include "rfb/Logger_stdio.h"
-#include "rfb/LogWriter.h"
-#include "rfb/Configuration.h"
+#include "rfb/encodings.h"
+#include "vncconnection.h"
 #ifdef HAVE_GNUTLS
 #include "rfb/CSecurityTLS.h"
 #endif
-#include "rfb/Exception.h"
-#include "network/TcpSocket.h"
-#include "i18n.h"
 #include "MonitorIndicesParameter.h"
+#include "i18n.h"
+#include "network/TcpSocket.h"
+#include "rfb/Exception.h"
 #undef asprintf
 
 #define SERVER_HISTORY_SIZE 20
@@ -64,114 +64,110 @@ using namespace std;
 
 static LogWriter vlog("Parameters");
 
-namespace os {
-  extern const char *getvnchomedir();
+namespace os
+{
+extern const char* getvnchomedir();
 }
-ViewerConfig *ViewerConfig::config_;
+
+ViewerConfig* ViewerConfig::config_;
 
 IntParameter pointerEventInterval("PointerEventInterval",
                                   "Time in milliseconds to rate-limit"
-                                  " successive pointer events", 17);
+                                  " successive pointer events",
+                                  17);
 BoolParameter emulateMiddleButton("EmulateMiddleButton",
                                   "Emulate middle mouse button by pressing "
                                   "left and right mouse buttons simultaneously",
                                   false);
 BoolParameter dotWhenNoCursor("DotWhenNoCursor",
                               "Show the dot cursor when the server sends an "
-                              "invisible cursor", false);
+                              "invisible cursor",
+                              false);
 
 BoolParameter alertOnFatalError("AlertOnFatalError",
                                 "Give a dialog on connection problems rather "
-                                "than exiting immediately", true);
+                                "than exiting immediately",
+                                true);
 
 BoolParameter reconnectOnError("ReconnectOnError",
                                "Give a dialog on connection problems rather "
-                               "than exiting immediately and ask for a reconnect.", true);
+                               "than exiting immediately and ask for a reconnect.",
+                               true);
 
-StringParameter passwordFile("PasswordFile",
-                             "Password file for VNC authentication", "");
+StringParameter passwordFile("PasswordFile", "Password file for VNC authentication", "");
 AliasParameter passwd("passwd", "Alias for PasswordFile", &passwordFile);
 
 BoolParameter autoSelect("AutoSelect",
                          "Auto select pixel format and encoding. "
-                         "Default if PreferredEncoding and FullColor are not specified.", 
+                         "Default if PreferredEncoding and FullColor are not specified.",
                          true);
-BoolParameter fullColour("FullColor",
-                         "Use full color", true);
+BoolParameter fullColour("FullColor", "Use full color", true);
 AliasParameter fullColourAlias("FullColour", "Alias for FullColor", &fullColour);
 IntParameter lowColourLevel("LowColorLevel",
                             "Color level to use on slow connections. "
-                            "0 = Very Low, 1 = Low, 2 = Medium", 2);
+                            "0 = Very Low, 1 = Low, 2 = Medium",
+                            2);
 AliasParameter lowColourLevelAlias("LowColourLevel", "Alias for LowColorLevel", &lowColourLevel);
 StringParameter preferredEncoding("PreferredEncoding",
                                   "Preferred encoding to use (Tight, ZRLE, Hextile or"
-                                  " Raw)", "Tight");
+                                  " Raw)",
+                                  "Tight");
 BoolParameter customCompressLevel("CustomCompressLevel",
                                   "Use custom compression level. "
-                                  "Default if CompressLevel is specified.", false);
-IntParameter compressLevel("CompressLevel",
-                           "Use specified compression level 0 = Low, 9 = High",
-                           2);
-BoolParameter noJpeg("NoJPEG",
-                     "Disable lossy JPEG compression in Tight encoding.",
-                     false);
-IntParameter qualityLevel("QualityLevel",
-                          "JPEG quality level. 0 = Low, 9 = High",
-                          8);
+                                  "Default if CompressLevel is specified.",
+                                  false);
+IntParameter compressLevel("CompressLevel", "Use specified compression level 0 = Low, 9 = High", 2);
+BoolParameter noJpeg("NoJPEG", "Disable lossy JPEG compression in Tight encoding.", false);
+IntParameter qualityLevel("QualityLevel", "JPEG quality level. 0 = Low, 9 = High", 8);
 
 BoolParameter maximize("Maximize", "Maximize viewer window", false);
 BoolParameter fullScreen("FullScreen", "Enable full screen", false);
-StringParameter fullScreenMode("FullScreenMode", "Specify which monitors to use when in full screen. "
-                                                 "Should be either Current, Selected or All",
-                                                 "Current");
+StringParameter fullScreenMode("FullScreenMode",
+                               "Specify which monitors to use when in full screen. "
+                               "Should be either Current, Selected or All",
+                               "Current");
 BoolParameter fullScreenAllMonitors("FullScreenAllMonitors",
                                     "[DEPRECATED] Enable full screen over all monitors",
                                     false);
 MonitorIndicesParameter fullScreenSelectedMonitors("FullScreenSelectedMonitors",
-                                         "Use the given list of monitors in full screen"
-                                         " when -FullScreenMode=Selected.",
-                                         "1");
+                                                   "Use the given list of monitors in full screen"
+                                                   " when -FullScreenMode=Selected.",
+                                                   "1");
 StringParameter desktopSize("DesktopSize",
                             "Reconfigure desktop size on the server on "
-                            "connect (if possible)", "");
-StringParameter geometry("geometry",
-                         "Specify size and position of viewer window", "");
+                            "connect (if possible)",
+                            "");
+StringParameter geometry("geometry", "Specify size and position of viewer window", "");
 
 BoolParameter listenMode("listen", "Listen for connections from VNC servers", false);
 
 BoolParameter remoteResize("RemoteResize",
                            "Dynamically resize the remote desktop size as "
                            "the size of the local client window changes. "
-                           "(Does not work with all servers)", true);
+                           "(Does not work with all servers)",
+                           true);
 
-BoolParameter viewOnly("ViewOnly",
-                       "Don't send any mouse or keyboard events to the server",
-                       false);
+BoolParameter viewOnly("ViewOnly", "Don't send any mouse or keyboard events to the server", false);
 BoolParameter shared("Shared",
                      "Don't disconnect other viewers upon connection - "
                      "share the desktop instead",
                      false);
 
-BoolParameter acceptClipboard("AcceptClipboard",
-                              "Accept clipboard changes from the server",
-                              true);
-BoolParameter sendClipboard("SendClipboard",
-                            "Send clipboard changes to the server", true);
+BoolParameter acceptClipboard("AcceptClipboard", "Accept clipboard changes from the server", true);
+BoolParameter sendClipboard("SendClipboard", "Send clipboard changes to the server", true);
 #if !defined(WIN32) && !defined(__APPLE__)
 BoolParameter setPrimary("SetPrimary",
                          "Set the primary selection as well as the "
-                         "clipboard selection", true);
+                         "clipboard selection",
+                         true);
 BoolParameter sendPrimary("SendPrimary",
                           "Send the primary selection to the "
                           "server as well as the clipboard selection",
                           true);
-StringParameter display("display",
-			"Specifies the X display on which the VNC viewer window should appear.",
-			"");
+StringParameter display("display", "Specifies the X display on which the VNC viewer window should appear.", "");
 #endif
 
-StringParameter menuKey("MenuKey", "The key which brings up the popup menu",
-                        "F8");
+StringParameter menuKey("MenuKey", "The key which brings up the popup menu", "F8");
 
 BoolParameter fullscreenSystemKeys("FullscreenSystemKeys",
                                    "Pass special keys (like Alt+Tab) directly "
@@ -187,64 +183,64 @@ static const char* IDENTIFIER_STRING = "TigerVNC Configuration file Version 1.0"
  * the graphical user interface
  */
 static VoidParameter* parameterArray[] = {
-  /* Security */
+/* Security */
 #ifdef HAVE_GNUTLS
-  &CSecurityTLS::X509CA,
-  &CSecurityTLS::X509CRL,
+    &CSecurityTLS::X509CA,
+    &CSecurityTLS::X509CRL,
 #endif // HAVE_GNUTLS
-  &SecurityClient::secTypes,
-  /* Misc. */
-  &reconnectOnError,
-  &shared,
-  /* Compression */
-  &autoSelect,
-  &fullColour,
-  &lowColourLevel,
-  &preferredEncoding,
-  &customCompressLevel,
-  &compressLevel,
-  &noJpeg,
-  &qualityLevel,
-  /* Display */
-  &fullScreen,
-  &fullScreenMode,
-  &fullScreenSelectedMonitors,
-  /* Input */
-  &viewOnly,
-  &emulateMiddleButton,
-  &dotWhenNoCursor,
-  &acceptClipboard,
-  &sendClipboard,
+    &SecurityClient::secTypes,
+    /* Misc. */
+    &reconnectOnError,
+    &shared,
+    /* Compression */
+    &autoSelect,
+    &fullColour,
+    &lowColourLevel,
+    &preferredEncoding,
+    &customCompressLevel,
+    &compressLevel,
+    &noJpeg,
+    &qualityLevel,
+    /* Display */
+    &fullScreen,
+    &fullScreenMode,
+    &fullScreenSelectedMonitors,
+    /* Input */
+    &viewOnly,
+    &emulateMiddleButton,
+    &dotWhenNoCursor,
+    &acceptClipboard,
+    &sendClipboard,
 #if !defined(WIN32) && !defined(__APPLE__)
-  &sendPrimary,
-  &setPrimary,
+    &sendPrimary,
+    &setPrimary,
 #endif
-  &menuKey,
-  &fullscreenSystemKeys
-};
+    &menuKey,
+    &fullscreenSystemKeys};
 
-static VoidParameter* readOnlyParameterArray[] = {
-  &fullScreenAllMonitors
-};
+static VoidParameter* readOnlyParameterArray[] = {&fullScreenAllMonitors};
 
 // Encoding Table
 static struct {
   const char first;
   const char second;
-} replaceMap[] = { { '\n', 'n' },
-                   { '\r', 'r' },
-                   { '\\', '\\' } };
+} replaceMap[] = {
+    {'\n', 'n' },
+    {'\r', 'r' },
+    {'\\', '\\'}
+};
 
-static bool encodeValue(const char* val, char* dest, size_t destSize) {
+static bool encodeValue(const char* val, char* dest, size_t destSize)
+{
 
   size_t pos = 0;
 
   for (size_t i = 0; (val[i] != '\0') && (i < (destSize - 1)); i++) {
     bool normalCharacter;
-    
+
     // Check for sequences which will need encoding
     normalCharacter = true;
-    for (size_t j = 0; j < sizeof(replaceMap)/sizeof(replaceMap[0]); j++) {
+    for (size_t j = 0; j < sizeof(replaceMap) / sizeof(replaceMap[0]); j++) {
 
       if (val[i] == replaceMap[j].first) {
         dest[pos] = '\\';
@@ -271,20 +267,20 @@ static bool encodeValue(const char* val, char* dest, size_t destSize) {
   return true;
 }
 
-
-static bool decodeValue(const char* val, char* dest, size_t destSize) {
+static bool decodeValue(const char* val, char* dest, size_t destSize)
+{
 
   size_t pos = 0;
-  
+
   for (size_t i = 0; (val[i] != '\0') && (i < (destSize - 1)); i++) {
-    
+
     // Check for escape sequences
     if (val[i] == '\\') {
       bool escapedCharacter;
-      
+
       escapedCharacter = false;
-      for (size_t j = 0; j < sizeof(replaceMap)/sizeof(replaceMap[0]); j++) {
-        if (val[i+1] == replaceMap[j].second) {
+      for (size_t j = 0; j < sizeof(replaceMap) / sizeof(replaceMap[0]); j++) {
+        if (val[i + 1] == replaceMap[j].second) {
           dest[pos] = replaceMap[j].first;
           escapedCharacter = true;
           i++;
@@ -304,20 +300,20 @@ static bool decodeValue(const char* val, char* dest, size_t destSize) {
       return false;
     }
   }
-  
+
   dest[pos] = '\0';
   return true;
 }
 
-
 #ifdef _WIN32
-static void setKeyString(const char *_name, const char *_value, HKEY* hKey) {
+static void setKeyString(const char* _name, const char* _value, HKEY* hKey)
+{
 
   const DWORD buffersize = 256;
 
   wchar_t name[buffersize];
-  unsigned size = MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, _name, strlen(_name)+1, name, buffersize); // QT
-  //unsigned size = fl_utf8towc(_name, strlen(_name)+1, name, buffersize);
+  unsigned size = MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, _name, strlen(_name) + 1, name, buffersize); // QT
+  // unsigned size = fl_utf8towc(_name, strlen(_name)+1, name, buffersize);
   if (size >= buffersize)
     throw Exception(_("The name of the parameter is too large"));
 
@@ -326,25 +322,26 @@ static void setKeyString(const char *_name, const char *_value, HKEY* hKey) {
     throw Exception(_("The parameter is too large"));
 
   wchar_t value[buffersize];
-  size = MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, encodingBuffer, strlen(encodingBuffer)+1, value, buffersize); // QT
-  //size = fl_utf8towc(encodingBuffer, strlen(encodingBuffer)+1, value, buffersize);
+  size =
+      MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, encodingBuffer, strlen(encodingBuffer) + 1, value, buffersize); // QT
+  // size = fl_utf8towc(encodingBuffer, strlen(encodingBuffer)+1, value, buffersize);
   if (size >= buffersize)
     throw Exception(_("The parameter is too large"));
 
-  LONG res = RegSetValueExW(*hKey, name, 0, REG_SZ, (BYTE*)&value, (wcslen(value)+1)*2);
+  LONG res = RegSetValueExW(*hKey, name, 0, REG_SZ, (BYTE*)&value, (wcslen(value) + 1) * 2);
   if (res != ERROR_SUCCESS)
     throw rdr::SystemException("RegSetValueExW", res);
 }
 
-
-static void setKeyInt(const char *_name, const int _value, HKEY* hKey) {
+static void setKeyInt(const char* _name, const int _value, HKEY* hKey)
+{
 
   const DWORD buffersize = 256;
   wchar_t name[buffersize];
   DWORD value = _value;
 
-  unsigned size = MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, _name, strlen(_name)+1, name, buffersize); // QT
-  //unsigned size = fl_utf8towc(_name, strlen(_name)+1, name, buffersize);
+  unsigned size = MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, _name, strlen(_name) + 1, name, buffersize); // QT
+  // unsigned size = fl_utf8towc(_name, strlen(_name)+1, name, buffersize);
   if (size >= buffersize)
     throw Exception(_("The name of the parameter is too large"));
 
@@ -353,24 +350,24 @@ static void setKeyInt(const char *_name, const int _value, HKEY* hKey) {
     throw rdr::SystemException("RegSetValueExW", res);
 }
 
-
-static bool getKeyString(const char* _name, char* dest, size_t destSize, HKEY* hKey) {
+static bool getKeyString(const char* _name, char* dest, size_t destSize, HKEY* hKey)
+{
 
   const DWORD buffersize = 256;
   wchar_t name[buffersize];
   WCHAR* value;
   DWORD valuesize;
 
-  unsigned size = MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, _name, strlen(_name)+1, name, buffersize); // QT
-  //unsigned size = fl_utf8towc(_name, strlen(_name)+1, name, buffersize);
+  unsigned size = MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, _name, strlen(_name) + 1, name, buffersize); // QT
+  // unsigned size = fl_utf8towc(_name, strlen(_name)+1, name, buffersize);
   if (size >= buffersize)
     throw Exception(_("The name of the parameter is too large"));
 
   value = new WCHAR[destSize];
   valuesize = destSize;
   LONG res = RegQueryValueExW(*hKey, name, 0, NULL, (LPBYTE)value, &valuesize);
-  if (res != ERROR_SUCCESS){
-    delete [] value;
+  if (res != ERROR_SUCCESS) {
+    delete[] value;
     if (res != ERROR_FILE_NOT_FOUND)
       throw rdr::SystemException("RegQueryValueExW", res);
     // The value does not exist, defaults will be used.
@@ -378,16 +375,16 @@ static bool getKeyString(const char* _name, char* dest, size_t destSize, HKEY* h
   }
 
   char* utf8val = new char[destSize];
-  size = WideCharToMultiByte(CP_ACP, 0, value, wcslen(value)+1, utf8val, destSize, nullptr, FALSE); // QT
-  //size = fl_utf8fromwc(utf8val, destSize, value, wcslen(value)+1);
-  delete [] value;
+  size = WideCharToMultiByte(CP_ACP, 0, value, wcslen(value) + 1, utf8val, destSize, nullptr, FALSE); // QT
+  // size = fl_utf8fromwc(utf8val, destSize, value, wcslen(value)+1);
+  delete[] value;
   if (size >= destSize) {
-    delete [] utf8val;
+    delete[] utf8val;
     throw Exception(_("The parameter is too large"));
   }
 
   bool ret = decodeValue(utf8val, dest, destSize);
-  delete [] utf8val;
+  delete[] utf8val;
 
   if (!ret)
     throw Exception(_("Invalid format or too large value"));
@@ -395,21 +392,21 @@ static bool getKeyString(const char* _name, char* dest, size_t destSize, HKEY* h
   return true;
 }
 
-
-static bool getKeyInt(const char* _name, int* dest, HKEY* hKey) {
+static bool getKeyInt(const char* _name, int* dest, HKEY* hKey)
+{
 
   const DWORD buffersize = 256;
   DWORD dwordsize = sizeof(DWORD);
   DWORD value = 0;
   wchar_t name[buffersize];
 
-  unsigned size = MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, _name, strlen(_name)+1, name, buffersize); // QT
-  //unsigned size = fl_utf8towc(_name, strlen(_name)+1, name, buffersize);
+  unsigned size = MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, _name, strlen(_name) + 1, name, buffersize); // QT
+  // unsigned size = fl_utf8towc(_name, strlen(_name)+1, name, buffersize);
   if (size >= buffersize)
     throw Exception(_("The name of the parameter is too large"));
 
   LONG res = RegQueryValueExW(*hKey, name, 0, NULL, (LPBYTE)&value, &dwordsize);
-  if (res != ERROR_SUCCESS){
+  if (res != ERROR_SUCCESS) {
     if (res != ERROR_FILE_NOT_FOUND)
       throw rdr::SystemException("RegQueryValueExW", res);
     // The value does not exist, defaults will be used.
@@ -421,12 +418,13 @@ static bool getKeyInt(const char* _name, int* dest, HKEY* hKey) {
   return true;
 }
 
-static void removeValue(const char* _name, HKEY* hKey) {
+static void removeValue(const char* _name, HKEY* hKey)
+{
   const DWORD buffersize = 256;
   wchar_t name[buffersize];
 
-  unsigned size = MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, _name, strlen(_name)+1, name, buffersize); // QT
-  //unsigned size = fl_utf8towc(_name, strlen(_name)+1, name, buffersize);
+  unsigned size = MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, _name, strlen(_name) + 1, name, buffersize); // QT
+  // unsigned size = fl_utf8towc(_name, strlen(_name)+1, name, buffersize);
   if (size >= buffersize)
     throw Exception(_("The name of the parameter is too large"));
 
@@ -439,12 +437,18 @@ static void removeValue(const char* _name, HKEY* hKey) {
   }
 }
 
-void saveHistoryToRegKey(const QStringList &serverHistory) {
+void saveHistoryToRegKey(const QStringList& serverHistory)
+{
   HKEY hKey;
   LONG res = RegCreateKeyExW(HKEY_CURRENT_USER,
-                             L"Software\\TigerVNC\\vncviewer\\history", 0, NULL,
-                             REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL,
-                             &hKey, NULL);
+                             L"Software\\TigerVNC\\vncviewer\\history",
+                             0,
+                             NULL,
+                             REG_OPTION_NON_VOLATILE,
+                             KEY_ALL_ACCESS,
+                             NULL,
+                             &hKey,
+                             NULL);
 
   if (res != ERROR_SUCCESS)
     throw rdr::SystemException(_("Failed to create registry key"), res);
@@ -454,7 +458,7 @@ void saveHistoryToRegKey(const QStringList &serverHistory) {
   char indexString[3];
 
   try {
-    while(index < serverHistory.size() && index <= SERVER_HISTORY_SIZE) {
+    while (index < serverHistory.size() && index <= SERVER_HISTORY_SIZE) {
       snprintf(indexString, 3, "%d", (int)index);
       setKeyString(indexString, serverHistory[index].toUtf8(), &hKey);
       index++;
@@ -469,13 +473,19 @@ void saveHistoryToRegKey(const QStringList &serverHistory) {
     throw rdr::SystemException(_("Failed to close registry key"), res);
 }
 
-static void saveToReg(const char* servername) {
+static void saveToReg(const char* servername)
+{
   HKEY hKey;
-    
+
   LONG res = RegCreateKeyExW(HKEY_CURRENT_USER,
-                             L"Software\\TigerVNC\\vncviewer", 0, NULL,
-                             REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL,
-                             &hKey, NULL);
+                             L"Software\\TigerVNC\\vncviewer",
+                             0,
+                             NULL,
+                             REG_OPTION_NON_VOLATILE,
+                             KEY_ALL_ACCESS,
+                             NULL,
+                             &hKey,
+                             NULL);
   if (res != ERROR_SUCCESS)
     throw rdr::SystemException(_("Failed to create registry key"), res);
 
@@ -483,11 +493,10 @@ static void saveToReg(const char* servername) {
     setKeyString("ServerName", servername, &hKey);
   } catch (Exception& e) {
     RegCloseKey(hKey);
-    throw Exception(_("Failed to save \"%s\": %s"),
-                    "ServerName", e.str());
+    throw Exception(_("Failed to save \"%s\": %s"), "ServerName", e.str());
   }
 
-  for (size_t i = 0; i < sizeof(parameterArray)/sizeof(VoidParameter*); i++) {
+  for (size_t i = 0; i < sizeof(parameterArray) / sizeof(VoidParameter*); i++) {
     try {
       if (dynamic_cast<StringParameter*>(parameterArray[i]) != NULL) {
         setKeyString(parameterArray[i]->getName(), *(StringParameter*)parameterArray[i], &hKey);
@@ -500,21 +509,19 @@ static void saveToReg(const char* servername) {
       }
     } catch (Exception& e) {
       RegCloseKey(hKey);
-      throw Exception(_("Failed to save \"%s\": %s"),
-                      parameterArray[i]->getName(), e.str());
+      throw Exception(_("Failed to save \"%s\": %s"), parameterArray[i]->getName(), e.str());
     }
   }
 
   // Remove read-only parameters to replicate the behaviour of Linux/macOS when they
   // store a config to disk. If the parameter hasn't been migrated at this point it
   // will be lost.
-  for (size_t i = 0; i < sizeof(readOnlyParameterArray)/sizeof(VoidParameter*); i++) {
+  for (size_t i = 0; i < sizeof(readOnlyParameterArray) / sizeof(VoidParameter*); i++) {
     try {
       removeValue(readOnlyParameterArray[i]->getName(), &hKey);
     } catch (Exception& e) {
       RegCloseKey(hKey);
-      throw Exception(_("Failed to remove \"%s\": %s"),
-                      readOnlyParameterArray[i]->getName(), e.str());
+      throw Exception(_("Failed to remove \"%s\": %s"), readOnlyParameterArray[i]->getName(), e.str());
     }
   }
 
@@ -523,12 +530,11 @@ static void saveToReg(const char* servername) {
     throw rdr::SystemException(_("Failed to close registry key"), res);
 }
 
-void loadHistoryFromRegKey(QStringList& serverHistory) {
+void loadHistoryFromRegKey(QStringList& serverHistory)
+{
   HKEY hKey;
 
-  LONG res = RegOpenKeyExW(HKEY_CURRENT_USER,
-                           L"Software\\TigerVNC\\vncviewer\\history", 0,
-                           KEY_READ, &hKey);
+  LONG res = RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\TigerVNC\\vncviewer\\history", 0, KEY_READ, &hKey);
   if (res != ERROR_SUCCESS) {
     if (res == ERROR_FILE_NOT_FOUND) {
       // The key does not exist, defaults will be used.
@@ -542,18 +548,16 @@ void loadHistoryFromRegKey(QStringList& serverHistory) {
   const DWORD buffersize = 256;
   char indexString[3];
 
-  for (index = 0;;index++) {
+  for (index = 0;; index++) {
     snprintf(indexString, 3, "%d", (int)index);
     char servernameBuffer[buffersize];
 
     try {
-      if (!getKeyString(indexString, servernameBuffer,
-                        buffersize, &hKey))
+      if (!getKeyString(indexString, servernameBuffer, buffersize, &hKey))
         break;
     } catch (Exception& e) {
       // Just ignore this entry and try the next one
-      vlog.error(_("Failed to read server history entry %d: %s"),
-                 (int)index, e.str());
+      vlog.error(_("Failed to read server history entry %d: %s"), (int)index, e.str());
       continue;
     }
 
@@ -565,14 +569,13 @@ void loadHistoryFromRegKey(QStringList& serverHistory) {
     throw rdr::SystemException(_("Failed to close registry key"), res);
 }
 
-static void getParametersFromReg(VoidParameter* parameters[],
-                                 size_t parameters_len, HKEY* hKey)
+static void getParametersFromReg(VoidParameter* parameters[], size_t parameters_len, HKEY* hKey)
 {
   const size_t buffersize = 256;
   int intValue = 0;
   char stringValue[buffersize];
 
-  for (size_t i = 0; i < parameters_len/sizeof(VoidParameter*); i++) {
+  for (size_t i = 0; i < parameters_len / sizeof(VoidParameter*); i++) {
     try {
       if (dynamic_cast<StringParameter*>(parameters[i]) != NULL) {
         if (getKeyString(parameters[i]->getName(), stringValue, buffersize, hKey))
@@ -586,20 +589,18 @@ static void getParametersFromReg(VoidParameter* parameters[],
       } else {
         throw Exception(_("Unknown parameter type"));
       }
-    } catch(Exception& e) {
+    } catch (Exception& e) {
       // Just ignore this entry and continue with the rest
-      vlog.error(_("Failed to read parameter \"%s\": %s"),
-                 parameters[i]->getName(), e.str());
+      vlog.error(_("Failed to read parameter \"%s\": %s"), parameters[i]->getName(), e.str());
     }
   }
 }
 
-static char* loadFromReg() {
+static char* loadFromReg()
+{
   HKEY hKey;
 
-  LONG res = RegOpenKeyExW(HKEY_CURRENT_USER,
-                           L"Software\\TigerVNC\\vncviewer", 0,
-                           KEY_READ, &hKey);
+  LONG res = RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\TigerVNC\\vncviewer", 0, KEY_READ, &hKey);
   if (res != ERROR_SUCCESS) {
     if (res == ERROR_FILE_NOT_FOUND) {
       // The key does not exist, defaults will be used.
@@ -616,15 +617,13 @@ static char* loadFromReg() {
   try {
     if (getKeyString("ServerName", servernameBuffer, buffersize, &hKey))
       snprintf(servername, buffersize, "%s", servernameBuffer);
-  } catch(Exception& e) {
-    vlog.error(_("Failed to read parameter \"%s\": %s"),
-               "ServerName", e.str());
+  } catch (Exception& e) {
+    vlog.error(_("Failed to read parameter \"%s\": %s"), "ServerName", e.str());
     strcpy(servername, "");
   }
 
   getParametersFromReg(parameterArray, sizeof(parameterArray), &hKey);
-  getParametersFromReg(readOnlyParameterArray,
-                       sizeof(readOnlyParameterArray), &hKey);
+  getParametersFromReg(readOnlyParameterArray, sizeof(readOnlyParameterArray), &hKey);
 
   res = RegCloseKey(hKey);
   if (res != ERROR_SUCCESS)
@@ -634,15 +633,15 @@ static char* loadFromReg() {
 }
 #endif // _WIN32
 
-
-void saveViewerParameters(const char *filename, const char *servername) {
+void saveViewerParameters(const char* filename, const char* servername)
+{
 
   const size_t buffersize = 256;
   char filepath[PATH_MAX];
   char encodingBuffer[buffersize];
 
   // Write to the registry or a predefined file if no filename was specified.
-  if(filename == NULL) {
+  if (filename == NULL) {
 #ifdef _WIN32
     saveToReg(servername);
     return;
@@ -664,56 +663,50 @@ void saveViewerParameters(const char *filename, const char *servername) {
   /* Write parameters to file */
   FILE* f = fopen(filepath, "w+");
   if (!f)
-    throw Exception(_("Could not open \"%s\": %s"),
-                    filepath, strerror(errno));
+    throw Exception(_("Could not open \"%s\": %s"), filepath, strerror(errno));
 
   fprintf(f, "%s\n", IDENTIFIER_STRING);
   fprintf(f, "\n");
 
   if (!encodeValue(servername, encodingBuffer, buffersize)) {
     fclose(f);
-    throw Exception(_("Failed to save \"%s\": %s"),
-                    "ServerName", _("Could not encode parameter"));
+    throw Exception(_("Failed to save \"%s\": %s"), "ServerName", _("Could not encode parameter"));
   }
   fprintf(f, "ServerName=%s\n", encodingBuffer);
 
-  for (size_t i = 0; i < sizeof(parameterArray)/sizeof(VoidParameter*); i++) {
+  for (size_t i = 0; i < sizeof(parameterArray) / sizeof(VoidParameter*); i++) {
     if (dynamic_cast<StringParameter*>(parameterArray[i]) != NULL) {
-      if (!encodeValue(*(StringParameter*)parameterArray[i],
-          encodingBuffer, buffersize)) {
+      if (!encodeValue(*(StringParameter*)parameterArray[i], encodingBuffer, buffersize)) {
         fclose(f);
-        throw Exception(_("Failed to save \"%s\": %s"),
-                        parameterArray[i]->getName(),
-                        _("Could not encode parameter"));
+        throw Exception(_("Failed to save \"%s\": %s"), parameterArray[i]->getName(), _("Could not encode parameter"));
       }
       fprintf(f, "%s=%s\n", ((StringParameter*)parameterArray[i])->getName(), encodingBuffer);
     } else if (dynamic_cast<IntParameter*>(parameterArray[i]) != NULL) {
       fprintf(f, "%s=%d\n", ((IntParameter*)parameterArray[i])->getName(), (int)*(IntParameter*)parameterArray[i]);
     } else if (dynamic_cast<BoolParameter*>(parameterArray[i]) != NULL) {
       fprintf(f, "%s=%d\n", ((BoolParameter*)parameterArray[i])->getName(), (int)*(BoolParameter*)parameterArray[i]);
-    } else {      
+    } else {
       fclose(f);
-      throw Exception(_("Failed to save \"%s\": %s"),
-                      parameterArray[i]->getName(),
-                      _("Unknown parameter type"));
+      throw Exception(_("Failed to save \"%s\": %s"), parameterArray[i]->getName(), _("Unknown parameter type"));
     }
   }
   fclose(f);
 }
 
-static bool findAndSetViewerParameterFromValue(
-  VoidParameter* parameters[], size_t parameters_len,
-  char* value, char* line)
+static bool findAndSetViewerParameterFromValue(VoidParameter* parameters[],
+                                               size_t parameters_len,
+                                               char* value,
+                                               char* line)
 {
   const size_t buffersize = 256;
   char decodingBuffer[buffersize];
 
   // Find and set the correct parameter
-  for (size_t i = 0; i < parameters_len/sizeof(VoidParameter*); i++) {
+  for (size_t i = 0; i < parameters_len / sizeof(VoidParameter*); i++) {
 
     if (dynamic_cast<StringParameter*>(parameters[i]) != NULL) {
       if (strcasecmp(line, ((StringParameter*)parameters[i])->getName()) == 0) {
-        if(!decodeValue(value, decodingBuffer, sizeof(decodingBuffer)))
+        if (!decodeValue(value, decodingBuffer, sizeof(decodingBuffer)))
           throw Exception(_("Invalid format or too large value"));
         ((StringParameter*)parameters[i])->setParam(decodingBuffer);
         return false;
@@ -738,7 +731,8 @@ static bool findAndSetViewerParameterFromValue(
   return true;
 }
 
-char* loadViewerParameters(const char *filename) {
+char* loadViewerParameters(const char* filename)
+{
 
   const size_t buffersize = 256;
   char filepath[PATH_MAX];
@@ -749,7 +743,7 @@ char* loadViewerParameters(const char *filename) {
   memset(servername, '\0', sizeof(servername));
 
   // Load from the registry or a predefined file if no filename was specified.
-  if(filename == NULL) {
+  if (filename == NULL) {
 
 #ifdef _WIN32
     return loadFromReg();
@@ -773,10 +767,9 @@ char* loadViewerParameters(const char *filename) {
   if (!f) {
     if (!filename)
       return NULL; // Use defaults.
-    throw Exception(_("Could not open \"%s\": %s"),
-                    filepath, strerror(errno));
+    throw Exception(_("Could not open \"%s\": %s"), filepath, strerror(errno));
   }
-  
+
   int lineNr = 0;
   while (!feof(f)) {
 
@@ -787,106 +780,105 @@ char* loadViewerParameters(const char *filename) {
         break;
 
       fclose(f);
-      throw Exception(_("Failed to read line %d in file %s: %s"),
-                      lineNr, filepath, strerror(errno));
+      throw Exception(_("Failed to read line %d in file %s: %s"), lineNr, filepath, strerror(errno));
     }
 
     if (strlen(line) == (sizeof(line) - 1)) {
       fclose(f);
-      throw Exception(_("Failed to read line %d in file %s: %s"),
-                      lineNr, filepath, _("Line too long"));
+      throw Exception(_("Failed to read line %d in file %s: %s"), lineNr, filepath, _("Line too long"));
     }
 
     // Make sure that the first line of the file has the file identifier string
-    if(lineNr == 1) {
-      if(strncmp(line, IDENTIFIER_STRING, strlen(IDENTIFIER_STRING)) == 0)
+    if (lineNr == 1) {
+      if (strncmp(line, IDENTIFIER_STRING, strlen(IDENTIFIER_STRING)) == 0)
         continue;
 
       fclose(f);
-      throw Exception(_("Configuration file %s is in an invalid format"),
-                      filepath);
+      throw Exception(_("Configuration file %s is in an invalid format"), filepath);
     }
-    
+
     // Skip empty lines and comments
     if ((line[0] == '\n') || (line[0] == '#') || (line[0] == '\r'))
       continue;
 
     int len = strlen(line);
-    if (line[len-1] == '\n') {
-      line[len-1] = '\0';
+    if (line[len - 1] == '\n') {
+      line[len - 1] = '\0';
       len--;
     }
-    if (line[len-1] == '\r') {
-      line[len-1] = '\0';
+    if (line[len - 1] == '\r') {
+      line[len - 1] = '\0';
       len--;
     }
 
     // Find the parameter value
-    char *value = strchr(line, '=');
+    char* value = strchr(line, '=');
     if (value == NULL) {
-      vlog.error(_("Failed to read line %d in file %s: %s"),
-                 lineNr, filepath, _("Invalid format"));
+      vlog.error(_("Failed to read line %d in file %s: %s"), lineNr, filepath, _("Invalid format"));
       continue;
     }
     *value = '\0'; // line only contains the parameter name below.
     value++;
-    
-    bool invalidParameterName = true; // Will be set to false below if 
+
+    bool invalidParameterName = true; // Will be set to false below if
                                       // the line contains a valid name.
 
     try {
       if (strcasecmp(line, "ServerName") == 0) {
 
-        if(!decodeValue(value, decodingBuffer, sizeof(decodingBuffer)))
+        if (!decodeValue(value, decodingBuffer, sizeof(decodingBuffer)))
           throw Exception(_("Invalid format or too large value"));
         snprintf(servername, sizeof(decodingBuffer), "%s", decodingBuffer);
         invalidParameterName = false;
 
       } else {
-        invalidParameterName = findAndSetViewerParameterFromValue(parameterArray, sizeof(parameterArray),
-                                                                  value, line);
+        invalidParameterName = findAndSetViewerParameterFromValue(parameterArray, sizeof(parameterArray), value, line);
 
         if (invalidParameterName) {
-          invalidParameterName = findAndSetViewerParameterFromValue(readOnlyParameterArray, sizeof(readOnlyParameterArray),
-                                                                    value, line);
+          invalidParameterName =
+              findAndSetViewerParameterFromValue(readOnlyParameterArray, sizeof(readOnlyParameterArray), value, line);
         }
       }
-    } catch(Exception& e) {
+    } catch (Exception& e) {
       // Just ignore this entry and continue with the rest
-      vlog.error(_("Failed to read line %d in file %s: %s"),
-                 lineNr, filepath, e.str());
+      vlog.error(_("Failed to read line %d in file %s: %s"), lineNr, filepath, e.str());
       continue;
     }
 
     if (invalidParameterName)
-      vlog.error(_("Failed to read line %d in file %s: %s"),
-                 lineNr, filepath, _("Unknown parameter"));
+      vlog.error(_("Failed to read line %d in file %s: %s"), lineNr, filepath, _("Unknown parameter"));
   }
-  fclose(f); f=0;
-  
+  fclose(f);
+  f = 0;
+
   return servername;
 }
 
 ViewerConfig::ViewerConfig()
- : QObject(nullptr)
- , encNone(false)
- , encTLSAnon(false)
- , encTLSX509(false)
- , encAES(false)
- , authNone(false)
- , authVNC(false)
- , authPlain(false)
- , serverPort(SERVER_PORT_OFFSET)
- , gatewayLocalPort(0)
+  : QObject(nullptr)
+  , encNone(false)
+  , encTLSAnon(false)
+  , encTLSX509(false)
+  , encAES(false)
+  , authNone(false)
+  , authVNC(false)
+  , authPlain(false)
+  , serverPort(SERVER_PORT_OFFSET)
+  , gatewayLocalPort(0)
   , messageDir(nullptr)
 {
-  connect(this, &ViewerConfig::accessPointChanged, this, [this](QString accessPoint) {
+  connect(
+      this,
+      &ViewerConfig::accessPointChanged,
+      this,
+      [this](QString accessPoint) {
         serverHistory.removeOne(accessPoint);
         serverHistory.push_front(accessPoint);
-    parseServerName();
-    saveServerHistory();
-    emit serverHistoryChanged(serverHistory);
-  }, Qt::QueuedConnection);
+        parseServerName();
+        saveServerHistory();
+        emit serverHistoryChanged(serverHistory);
+      },
+      Qt::QueuedConnection);
   initializeLogger();
 
   const char* homeDir = os::getvnchomedir();
@@ -896,7 +888,7 @@ ViewerConfig::ViewerConfig()
       vlog.error(_("Could not create VNC home directory:"));
     }
   }
-  
+
   rfb::Configuration::enableViewerParams();
   loadViewerParameters("");
   if (::fullScreenAllMonitors) {
@@ -907,18 +899,14 @@ ViewerConfig::ViewerConfig()
   int argc = argv.length();
   for (int i = 1; i < argc;) {
     /* We need to resolve an ambiguity for booleans */
-    if (argv[i][0] == '-' && i+1 < argc) {
+    if (argv[i][0] == '-' && i + 1 < argc) {
       QString name = argv[i].mid(1);
-      rfb::VoidParameter *param = rfb::Configuration::getParam(name.toStdString().c_str());
-      if ((param != NULL) &&
-          (dynamic_cast<rfb::BoolParameter*>(param) != NULL)) {
-        QString opt = argv[i+1];
-        if ((opt.compare("0") == 0) ||
-            (opt.compare("1") == 0) ||
-            (opt.compare("true", Qt::CaseInsensitive) == 0) ||
-            (opt.compare("false", Qt::CaseInsensitive) == 0) ||
-            (opt.compare("yes", Qt::CaseInsensitive) == 0) ||
-            (opt.compare("no", Qt::CaseInsensitive) == 0)) {
+      rfb::VoidParameter* param = rfb::Configuration::getParam(name.toStdString().c_str());
+      if ((param != NULL) && (dynamic_cast<rfb::BoolParameter*>(param) != NULL)) {
+        QString opt = argv[i + 1];
+        if ((opt.compare("0") == 0) || (opt.compare("1") == 0) || (opt.compare("true", Qt::CaseInsensitive) == 0)
+            || (opt.compare("false", Qt::CaseInsensitive) == 0) || (opt.compare("yes", Qt::CaseInsensitive) == 0)
+            || (opt.compare("no", Qt::CaseInsensitive) == 0)) {
           param->setParam(opt.toStdString().c_str());
           i += 2;
           continue;
@@ -932,8 +920,8 @@ ViewerConfig::ViewerConfig()
     }
 
     if (argv[i][0] == '-') {
-      if (i+1 < argc) {
-        if (rfb::Configuration::setParam(argv[i].mid(1).toStdString().c_str(), argv[i+1].toStdString().c_str())) {
+      if (i + 1 < argc) {
+        if (rfb::Configuration::setParam(argv[i].mid(1).toStdString().c_str(), argv[i + 1].toStdString().c_str())) {
           i += 2;
           continue;
         }
@@ -1101,7 +1089,7 @@ void ViewerConfig::loadServerHistory()
     lineNr++;
     if (!fgets(line, sizeof(line), f)) {
       if (feof(f))
-	break;
+        break;
 
       fclose(f);
       throw rdr::Exception(_("Failed to read line %d in file %s: %s"), lineNr, filepath, strerror(errno));
@@ -1114,18 +1102,18 @@ void ViewerConfig::loadServerHistory()
       throw rdr::Exception(_("Failed to read line %d in file %s: %s"), lineNr, filepath, _("Line too long"));
     }
 
-    if ((len > 0) && (line[len-1] == '\n')) {
-      line[len-1] = '\0';
+    if ((len > 0) && (line[len - 1] == '\n')) {
+      line[len - 1] = '\0';
       len--;
     }
-    if ((len > 0) && (line[len-1] == '\r')) {
-      line[len-1] = '\0';
+    if ((len > 0) && (line[len - 1] == '\r')) {
+      line[len - 1] = '\0';
       len--;
     }
 
     if (len == 0)
       continue;
-    
+
     serverHistory.push_back(line);
   }
 
@@ -1143,12 +1131,11 @@ void ViewerConfig::setServerHistory(QStringList history)
 
 void ViewerConfig::addToServerHistory(QString value)
 {
-  if(!serverHistory.contains(value))
-    {
+  if (!serverHistory.contains(value)) {
     serverHistory.append(value);
-        saveServerHistory();
+    saveServerHistory();
     emit serverHistoryChanged(serverHistory);
-    }
+  }
 }
 
 void ViewerConfig::saveServerHistory()
@@ -1166,15 +1153,15 @@ void ViewerConfig::saveServerHistory()
   snprintf(filepath, sizeof(filepath), "%s/%s", homeDir, SERVER_HISTORY);
 
   /* Write server history to file */
-  FILE *f = fopen(filepath, "w");
+  FILE* f = fopen(filepath, "w");
   if (!f) {
     throw rdr::Exception(_("Could not open \"%s\": %s"), filepath, strerror(errno));
   }
   QTextStream stream(f, QIODevice::WriteOnly | QIODevice::WriteOnly);
 
   // Save the last X elements to the config file.
-  for(int i = 0; i < serverHistory_.size() && i <= SERVER_HISTORY_SIZE; i++) {
-    stream << serverHistory_[i] << "\n";
+  for (int i = 0; i < serverHistory.size() && i <= SERVER_HISTORY_SIZE; i++) {
+    stream << serverHistory[i] << "\n";
   }
   stream.flush();
   fclose(f);
@@ -1411,7 +1398,7 @@ void ViewerConfig::setX509CA(QString value)
 #else
   Q_UNUSED(value)
 #endif
-  }
+}
 
 QString ViewerConfig::x509CRL() const
 {
@@ -1432,7 +1419,7 @@ void ViewerConfig::setX509CRL(QString value)
 #else
   Q_UNUSED(value)
 #endif
-  }
+}
 
 bool ViewerConfig::viewOnly() const
 {
@@ -1591,7 +1578,7 @@ void ViewerConfig::setSelectedScreens(QList<int> value)
 {
   if (selectedScreens() != value) {
     std::set<int> screens;
-    for (int &screen : value) {
+    for (int& screen : value) {
       screens.insert(screen);
     }
     ::fullScreenSelectedMonitors.setParam(screens);
@@ -1631,7 +1618,7 @@ void ViewerConfig::handleOptions()
   // a pain. Assume something has changed, as resending the encoding
   // list is cheap. Avoid overriding what the auto logic has selected
   // though.
-  QVNCConnection *cc = AppManager::instance()->getConnection();
+  QVNCConnection* cc = AppManager::instance()->getConnection();
   if (!::autoSelect) {
     int encNum = encodingNum(::preferredEncoding);
 
@@ -1662,8 +1649,7 @@ bool ViewerConfig::potentiallyLoadConfigurationFile(QString vncServerName)
     // This might be a UNIX socket, we need to check
     if (stat(vncServerName.toStdString().c_str(), &sb) == -1) {
       // Some access problem; let loadViewerParameters() deal with it...
-    }
-    else {
+    } else {
       if ((sb.st_mode & S_IFMT) == S_IFSOCK) {
         return true;
       }
@@ -1672,8 +1658,7 @@ bool ViewerConfig::potentiallyLoadConfigurationFile(QString vncServerName)
 
     try {
       serverName = loadViewerParameters(vncServerName);
-    }
-    catch (rfb::Exception& e) {
+    } catch (rfb::Exception& e) {
       vlog.error("%s", e.str());
       return false;
     }
@@ -1684,16 +1669,19 @@ bool ViewerConfig::potentiallyLoadConfigurationFile(QString vncServerName)
 QString ViewerConfig::aboutText()
 {
   return QString::asprintf(_("TigerVNC Viewer v%s\n"
-                   "Built on: %s\n"
-                   "Copyright (C) 1999-%d TigerVNC Team and many others (see README.rst)\n"
-                   "See https://www.tigervnc.org for information on TigerVNC."), PACKAGE_VERSION, BUILD_TIMESTAMP, QDate::currentDate().year());
+                             "Built on: %s\n"
+                             "Copyright (C) 1999-%d TigerVNC Team and many others (see README.rst)\n"
+                             "See https://www.tigervnc.org for information on TigerVNC."),
+                           PACKAGE_VERSION,
+                           BUILD_TIMESTAMP,
+                           QDate::currentDate().year());
 }
 
 void ViewerConfig::usage()
 {
   QString argv0 = QGuiApplication::arguments().at(0);
   std::string str = argv0.toStdString();
-  const char *programName = str.c_str();
+  const char* programName = str.c_str();
 
   fprintf(stderr,
           "\n"
@@ -1704,21 +1692,25 @@ void ViewerConfig::usage()
 #endif
           "       %s [parameters] -listen [port]\n"
           "       %s [parameters] [.tigervnc file]\n",
-          programName, programName,
+          programName,
+          programName,
 #ifndef WIN32
           programName,
 #endif
-          programName, programName);
+          programName,
+          programName);
 
 #if !defined(WIN32) && !defined(__APPLE__)
-  fprintf(stderr,"\n"
+  fprintf(stderr,
+          "\n"
           "Options:\n\n"
           "  -display Xdisplay  - Specifies the X display for the viewer window\n"
           "  -geometry geometry - Initial position of the main VNC viewer window. See the\n"
           "                       man page for details.\n");
 #endif
 
-  fprintf(stderr,"\n"
+  fprintf(stderr,
+          "\n"
           "Parameters can be turned on with -<param> or off with -<param>=0\n"
           "Parameters which take a value can be specified as "
           "-<param> <value>\n"
@@ -1763,8 +1755,7 @@ QString ViewerConfig::getlocaledir()
   if (bundle == NULL)
     return QString();
 
-  localeurl = CFBundleCopyResourceURL(bundle, CFSTR("locale"),
-                                      NULL, NULL);
+  localeurl = CFBundleCopyResourceURL(bundle, CFSTR("locale"), NULL, NULL);
   if (localeurl == NULL)
     return QString();
 
@@ -1772,8 +1763,7 @@ QString ViewerConfig::getlocaledir()
 
   CFRelease(localeurl);
 
-  ret = CFStringGetCString(localestr, localebuf, sizeof(localebuf),
-                           kCFStringEncodingUTF8);
+  ret = CFStringGetCString(localestr, localebuf, sizeof(localebuf), kCFStringEncodingUTF8);
   if (!ret)
     return QString();
 
@@ -1797,7 +1787,8 @@ void ViewerConfig::initializeLogger()
 {
   setlocale(LC_ALL, "");
 #if defined(WIN32) && ENABLE_NLS
-  // Quick workaround for the defect of gettext on Windows. Read the discussion at https://github.com/msys2/MINGW-packages/issues/4059 for details.
+  // Quick workaround for the defect of gettext on Windows. Read the discussion at
+  // https://github.com/msys2/MINGW-packages/issues/4059 for details.
   QString elang = QString(qgetenv("LANGUAGE")).trimmed();
   if (elang.length() == 0) {
     qputenv("LANGUAGE", "en:C");
@@ -1809,11 +1800,11 @@ void ViewerConfig::initializeLogger()
     fprintf(stderr, "Failed to determine locale directory\n");
   else {
     QFileInfo locale(localedir);
-    // According to the linux document, trailing '/locale' of the message directory path must be removed for passing it to bindtextdomain()
-    // but in reallity '/locale' must be given to make gettext() work properly.
+    // According to the linux document, trailing '/locale' of the message directory path must be removed for passing it
+    // to bindtextdomain() but in reallity '/locale' must be given to make gettext() work properly.
     messageDir = strdup(locale.absoluteFilePath().toStdString().c_str());
 #ifdef ENABLE_NLS
-    bindtextdomain(PACKAGE_NAME, messageDir_);
+    bindtextdomain(PACKAGE_NAME, messageDir);
 #endif
   }
 #ifdef ENABLE_NLS
@@ -1822,7 +1813,7 @@ void ViewerConfig::initializeLogger()
 
   // Write about text to console, still using normal locale codeset
   QString about = aboutText();
-  fprintf(stderr,"\n%s\n", about.toStdString().c_str());
+  fprintf(stderr, "\n%s\n", about.toStdString().c_str());
 
 #ifdef ENABLE_NLS
   // Set gettext codeset to what our GUI toolkit uses. Since we are
@@ -1874,21 +1865,18 @@ void ViewerConfig::parseServerName()
       if (ok) {
         serverPort = port;
       }
-    }
-    else {
+    } else {
       int port = serverName.mid(ix + 2).toInt(&ok, 10);
       if (ok) {
         serverPort = port;
       }
     }
     serverHost = serverName.left(ix);
-  }
-  else {
+  } else {
     int port = serverName.toInt(&ok, 10);
     if (ok) {
       serverPort = port;
-    }
-    else {
+    } else {
       serverHost = serverName;
     }
   }
