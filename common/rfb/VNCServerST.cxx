@@ -81,10 +81,10 @@ static LogWriter connectionsLog("Connections");
 
 VNCServerST::VNCServerST(const char* name_, SDesktop* desktop_)
   : blHosts(&blacklist), desktop(desktop_), desktopStarted(false),
-    blockCounter(0), pb(0), ledState(ledUnknown),
-    name(name_), pointerClient(0), clipboardClient(0),
+    blockCounter(0), pb(nullptr), ledState(ledUnknown),
+    name(name_), pointerClient(nullptr), clipboardClient(nullptr),
     pointerClientTime(0),
-    comparer(0), cursor(new Cursor(0, 0, Point(), NULL)),
+    comparer(nullptr), cursor(new Cursor(0, 0, Point(), nullptr)),
     renderedCursorInvalid(false),
     keyRemapper(&KeyRemapper::defInstance),
     idleTimer(this), disconnectTimer(this), connectTimer(this),
@@ -173,7 +173,7 @@ void VNCServerST::removeSocket(network::Socket* sock) {
     if ((*ci)->getSock() == sock) {
       // - Remove any references to it
       if (pointerClient == *ci)
-        pointerClient = NULL;
+        pointerClient = nullptr;
       if (clipboardClient == *ci)
         handleClipboardAnnounce(*ci, false);
       clipboardRequestors.remove(*ci);
@@ -262,7 +262,7 @@ void VNCServerST::setPixelBuffer(PixelBuffer* pb_, const ScreenSet& layout)
 
   pb = pb_;
   delete comparer;
-  comparer = 0;
+  comparer = nullptr;
 
   if (!pb) {
     screenLayout = ScreenSet();
@@ -485,7 +485,7 @@ void VNCServerST::keyEvent(uint32_t keysym, uint32_t keycode, bool down)
 void VNCServerST::pointerEvent(VNCSConnectionST* client,
                                const Point& pos, int buttonMask)
 {
-  time_t now = time(0);
+  time_t now = time(nullptr);
   if (rfb::Server::maxIdleTime)
     idleTimer.start(secsToMillis(rfb::Server::maxIdleTime));
 
@@ -500,7 +500,7 @@ void VNCServerST::pointerEvent(VNCSConnectionST* client,
   if (buttonMask)
     pointerClient = client;
   else
-    pointerClient = NULL;
+    pointerClient = nullptr;
 
   desktop->pointerEvent(pos, buttonMask);
 }
@@ -520,7 +520,7 @@ void VNCServerST::handleClipboardAnnounce(VNCSConnectionST* client,
   else {
     if (client != clipboardClient)
       return;
-    clipboardClient = NULL;
+    clipboardClient = nullptr;
   }
   desktop->handleClipboardAnnounce(available);
 }
@@ -620,7 +620,7 @@ SConnection* VNCServerST::getConnection(network::Socket* sock) {
     if ((*ci)->getSock() == sock)
       return (SConnection*)*ci;
   }
-  return 0;
+  return nullptr;
 }
 
 bool VNCServerST::handleTimeout(Timer* t)
@@ -675,14 +675,14 @@ void VNCServerST::queryConnection(VNCSConnectionST* client,
   // - Are we configured to do queries?
   if (!rfb::Server::queryConnect &&
       !client->getSock()->requiresQuery()) {
-    approveConnection(client->getSock(), true, NULL);
+    approveConnection(client->getSock(), true, nullptr);
     return;
   }
 
   // - Does the client have the right to bypass the query?
   if (client->accessCheck(SConnection::AccessNoQuery))
   {
-    approveConnection(client->getSock(), true, NULL);
+    approveConnection(client->getSock(), true, nullptr);
     return;
   }
 

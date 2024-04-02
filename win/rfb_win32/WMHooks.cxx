@@ -110,7 +110,7 @@ static void LoadHooks()
 
 error:
   FreeLibrary(hooksLibrary);
-  hooksLibrary = NULL;
+  hooksLibrary = nullptr;
 }
 
 
@@ -126,7 +126,7 @@ protected:
   DWORD thread_id;
 };
 
-static WMHooksThread* hook_mgr = 0;
+static WMHooksThread* hook_mgr = nullptr;
 static std::list<WMHooks*> hooks;
 static os::Mutex hook_mgr_lock;
 
@@ -146,7 +146,7 @@ static bool StartHookThread() {
     vlog.error("failed to initialise hooks");
     hook_mgr->stop();
     delete hook_mgr;
-    hook_mgr = 0;
+    hook_mgr = nullptr;
     return false;
   }
   return true;
@@ -160,7 +160,7 @@ static void StopHookThread() {
   vlog.debug("closing thread");
   hook_mgr->stop();
   delete hook_mgr;
-  hook_mgr = 0;
+  hook_mgr = nullptr;
 }
 
 
@@ -220,7 +220,7 @@ WMHooksThread::worker() {
 
   thread_id = GetCurrentThreadId();
 
-  while (active && GetMessage(&msg, NULL, 0, 0)) {
+  while (active && GetMessage(&msg, nullptr, 0, 0)) {
     count++;
 
     if (msg.message == WM_TIMER) {
@@ -306,7 +306,7 @@ WMHooksThread::stop() {
 
 // -=- WMHooks class
 
-rfb::win32::WMHooks::WMHooks() : updateEvent(0) {
+rfb::win32::WMHooks::WMHooks() : updateEvent(nullptr) {
   LoadHooks();
 }
 

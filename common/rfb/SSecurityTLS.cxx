@@ -67,9 +67,9 @@ StringParameter SSecurityTLS::X509_KeyFile
 static LogWriter vlog("TLS");
 
 SSecurityTLS::SSecurityTLS(SConnection* sc, bool _anon)
-  : SSecurity(sc), session(NULL), anon_cred(NULL),
-    cert_cred(NULL), anon(_anon), tlsis(NULL), tlsos(NULL),
-    rawis(NULL), rawos(NULL)
+  : SSecurity(sc), session(nullptr), anon_cred(nullptr),
+    cert_cred(nullptr), anon(_anon), tlsis(nullptr), tlsos(nullptr),
+    rawis(nullptr), rawos(nullptr)
 {
 #if defined (SSECURITYTLS__USE_DEPRECATED_DH)
   dh_params = NULL;
@@ -99,32 +99,32 @@ void SSecurityTLS::shutdown()
 
   if (anon_cred) {
     gnutls_anon_free_server_credentials(anon_cred);
-    anon_cred = 0;
+    anon_cred = nullptr;
   }
 
   if (cert_cred) {
     gnutls_certificate_free_credentials(cert_cred);
-    cert_cred = 0;
+    cert_cred = nullptr;
   }
 
   if (rawis && rawos) {
     sc->setStreams(rawis, rawos);
-    rawis = NULL;
-    rawos = NULL;
+    rawis = nullptr;
+    rawos = nullptr;
   }
 
   if (tlsis) {
     delete tlsis;
-    tlsis = NULL;
+    tlsis = nullptr;
   }
   if (tlsos) {
     delete tlsos;
-    tlsos = NULL;
+    tlsos = nullptr;
   }
 
   if (session) {
     gnutls_deinit(session);
-    session = 0;
+    session = nullptr;
   }
 }
 

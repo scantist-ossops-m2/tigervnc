@@ -44,9 +44,9 @@ static SendSAS_proto _SendSAS = NULL;
 
 VNCServerService::VNCServerService()
   : Service(Name)
-  , stopServiceEvent(CreateEvent(0, FALSE, FALSE, 0))
-  , sessionEvent(CreateEvent(0, FALSE, FALSE, "Global\\SessionEventTigerVNC"))
-  , sessionEventCad(CreateEvent(0, FALSE, FALSE, "Global\\SessionEventTigerVNCCad")) {
+  , stopServiceEvent(CreateEvent(nullptr, FALSE, FALSE, nullptr))
+  , sessionEvent(CreateEvent(nullptr, FALSE, FALSE, "Global\\SessionEventTigerVNC"))
+  , sessionEventCad(CreateEvent(nullptr, FALSE, FALSE, "Global\\SessionEventTigerVNCCad")) {
   if (sasLibrary == NULL) {
     sasLibrary = LoadLibrary("sas.dll");
     if (sasLibrary != NULL)
@@ -116,9 +116,9 @@ HANDLE LaunchProcessWin(DWORD /*dwSessionId*/)
         si.cb = sizeof si;
         si.dwFlags = STARTF_USESHOWWINDOW;
         PROCESS_INFORMATION	pi;
-        if (CreateProcessAsUser(hToken, NULL, (char*)cmdLine.c_str(),
-                                NULL, NULL, FALSE, DETACHED_PROCESS,
-                                NULL, NULL, &si, &pi))
+        if (CreateProcessAsUser(hToken, nullptr, (char*)cmdLine.c_str(),
+                                nullptr, nullptr, FALSE, DETACHED_PROCESS,
+                                nullptr, nullptr, &si, &pi))
         {
             CloseHandle(pi.hThread);
             hProcess = pi.hProcess;

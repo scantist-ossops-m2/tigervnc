@@ -149,7 +149,7 @@ void startTimeCounter(void)
 #ifdef WIN32
   QueryPerformanceCounter(&timeStart);
 #else
-  gettimeofday(&timeStart, NULL);
+  gettimeofday(&timeStart, nullptr);
 #endif
 }
 
@@ -158,7 +158,7 @@ void endTimeCounter(void)
 #ifdef WIN32
   QueryPerformanceCounter(&timeEnd);
 #else
-  gettimeofday(&timeEnd, NULL);
+  gettimeofday(&timeEnd, nullptr);
 #endif
 }
 

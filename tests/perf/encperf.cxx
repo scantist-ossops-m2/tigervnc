@@ -305,7 +305,7 @@ void Manager::getStats(double& ratio, unsigned long long& encodedBytes,
 SConn::SConn()
 {
   out = new DummyOutStream;
-  setStreams(NULL, out);
+  setStreams(nullptr, out);
 
   setWriter(new rfb::SMsgWriter(&client, out));
 
@@ -320,7 +320,7 @@ SConn::~SConn()
 
 void SConn::writeUpdate(const rfb::UpdateInfo& ui, const rfb::PixelBuffer* pb)
 {
-  manager->writeUpdate(ui, pb, NULL);
+  manager->writeUpdate(ui, pb, nullptr);
 }
 
 void SConn::getStats(double& ratio, unsigned long long& bytes,
@@ -354,7 +354,7 @@ static struct stats runTest(const char *fn)
   struct stats s;
   struct timeval start, stop;
 
-  gettimeofday(&start, NULL);
+  gettimeofday(&start, nullptr);
 
   try {
     cc = new CConn(fn);
@@ -372,7 +372,7 @@ static struct stats runTest(const char *fn)
     exit(1);
   }
 
-  gettimeofday(&stop, NULL);
+  gettimeofday(&stop, nullptr);
 
   s.decodeTime = cc->decodeTime;
   s.encodeTime = cc->encodeTime;
@@ -417,7 +417,7 @@ int main(int argc, char **argv)
 
   const char *fn;
 
-  fn = NULL;
+  fn = nullptr;
   for (i = 1; i < argc; i++) {
     if (rfb::Configuration::setParam(argv[i]))
       continue;

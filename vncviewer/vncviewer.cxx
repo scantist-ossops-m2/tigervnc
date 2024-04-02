@@ -214,9 +214,9 @@ static void mainloop(const char* vncserver, network::Socket* sock)
       int ret;
       ret = fl_choice(_("%s\n\n"
                         "Attempt to reconnect?"),
-                      NULL, fl_yes, fl_no, exitError);
+                      nullptr, fl_yes, fl_no, exitError);
       free(exitError);
-      exitError = NULL;
+      exitError = nullptr;
       if (ret == 1)
         continue;
       else
@@ -251,7 +251,7 @@ static void new_connection_cb(Fl_Widget* /*widget*/, void* /*data*/)
     return;
 
   argv[0] = argv0;
-  argv[1] = NULL;
+  argv[1] = nullptr;
 
   execvp(argv[0], (char * const *)argv);
 
@@ -274,7 +274,7 @@ static const char* getlocaledir()
   static char localebuf[PATH_MAX];
   char *slash;
 
-  GetModuleFileName(NULL, localebuf, sizeof(localebuf));
+  GetModuleFileName(nullptr, localebuf, sizeof(localebuf));
 
   slash = strrchr(localebuf, '\\');
   if (slash == NULL)
@@ -301,7 +301,7 @@ static const char* getlocaledir()
     return NULL;
 
   localeurl = CFBundleCopyResourceURL(bundle, CFSTR("locale"),
-                                      NULL, NULL);
+                                      nullptr, nullptr);
   if (localeurl == NULL)
     return NULL;
 
@@ -332,11 +332,13 @@ static void init_fltk()
 #ifdef WIN32
   HICON lg, sm;
 
-  lg = (HICON)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON),
+  lg = (HICON)LoadImage(GetModuleHandle(nullptr),
+                        MAKEINTRESOURCE(IDI_ICON),
                         IMAGE_ICON, GetSystemMetrics(SM_CXICON),
                         GetSystemMetrics(SM_CYICON),
                         LR_DEFAULTCOLOR | LR_SHARED);
-  sm = (HICON)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON),
+  sm = (HICON)LoadImage(GetModuleHandle(nullptr),
+                        MAKEINTRESOURCE(IDI_ICON),
                         IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
                         GetSystemMetrics(SM_CYSMICON),
                         LR_DEFAULTCOLOR | LR_SHARED);
@@ -413,7 +415,7 @@ static void init_fltk()
   Fl_Mac_App_Menu::hide_others = _("Hide Others");
   Fl_Mac_App_Menu::show = _("Show All");
 
-  fl_mac_set_about(about_callback, NULL);
+  fl_mac_set_about(about_callback, nullptr);
 
   Fl_Sys_Menu_Bar *menubar;
   char buffer[1024];
@@ -422,7 +424,7 @@ static void init_fltk()
   // which means we cannot use our generic Fl_Menu_ helpers.
   if (fltk_menu_escape(p_("SysMenu|", "&File"),
                        buffer, sizeof(buffer)) < sizeof(buffer))
-      menubar->add(buffer, 0, 0, 0, FL_SUBMENU);
+      menubar->add(buffer, 0, nullptr, nullptr, FL_SUBMENU);
   if (fltk_menu_escape(p_("SysMenu|File|", "&New Connection"),
                        buffer, sizeof(buffer)) < sizeof(buffer))
       menubar->insert(1, buffer, FL_COMMAND | 'n', new_connection_cb);
@@ -661,7 +663,7 @@ int main(int argc, char** argv)
   char defaultServerName[VNCSERVERNAMELEN] = "";
   try {
     const char* configServerName;
-    configServerName = loadViewerParameters(NULL);
+    configServerName = loadViewerParameters(nullptr);
     if (configServerName != NULL) {
       strncpy(defaultServerName, configServerName, VNCSERVERNAMELEN-1);
       defaultServerName[VNCSERVERNAMELEN-1] = '\0';
@@ -717,7 +719,7 @@ int main(int argc, char** argv)
     Fl::display(display);
   }
   fl_open_display();
-  XkbSetDetectableAutoRepeat(fl_display, True, NULL);
+  XkbSetDetectableAutoRepeat(fl_display, True, nullptr);
 #endif
 
   init_fltk();
@@ -755,7 +757,7 @@ int main(int argc, char** argv)
       if (isdigit(vncServerName[0]))
         port = atoi(vncServerName);
 
-      createTcpListeners(&listeners, 0, port);
+      createTcpListeners(&listeners, nullptr, port);
       if (listeners.empty())
         throw Exception(_("Unable to listen for incoming connections"));
 
@@ -770,7 +772,7 @@ int main(int argc, char** argv)
              i++)
           FD_SET((*i)->getFd(), &rfds);
 
-        int n = select(FD_SETSIZE, &rfds, 0, 0, 0);
+        int n = select(FD_SETSIZE, &rfds, nullptr, nullptr, nullptr);
         if (n < 0) {
           if (errno == EINTR) {
             vlog.debug("Interrupted select() system call");

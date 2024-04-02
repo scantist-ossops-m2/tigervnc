@@ -41,7 +41,7 @@ static LogWriter vlog("SVeNCrypt");
 SSecurityVeNCrypt::SSecurityVeNCrypt(SConnection* sc, SecurityServer *sec)
   : SSecurity(sc), security(sec)
 {
-  ssecurity = NULL;
+  ssecurity = nullptr;
   haveSentVersion = false;
   haveRecvdMajorVersion = false;
   haveRecvdMinorVersion = false;
@@ -51,7 +51,7 @@ SSecurityVeNCrypt::SSecurityVeNCrypt(SConnection* sc, SecurityServer *sec)
   haveChosenType = false;
   chosenType = secTypeVeNCrypt;
   numTypes = 0;
-  subTypes = NULL;
+  subTypes = nullptr;
 }
 
 SSecurityVeNCrypt::~SSecurityVeNCrypt()

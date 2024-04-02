@@ -55,7 +55,7 @@ namespace rfb {
       // SocketServer.
       void addListener(network::SocketListener* sock_,
                        network::SocketServer* srvr,
-                       AddressChangeNotifier* acn = 0);
+                       AddressChangeNotifier* acn=nullptr);
 
       // Remove and delete a listening socket.
       void remListener(network::SocketListener* sock);

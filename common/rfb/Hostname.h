@@ -64,14 +64,14 @@ namespace rfb {
 
       portStart = hostEnd + 1;
       if (isAllSpace(portStart))
-        portStart = NULL;
+        portStart = nullptr;
     } else {
       hostStart = &hi[0];
       hostEnd = strrchr(hostStart, ':');
 
       if (hostEnd == NULL) {
         hostEnd = hostStart + strlen(hostStart);
-        portStart = NULL;
+        portStart = nullptr;
       } else {
         if ((hostEnd > hostStart) && (hostEnd[-1] == ':'))
           hostEnd--;
@@ -79,7 +79,7 @@ namespace rfb {
         if (portStart != hostEnd) {
           // We found more : in the host. This is probably an IPv6 address
           hostEnd = hostStart + strlen(hostStart);
-          portStart = NULL;
+          portStart = nullptr;
         }
       }
     }

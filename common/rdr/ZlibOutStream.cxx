@@ -39,10 +39,10 @@ ZlibOutStream::ZlibOutStream(OutStream* os, int compressLevel)
   : underlying(os), compressionLevel(compressLevel), newLevel(compressLevel)
 {
   zs = new z_stream;
-  zs->zalloc    = Z_NULL;
-  zs->zfree     = Z_NULL;
-  zs->opaque    = Z_NULL;
-  zs->next_in   = Z_NULL;
+  zs->zalloc    = nullptr;
+  zs->zfree     = nullptr;
+  zs->opaque    = nullptr;
+  zs->next_in   = nullptr;
   zs->avail_in  = 0;
   if (deflateInit(zs, compressLevel) != Z_OK) {
     delete zs;

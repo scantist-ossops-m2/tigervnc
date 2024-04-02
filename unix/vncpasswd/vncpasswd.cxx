@@ -71,7 +71,7 @@ static const char* getpassword(const char* prompt) {
       result[strlen(result)-1] = 0;
     return buf;
   }
-  return 0;
+  return nullptr;
 }
 
 // Reads passwords from stdin and prints encrypted passwords to stdout.
@@ -80,7 +80,7 @@ static int encrypt_pipe() {
 
   // We support a maximum of two passwords right now
   for (i = 0;i < 2;i++) {
-    const char *result = getpassword(NULL);
+    const char *result = getpassword(nullptr);
     if (!result)
       break;
 

@@ -71,9 +71,9 @@ static const char* gethomedir(bool userDir)
   return dir;
 #else
   if (userDir)
-    ret = SHGetSpecialFolderPath(NULL, dir, CSIDL_PROFILE, FALSE);
+    ret = SHGetSpecialFolderPath(nullptr, dir, CSIDL_PROFILE, FALSE);
   else
-    ret = SHGetSpecialFolderPath(NULL, dir, CSIDL_APPDATA, FALSE);
+    ret = SHGetSpecialFolderPath(nullptr, dir, CSIDL_APPDATA, FALSE);
 
   if (ret == FALSE)
     return NULL;

@@ -63,13 +63,13 @@ ImageCleanup imageCleanup;
 static rfb::LogWriter vlog("Image");
 
 Image::Image(Display *d)
-  : xim(NULL), dpy(d)
+  : xim(nullptr), dpy(d)
 {
   imageCleanup.images.push_back(this);
 }
 
 Image::Image(Display *d, int width, int height)
-  : xim(NULL), dpy(d)
+  : xim(nullptr), dpy(d)
 {
   imageCleanup.images.push_back(this);
   Init(width, height);
@@ -85,7 +85,8 @@ void Image::Init(int width, int height)
   }
 
   xim = XCreateImage(dpy, vis, DefaultDepth(dpy, DefaultScreen(dpy)),
-                     ZPixmap, 0, 0, width, height, BitmapPad(dpy), 0);
+                     ZPixmap, 0, nullptr, width, height,
+                     BitmapPad(dpy), 0);
 
   xim->data = (char *)malloc(xim->bytes_per_line * xim->height);
   if (xim->data == NULL) {
@@ -217,12 +218,12 @@ static int ShmCreationXErrorHandler(Display* /*dpy*/,
 }
 
 ShmImage::ShmImage(Display *d)
-  : Image(d), shminfo(NULL)
+  : Image(d), shminfo(nullptr)
 {
 }
 
 ShmImage::ShmImage(Display *d, int width, int height)
-  : Image(d), shminfo(NULL)
+  : Image(d), shminfo(nullptr)
 {
   Init(width, height);
 }
@@ -256,12 +257,12 @@ void ShmImage::Init(int width, int height, const XVisualInfo *vinfo)
 
   shminfo = new XShmSegmentInfo;
 
-  xim = XShmCreateImage(dpy, visual, depth, ZPixmap, 0, shminfo,
+  xim = XShmCreateImage(dpy, visual, depth, ZPixmap, nullptr, shminfo,
 			width, height);
   if (xim == NULL) {
     vlog.error("XShmCreateImage() failed");
     delete shminfo;
-    shminfo = NULL;
+    shminfo = nullptr;
     return;
   }
 
@@ -273,22 +274,22 @@ void ShmImage::Init(int width, int height, const XVisualInfo *vinfo)
     vlog.error("shmget() failed (%d bytes requested)",
                int(xim->bytes_per_line * xim->height));
     XDestroyImage(xim);
-    xim = NULL;
+    xim = nullptr;
     delete shminfo;
-    shminfo = NULL;
+    shminfo = nullptr;
     return;
   }
 
-  shminfo->shmaddr = xim->data = (char *)shmat(shminfo->shmid, 0, 0);
+  shminfo->shmaddr = xim->data = (char *)shmat(shminfo->shmid, nullptr, 0);
   if (shminfo->shmaddr == (char *)-1) {
     perror("shmat");
     vlog.error("shmat() failed (%d bytes requested)",
                int(xim->bytes_per_line * xim->height));
-    shmctl(shminfo->shmid, IPC_RMID, 0);
+    shmctl(shminfo->shmid, IPC_RMID, nullptr);
     XDestroyImage(xim);
-    xim = NULL;
+    xim = nullptr;
     delete shminfo;
-    shminfo = NULL;
+    shminfo = nullptr;
     return;
   }
 
@@ -301,11 +302,11 @@ void ShmImage::Init(int width, int height, const XVisualInfo *vinfo)
   if (caughtShmError) {
     vlog.error("XShmAttach() failed");
     shmdt(shminfo->shmaddr);
-    shmctl(shminfo->shmid, IPC_RMID, 0);
+    shmctl(shminfo->shmid, IPC_RMID, nullptr);
     XDestroyImage(xim);
-    xim = NULL;
+    xim = nullptr;
     delete shminfo;
-    shminfo = NULL;
+    shminfo = nullptr;
     return;
   }
 }
@@ -315,7 +316,7 @@ ShmImage::~ShmImage()
   if (shminfo != NULL) {
     XShmDetach(dpy, shminfo);
     shmdt(shminfo->shmaddr);
-    shmctl(shminfo->shmid, IPC_RMID, 0);
+    shmctl(shminfo->shmid, IPC_RMID, nullptr);
     delete shminfo;
   }
 }

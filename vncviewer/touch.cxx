@@ -267,7 +267,7 @@ void enable_touch()
     vlog.error(_("X Input 2.2 (or newer) is not available. Touch gestures will not be supported."));
 #endif
 
-  Fl::add_system_handler(handleTouchEvent, NULL);
+  Fl::add_system_handler(handleTouchEvent, nullptr);
 }
 
 void disable_touch()

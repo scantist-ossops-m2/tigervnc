@@ -41,7 +41,7 @@ using namespace rfb;
 static LogWriter vlog("DecodeManager");
 
 DecodeManager::DecodeManager(CConnection *conn) :
-  conn(conn), threadException(NULL)
+  conn(conn), threadException(nullptr)
 {
   size_t cpuCount;
 
@@ -263,7 +263,7 @@ void DecodeManager::throwThreadException()
   rdr::Exception e(*threadException);
 
   delete threadException;
-  threadException = NULL;
+  threadException = nullptr;
 
   throw e;
 }

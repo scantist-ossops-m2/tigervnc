@@ -93,7 +93,7 @@ static const char* defaultDesktopName()
   if (pwent == NULL)
     return "";
 
-  int len = snprintf(NULL, 0, "%s@%s", pwent->pw_name, hostname.data());
+  int len = snprintf(nullptr, 0, "%s@%s", pwent->pw_name, hostname.data());
   if (len < 0)
     return "";
 
@@ -154,7 +154,7 @@ class FileTcpFilter : public TcpFilter
 public:
 
   FileTcpFilter(const char *fname)
-    : TcpFilter("-"), fileName(NULL), lastModTime(0)
+    : TcpFilter("-"), fileName(nullptr), lastModTime(0)
   {
     if (fname != NULL)
       fileName = strdup((char *)fname);
@@ -353,7 +353,7 @@ int main(int argc, char** argv)
       const char *addr = interface;
 
       if (strcasecmp(addr, "all") == 0)
-        addr = 0;
+        addr = nullptr;
       if (localhostOnly)
         createLocalTcpListeners(&tcp_listeners, (int)rfbport);
       else
@@ -433,8 +433,8 @@ int main(int argc, char** argv)
 
       // Do the wait...
       sched.sleepStarted();
-      int n = select(FD_SETSIZE, &rfds, &wfds, 0,
-                     wait_ms ? &tv : NULL);
+      int n = select(FD_SETSIZE, &rfds, &wfds, nullptr,
+                     wait_ms ? &tv : nullptr);
       sched.sleepFinished();
 
       if (n < 0) {

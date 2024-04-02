@@ -110,7 +110,7 @@ namespace rdr {
       if (restorePoint == NULL)
         throw Exception("Incorrect clearing of input stream restore point");
 #endif
-      restorePoint = NULL;
+      restorePoint = nullptr;
     }
     inline void gotoRestorePoint() {
 #ifdef RFB_INSTREAM_CHECK
@@ -204,7 +204,7 @@ namespace rdr {
 
   protected:
 
-    InStream() : restorePoint(NULL)
+    InStream() : restorePoint(nullptr)
 #ifdef RFB_INSTREAM_CHECK
       ,checkedBytes(0)
 #endif

@@ -56,8 +56,8 @@ const SConnection::AccessRights SConnection::AccessFull           = 0xffff;
 
 
 SConnection::SConnection()
-  : readyForSetColourMapEntries(false),
-    is(0), os(0), reader_(0), writer_(0), ssecurity(0),
+  : readyForSetColourMapEntries(false), is(nullptr), os(nullptr),
+    reader_(nullptr), writer_(nullptr), ssecurity(nullptr),
     authFailureTimer(this, &SConnection::handleAuthFailureTimeout),
     state_(RFBSTATE_UNINITIALISED), preferredEncoding(encodingRaw),
     accessRights(0x0000), hasRemoteClipboard(false),
@@ -621,11 +621,11 @@ void SConnection::sendClipboardData(const char* data)
 void SConnection::cleanup()
 {
   delete ssecurity;
-  ssecurity = NULL;
+  ssecurity = nullptr;
   delete reader_;
-  reader_ = NULL;
+  reader_ = nullptr;
   delete writer_;
-  writer_ = NULL;
+  writer_ = nullptr;
 }
 
 void SConnection::writeFakeColourMap(void)

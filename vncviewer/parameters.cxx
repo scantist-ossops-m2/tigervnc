@@ -350,7 +350,7 @@ static bool getKeyString(const char* _name, char* dest, size_t destSize, HKEY* h
 
   value = new WCHAR[destSize];
   valuesize = destSize;
-  LONG res = RegQueryValueExW(*hKey, name, 0, NULL, (LPBYTE)value, &valuesize);
+  LONG res = RegQueryValueExW(*hKey, name, nullptr, nullptr, (LPBYTE)value, &valuesize);
   if (res != ERROR_SUCCESS){
     delete [] value;
     if (res != ERROR_FILE_NOT_FOUND)
@@ -388,7 +388,7 @@ static bool getKeyInt(const char* _name, int* dest, HKEY* hKey) {
   if (size >= buffersize)
     throw Exception(_("The name of the parameter is too large"));
 
-  LONG res = RegQueryValueExW(*hKey, name, 0, NULL, (LPBYTE)&value, &dwordsize);
+  LONG res = RegQueryValueExW(*hKey, name, nullptr, nullptr, (LPBYTE)&value, &dwordsize);
   if (res != ERROR_SUCCESS){
     if (res != ERROR_FILE_NOT_FOUND)
       throw rdr::SystemException("RegQueryValueExW", res);
@@ -420,9 +420,9 @@ static void removeValue(const char* _name, HKEY* hKey) {
 void saveHistoryToRegKey(const vector<string>& serverHistory) {
   HKEY hKey;
   LONG res = RegCreateKeyExW(HKEY_CURRENT_USER,
-                             L"Software\\TigerVNC\\vncviewer\\history", 0, NULL,
-                             REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL,
-                             &hKey, NULL);
+                             L"Software\\TigerVNC\\vncviewer\\history", 0, nullptr,
+                             REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, nullptr,
+                             &hKey, nullptr);
 
   if (res != ERROR_SUCCESS)
     throw rdr::SystemException(_("Failed to create registry key"), res);
@@ -452,9 +452,9 @@ static void saveToReg(const char* servername) {
   HKEY hKey;
     
   LONG res = RegCreateKeyExW(HKEY_CURRENT_USER,
-                             L"Software\\TigerVNC\\vncviewer", 0, NULL,
-                             REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL,
-                             &hKey, NULL);
+                             L"Software\\TigerVNC\\vncviewer", 0, nullptr,
+                             REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, nullptr,
+                             &hKey, nullptr);
   if (res != ERROR_SUCCESS)
     throw rdr::SystemException(_("Failed to create registry key"), res);
 
@@ -836,7 +836,8 @@ char* loadViewerParameters(const char *filename) {
       vlog.error(_("Failed to read line %d in file %s: %s"),
                  lineNr, filepath, _("Unknown parameter"));
   }
-  fclose(f); f=0;
-  
+  fclose(f);
+  f = nullptr;
+
   return servername;
 }

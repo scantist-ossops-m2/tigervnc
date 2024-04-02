@@ -145,7 +145,7 @@ void Fl_Navigation::update_labels()
   int i, offset;
 
   labels->clear();
-  labels->resizable(NULL);
+  labels->resizable(nullptr);
 
   if (!pages->children())
     return;

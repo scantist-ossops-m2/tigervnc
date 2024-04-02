@@ -379,7 +379,7 @@ std::string Fl_Monitor_Arrangement::get_monitor_name(int m)
 
   Fl::screen_xywh(x, y, w, h, m);
 
-  EnumDisplayMonitors(NULL, NULL, EnumDisplayMonitorsCallback,
+  EnumDisplayMonitors(nullptr, nullptr, EnumDisplayMonitorsCallback,
                       (LPARAM)&sys_monitors);
 
   for (iter = sys_monitors.begin(); iter != sys_monitors.end(); ++iter) {
@@ -454,7 +454,7 @@ std::string Fl_Monitor_Arrangement::get_monitor_name(int m)
 
   if (dict_len > 0) {
     CFTypeRef * names = new CFTypeRef[dict_len];
-    CFDictionaryGetKeysAndValues(dict, NULL, (const void **) names);
+    CFDictionaryGetKeysAndValues(dict, nullptr, (const void **) names);
 
     if (names[0]) {
 

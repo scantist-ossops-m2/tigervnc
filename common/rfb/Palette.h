@@ -75,7 +75,7 @@ inline bool rfb::Palette::insert(uint32_t colour, int numPixels)
   hash_key = genHash(colour);
 
   pnode = hash[hash_key];
-  prev_pnode = NULL;
+  prev_pnode = nullptr;
 
   // Do we already have an entry for this colour?
   while (pnode != NULL) {
@@ -114,7 +114,7 @@ inline bool rfb::Palette::insert(uint32_t colour, int numPixels)
 
   // Create a new colour entry
   pnode = &list[numColours];
-  pnode->next = NULL;
+  pnode->next = nullptr;
   pnode->idx = 0;
   pnode->colour = colour;
 

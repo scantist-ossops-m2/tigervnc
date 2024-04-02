@@ -40,7 +40,7 @@ namespace rfb {
     std::string out;
 
     va_start(ap, fmt);
-    len = vsnprintf(NULL, 0, fmt, ap);
+    len = vsnprintf(nullptr, 0, fmt, ap);
     va_end(ap);
 
     if (len < 0)
@@ -621,7 +621,7 @@ namespace rfb {
   {
     struct timeval now;
 
-    gettimeofday(&now, NULL);
+    gettimeofday(&now, nullptr);
 
     return msBetween(then, &now);
   }

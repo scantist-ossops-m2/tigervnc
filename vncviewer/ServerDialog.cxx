@@ -110,7 +110,7 @@ ServerDialog::ServerDialog()
   y += BUTTON_HEIGHT + INNER_MARGIN;
 
   /* Needed for resize to work sanely */
-  resizable(NULL);
+  resizable(nullptr);
   h(y-INNER_MARGIN+OUTER_MARGIN);
 
   callback(this->handleCancel, this);
@@ -237,7 +237,7 @@ void ServerDialog::handleSaveAs(Fl_Widget* /*widget*/, void* data)
       // The file already exists.
       fclose(f);
       int overwrite_choice = fl_choice(_("%s already exists. Do you want to overwrite?"), 
-                                       _("Overwrite"), _("No"), NULL, filename);
+                                       _("Overwrite"), _("No"), nullptr, filename);
       if (overwrite_choice == 1) {
 
         // If the user doesn't want to overwrite:
@@ -284,7 +284,7 @@ void ServerDialog::handleConnect(Fl_Widget* /*widget*/, void *data)
   dialog->hide();
 
   try {
-    saveViewerParameters(NULL, servername);
+    saveViewerParameters(nullptr, servername);
   } catch (Exception& e) {
     vlog.error("%s", e.str());
     fl_alert(_("Unable to save the default configuration:\n\n%s"),

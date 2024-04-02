@@ -138,7 +138,7 @@ EncodeManager::EncodeManager(SConnection* conn_)
 {
   StatsVector::iterator iter;
 
-  encoders.resize(encoderClassMax, NULL);
+  encoders.resize(encoderClassMax, nullptr);
   activeEncoders.resize(encoderTypeMax, encoderRaw);
 
   encoders[encoderRaw] = new RawEncoder(conn);

@@ -84,8 +84,10 @@ static const char* homedirfn(const char* fn)
 }
 
 CSecurityTLS::CSecurityTLS(CConnection* cc, bool _anon)
-  : CSecurity(cc), session(NULL), anon_cred(NULL), cert_cred(NULL),
-    anon(_anon), tlsis(NULL), tlsos(NULL), rawis(NULL), rawos(NULL)
+  : CSecurity(cc), session(nullptr),
+    anon_cred(nullptr), cert_cred(nullptr),
+    anon(_anon), tlsis(nullptr), tlsos(nullptr),
+    rawis(nullptr), rawos(nullptr)
 {
   if (gnutls_global_init() != GNUTLS_E_SUCCESS)
     throw AuthFailureException("gnutls_global_init failed");
@@ -104,32 +106,32 @@ void CSecurityTLS::shutdown()
 
   if (anon_cred) {
     gnutls_anon_free_client_credentials(anon_cred);
-    anon_cred = 0;
+    anon_cred = nullptr;
   }
 
   if (cert_cred) {
     gnutls_certificate_free_credentials(cert_cred);
-    cert_cred = 0;
+    cert_cred = nullptr;
   }
 
   if (rawis && rawos) {
     cc->setStreams(rawis, rawos);
-    rawis = NULL;
-    rawos = NULL;
+    rawis = nullptr;
+    rawos = nullptr;
   }
 
   if (tlsis) {
     delete tlsis;
-    tlsis = NULL;
+    tlsis = nullptr;
   }
   if (tlsos) {
     delete tlsos;
-    tlsos = NULL;
+    tlsos = nullptr;
   }
 
   if (session) {
     gnutls_deinit(session);
-    session = 0;
+    session = nullptr;
   }
 }
 
@@ -394,8 +396,8 @@ void CSecurityTLS::checkSession()
   std::string dbPath;
   dbPath = (std::string)homeDir + "/x509_known_hosts";
 
-  err = gnutls_verify_stored_pubkey(dbPath.c_str(), NULL,
-                                    client->getServerName(), NULL,
+  err = gnutls_verify_stored_pubkey(dbPath.c_str(), nullptr,
+                                    client->getServerName(), nullptr,
                                     GNUTLS_CRT_X509, &cert_list[0], 0);
 
   /* Previously known? */
@@ -649,8 +651,9 @@ void CSecurityTLS::checkSession()
     }
   }
 
-  if (gnutls_store_pubkey(dbPath.c_str(), NULL, client->getServerName(),
-                          NULL, GNUTLS_CRT_X509, &cert_list[0], 0, 0))
+  if (gnutls_store_pubkey(dbPath.c_str(), nullptr,
+                          client->getServerName(), nullptr,
+                          GNUTLS_CRT_X509, &cert_list[0], 0, 0))
     vlog.error("Failed to store server certificate to known hosts database");
 
   vlog.info("Exception added for server host");

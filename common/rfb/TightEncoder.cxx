@@ -265,7 +265,7 @@ void TightEncoder::flushZlibOutStream(rdr::OutStream* os_)
 
   zos->cork(false);
   zos->flush();
-  zos->setUnderlying(NULL);
+  zos->setUnderlying(nullptr);
 
   os = conn->getOutStream();
 
