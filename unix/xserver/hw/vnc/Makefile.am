@@ -8,6 +8,8 @@ NETWORK_LIB=$(TIGERVNC_BUILDDIR)/common/network/libnetwork.la
 UNIXCOMMON_LIB=$(TIGERVNC_BUILDDIR)/unix/common/libunixcommon.la
 COMMON_LIBS=$(NETWORK_LIB) $(RFB_LIB) $(RDR_LIB) $(OS_LIB) $(UNIXCOMMON_LIB)
 
+AM_CXXFLAGS = -std=gnu++11
+
 noinst_LTLIBRARIES = libvnccommon.la
 
 HDRS = vncExtInit.h vncHooks.h \
