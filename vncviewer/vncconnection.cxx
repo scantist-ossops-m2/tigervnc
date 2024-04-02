@@ -14,10 +14,8 @@
 
 #include <QApplication>
 #include <QClipboard>
-#include <QLocalSocket>
 #include <QProcess>
 #include <QSocketNotifier>
-#include <QTcpSocket>
 #include <QTimer>
 #undef asprintf
 #include "CConn.h"
