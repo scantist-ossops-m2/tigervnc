@@ -79,7 +79,7 @@ XserverDesktop::XserverDesktop(int screenIndex_,
                                void* fbptr, int stride_)
   : screenIndex(screenIndex_),
     server(0), listeners(listeners_),
-    shadowFramebuffer(NULL),
+    shadowFramebuffer(nullptr),
     queryConnectId(0), queryConnectTimer(this)
 {
   format = pf;
@@ -122,7 +122,7 @@ void XserverDesktop::setFramebuffer(int w, int h, void* fbptr, int stride_)
 
   if (shadowFramebuffer) {
     delete [] shadowFramebuffer;
-    shadowFramebuffer = NULL;
+    shadowFramebuffer = nullptr;
   }
 
   if (!fbptr) {
@@ -493,7 +493,7 @@ void XserverDesktop::handleClipboardData(const char* data_)
 
 void XserverDesktop::grabRegion(const rfb::Region& region)
 {
-  if (shadowFramebuffer == NULL)
+  if (shadowFramebuffer == nullptr)
     return;
 
   std::vector<rfb::Rect> rects;
