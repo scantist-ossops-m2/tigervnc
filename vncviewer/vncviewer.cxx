@@ -87,11 +87,11 @@ using namespace rfb;
 
 char vncServerName[VNCSERVERNAMELEN] = { '\0' };
 
-static const char *argv0 = NULL;
+static const char *argv0 = nullptr;
 
 static bool inMainloop = false;
 static bool exitMainloop = false;
-static char *exitError = NULL;
+static char *exitError = nullptr;
 static bool fatalError = false;
 
 static const char *about_text()
@@ -118,7 +118,7 @@ void abort_vncviewer(const char *error, ...)
 
   // Prioritise the first error we get as that is probably the most
   // relevant one.
-  if (exitError == NULL) {
+  if (exitError == nullptr) {
     va_list ap;
 
     va_start(ap, error);
@@ -131,7 +131,7 @@ void abort_vncviewer(const char *error, ...)
     exitMainloop = true;
   else {
     // We're early in the startup. Assume we can just exit().
-    if (alertOnFatalError && (exitError != NULL))
+    if (alertOnFatalError && (exitError != nullptr))
       fl_alert("%s", exitError);
     exit(EXIT_FAILURE);
   }
@@ -143,7 +143,7 @@ void abort_connection(const char *error, ...)
 
   // Prioritise the first error we get as that is probably the most
   // relevant one.
-  if (exitError == NULL) {
+  if (exitError == nullptr) {
     va_list ap;
 
     va_start(ap, error);
@@ -207,10 +207,10 @@ static void mainloop(const char* vncserver, network::Socket* sock)
       break;
     }
 
-    if (exitError == NULL)
+    if (exitError == nullptr)
       break;
 
-    if(reconnectOnError && (sock == NULL)) {
+    if(reconnectOnError && (sock == nullptr)) {
       int ret;
       ret = fl_choice(_("%s\n\n"
                         "Attempt to reconnect?"),
@@ -277,13 +277,13 @@ static const char* getlocaledir()
   GetModuleFileName(nullptr, localebuf, sizeof(localebuf));
 
   slash = strrchr(localebuf, '\\');
-  if (slash == NULL)
-    return NULL;
+  if (slash == nullptr)
+    return nullptr;
 
   *slash = '\0';
 
   if ((strlen(localebuf) + strlen("\\locale")) >= sizeof(localebuf))
-    return NULL;
+    return nullptr;
 
   strcat(localebuf, "\\locale");
 
@@ -297,13 +297,13 @@ static const char* getlocaledir()
   static char localebuf[PATH_MAX];
 
   bundle = CFBundleGetMainBundle();
-  if (bundle == NULL)
-    return NULL;
+  if (bundle == nullptr)
+    return nullptr;
 
   localeurl = CFBundleCopyResourceURL(bundle, CFSTR("locale"),
                                       nullptr, nullptr);
-  if (localeurl == NULL)
-    return NULL;
+  if (localeurl == nullptr)
+    return nullptr;
 
   localestr = CFURLCopyFileSystemPath(localeurl, kCFURLPOSIXPathStyle);
 
@@ -312,7 +312,7 @@ static const char* getlocaledir()
   ret = CFStringGetCString(localestr, localebuf, sizeof(localebuf),
                            kCFStringEncodingUTF8);
   if (!ret)
-    return NULL;
+    return nullptr;
 
   return localebuf;
 #else
@@ -435,7 +435,7 @@ static void mkvnchomedir()
 {
   // Create .vnc in the user's home directory if it doesn't already exist
   const char* homeDir = os::getvnchomedir();
-  if (homeDir == NULL) {
+  if (homeDir == nullptr) {
     vlog.error(_("Could not obtain the home directory path"));
   } else {
     int result = mkdir(homeDir, 0755);
@@ -448,7 +448,7 @@ static void usage(const char *programName)
 {
 #ifdef WIN32
   // If we don't have a console then we need to create one for output
-  if (GetConsoleWindow() == NULL) {
+  if (GetConsoleWindow() == nullptr) {
     HANDLE handle;
     int fd;
 
@@ -503,8 +503,8 @@ static void usage(const char *programName)
 static void
 potentiallyLoadConfigurationFile(char *vncServerName)
 {
-  const bool hasPathSeparator = (strchr(vncServerName, '/') != NULL ||
-                                 (strchr(vncServerName, '\\')) != NULL);
+  const bool hasPathSeparator = (strchr(vncServerName, '/') != nullptr ||
+                                 (strchr(vncServerName, '\\')) != nullptr);
 
   if (hasPathSeparator) {
 #ifndef WIN32
@@ -550,7 +550,7 @@ interpretViaParam(char *remoteHost, int *remotePort, int localPort)
 {
   const int SERVER_PORT_OFFSET = 5900;
   char *pos = strchr(vncServerName, ':');
-  if (pos == NULL)
+  if (pos == nullptr)
     *remotePort = SERVER_PORT_OFFSET;
   else {
     int portOffset = SERVER_PORT_OFFSET;
@@ -596,7 +596,7 @@ createTunnel(const char *gatewayHost, const char *remoteHost,
     cmd = "/usr/bin/ssh -f -L \"$L\":\"$H\":\"$R\" \"$G\" sleep 20";
   /* Compatibility with TigerVNC's method. */
   cmd2 = strdup(cmd);
-  while ((percent = strchr(cmd2, '%')) != NULL)
+  while ((percent = strchr(cmd2, '%')) != nullptr)
     *percent = '$';
   system(cmd2);
   free(cmd2);
@@ -628,7 +628,7 @@ int main(int argc, char** argv)
   setlocale(LC_ALL, "");
 
   localedir = getlocaledir();
-  if (localedir == NULL)
+  if (localedir == nullptr)
     fprintf(stderr, "Failed to determine locale directory\n");
   else
     bindtextdomain(PACKAGE_NAME, localedir);
@@ -664,7 +664,7 @@ int main(int argc, char** argv)
   try {
     const char* configServerName;
     configServerName = loadViewerParameters(nullptr);
-    if (configServerName != NULL) {
+    if (configServerName != nullptr) {
       strncpy(defaultServerName, configServerName, VNCSERVERNAMELEN-1);
       defaultServerName[VNCSERVERNAMELEN-1] = '\0';
     }
@@ -678,8 +678,8 @@ int main(int argc, char** argv)
         VoidParameter *param;
 
         param = Configuration::getParam(&argv[i][1]);
-        if ((param != NULL) &&
-            (dynamic_cast<BoolParameter*>(param) != NULL)) {
+        if ((param != nullptr) &&
+            (dynamic_cast<BoolParameter*>(param) != nullptr)) {
           if ((strcasecmp(argv[i+1], "0") == 0) ||
               (strcasecmp(argv[i+1], "1") == 0) ||
               (strcasecmp(argv[i+1], "true") == 0) ||
@@ -737,7 +737,7 @@ int main(int argc, char** argv)
   CSecurity::msg = &dlg;
 #endif
 
-  Socket *sock = NULL;
+  Socket *sock = nullptr;
 
 #ifndef WIN32
   /* Specifying -via and -listen together is nonsense */
@@ -764,7 +764,7 @@ int main(int argc, char** argv)
       vlog.info(_("Listening on port %d"), port);
 
       /* Wait for a connection */
-      while (sock == NULL) {
+      while (sock == nullptr) {
         fd_set rfds;
         FD_ZERO(&rfds);
         for (std::list<SocketListener*>::iterator i = listeners.begin();

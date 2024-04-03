@@ -441,11 +441,11 @@ std::string Fl_Monitor_Arrangement::get_monitor_name(int m)
 
   info = IODisplayCreateInfoDictionary(CGDisplayIOServicePort(displayID),
                                        kIODisplayOnlyPreferredName);
-  if (info == NULL)
+  if (info == nullptr)
     return "";
 
   dict = (CFDictionaryRef) CFDictionaryGetValue(info, CFSTR(kDisplayProductName));
-  if (dict == NULL) {
+  if (dict == nullptr) {
     CFRelease(info);
     return "";
   }

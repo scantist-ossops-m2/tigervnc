@@ -314,9 +314,9 @@ void init_theme()
   CFStringRef name;
 
   font = CTFontCreateUIFontForLanguage(kCTFontSystemFontType, 0.0, nullptr);
-  if (font != NULL) {
+  if (font != nullptr) {
     name = CTFontCopyFullName(font);
-    if (name != NULL) {
+    if (name != nullptr) {
       CFStringGetCString(name, font_name, sizeof(font_name),
                          kCFStringEncodingUTF8);
 

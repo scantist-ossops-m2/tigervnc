@@ -72,7 +72,7 @@ Fl_Widget *Fl_Navigation::value()
       return pages->child(i);
   }
 
-  return NULL;
+  return nullptr;
 }
 
 int Fl_Navigation::value(Fl_Widget *newpage)

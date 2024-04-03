@@ -342,7 +342,7 @@ void VNCServerST::setScreenLayout(const ScreenSet& layout)
 
 void VNCServerST::requestClipboard()
 {
-  if (clipboardClient == NULL) {
+  if (clipboardClient == nullptr) {
     slog.debug("Got request for client clipboard but no client currently owns the clipboard");
     return;
   }
@@ -366,7 +366,7 @@ void VNCServerST::sendClipboardData(const char* data)
 {
   std::list<VNCSConnectionST*>::iterator ci, ci_next;
 
-  if (strchr(data, '\r') != NULL)
+  if (strchr(data, '\r') != nullptr)
     throw Exception("Invalid carriage return in clipboard data");
 
   for (ci = clipboardRequestors.begin();
@@ -399,7 +399,7 @@ void VNCServerST::setName(const char* name_)
 
 void VNCServerST::add_changed(const Region& region)
 {
-  if (comparer == NULL)
+  if (comparer == nullptr)
     return;
 
   comparer->add_changed(region);
@@ -408,7 +408,7 @@ void VNCServerST::add_changed(const Region& region)
 
 void VNCServerST::add_copied(const Region& dest, const Point& delta)
 {
-  if (comparer == NULL)
+  if (comparer == nullptr)
     return;
 
   comparer->add_copied(dest, delta);
@@ -492,7 +492,7 @@ void VNCServerST::pointerEvent(VNCSConnectionST* client,
   // Let one client own the cursor whilst buttons are pressed in order
   // to provide a bit more sane user experience. But limit the time to
   // prevent locking out all others when e.g. the network is down.
-  if ((pointerClient != NULL) && (pointerClient != client) &&
+  if ((pointerClient != nullptr) && (pointerClient != client) &&
       ((now - pointerClientTime) < 10))
     return;
 

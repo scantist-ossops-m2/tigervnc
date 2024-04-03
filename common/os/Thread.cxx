@@ -65,7 +65,7 @@ void Thread::start()
 
 #ifdef WIN32
   *(HANDLE*)threadId = CreateThread(nullptr, 0, startRoutine, this, 0, nullptr);
-  if (*(HANDLE*)threadId == NULL)
+  if (*(HANDLE*)threadId == nullptr)
     throw rdr::SystemException("Failed to create thread", GetLastError());
 #else
   int ret;

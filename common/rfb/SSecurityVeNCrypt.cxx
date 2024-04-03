@@ -175,14 +175,14 @@ bool SSecurityVeNCrypt::processMsg()
 
 const char* SSecurityVeNCrypt::getUserName() const
 {
-  if (ssecurity == NULL)
-    return NULL;
+  if (ssecurity == nullptr)
+    return nullptr;
   return ssecurity->getUserName();
 }
 
 SConnection::AccessRights SSecurityVeNCrypt::getAccessRights() const
 {
-  if (ssecurity == NULL)
+  if (ssecurity == nullptr)
     return SSecurity::getAccessRights();
   return ssecurity->getAccessRights();
 }

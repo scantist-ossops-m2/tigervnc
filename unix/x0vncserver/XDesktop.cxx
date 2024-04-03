@@ -956,7 +956,7 @@ bool XDesktop::setCursor()
   XFixesCursorImage *cim;
 
   cim = XFixesGetCursorImage(dpy);
-  if (cim == NULL)
+  if (cim == nullptr)
     return false;
 
   // Copied from XserverDesktop::setCursor() in

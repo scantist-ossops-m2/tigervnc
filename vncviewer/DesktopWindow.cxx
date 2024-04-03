@@ -438,7 +438,7 @@ void DesktopWindow::draw()
 #if !defined(__APPLE__)
 
   // Adjust offscreen surface dimensions
-  if ((offscreen == NULL) ||
+  if ((offscreen == nullptr) ||
       (offscreen->width() != w()) || (offscreen->height() != h())) {
     delete offscreen;
     offscreen = new Surface(w(), h());
@@ -852,7 +852,7 @@ int DesktopWindow::handle(int event)
       }
       // We also don't get sensible coordinates on zaphod setups
 #if !defined(WIN32) && !defined(__APPLE__)
-      if ((fl_xevent != NULL) && (fl_xevent->type == MotionNotify) &&
+      if ((fl_xevent != nullptr) && (fl_xevent->type == MotionNotify) &&
           (((XMotionEvent*)fl_xevent)->root !=
            XRootWindow(fl_display, fl_screen))) {
         ungrabPointer();
@@ -887,7 +887,7 @@ int DesktopWindow::fltkDispatch(int event, Fl_Window *win)
   // FLTK keeps spamming bogus FL_MOVE events if _any_ X event is
   // received with the mouse pointer outside our windows
   // https://github.com/fltk/fltk/issues/76
-  if ((event == FL_MOVE) && (win == NULL))
+  if ((event == FL_MOVE) && (win == nullptr))
     return 0;
 
   ret = Fl::handle_(event, win);

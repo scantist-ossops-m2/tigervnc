@@ -87,7 +87,7 @@ bool H264WinDecoderContext::initCodec() {
 
   // set decoder output type (NV12)
   DWORD output_index = 0;
-  IMFMediaType* output_type = NULL;
+  IMFMediaType* output_type = nullptr;
   while (SUCCEEDED(decoder->GetOutputAvailableType(0, output_index++, &output_type)))
   {
     GUID subtype;
@@ -232,7 +232,7 @@ void H264WinDecoderContext::decode(const uint8_t* h264_buffer,
       // need to setup output type and try decoding again
 
       DWORD output_index = 0;
-      IMFMediaType* output_type = NULL;
+      IMFMediaType* output_type = nullptr;
       while (SUCCEEDED(decoder->GetOutputAvailableType(0, output_index++, &output_type)))
       {
         GUID subtype;

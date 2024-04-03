@@ -123,7 +123,7 @@ OptionsDialog::~OptionsDialog()
 
 void OptionsDialog::showDialog(void)
 {
-  static OptionsDialog *dialog = NULL;
+  static OptionsDialog *dialog = nullptr;
 
   if (!dialog)
     dialog = new OptionsDialog();

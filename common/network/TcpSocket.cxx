@@ -139,7 +139,7 @@ TcpSocket::TcpSocket(const char *host, int port)
 
   sock = -1;
   err = 0;
-  for (current = ai; current != NULL; current = current->ai_next) {
+  for (current = ai; current != nullptr; current = current->ai_next) {
     int family;
     vnc_sockaddr_t sa;
     socklen_t salen;
@@ -244,7 +244,7 @@ const char* TcpSocket::getPeerAddress() {
     char *name;
 
     name = inet_ntoa(sa.u.sin.sin_addr);
-    if (name == NULL) {
+    if (name == nullptr) {
       vlog.error("unable to convert peer name to a string");
       return "(N/A)";
     }
@@ -360,7 +360,7 @@ std::list<std::string> TcpListener::getMyAddresses() {
   if ((getaddrinfo(nullptr, "1", &hints, &ai)) != 0)
     return result;
 
-  for (current= ai; current != NULL; current = current->ai_next) {
+  for (current= ai; current != nullptr; current = current->ai_next) {
     char addr[INET6_ADDRSTRLEN];
 
     switch (current->ai_family) {
@@ -463,7 +463,7 @@ void network::createTcpListeners(std::list<SocketListener*> *listeners,
 
   initSockets();
 
-  for (current = ai; current != NULL; current = current->ai_next) {
+  for (current = ai; current != nullptr; current = current->ai_next) {
     switch (current->ai_family) {
     case AF_INET:
       if (!UseIPv4)

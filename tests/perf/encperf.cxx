@@ -432,7 +432,7 @@ int main(int argc, char **argv)
       usage(argv[0]);
     }
 
-    if (fn != NULL)
+    if (fn != nullptr)
       usage(argv[0]);
 
     fn = argv[i];
@@ -444,7 +444,7 @@ int main(int argc, char **argv)
   double *dev = new double[runCount];
   double median, meddev;
 
-  if (fn == NULL) {
+  if (fn == nullptr) {
     fprintf(stderr, "No file specified!\n\n");
     usage(argv[0]);
   }

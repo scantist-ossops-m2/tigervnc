@@ -89,7 +89,7 @@ void Image::Init(int width, int height)
                      BitmapPad(dpy), 0);
 
   xim->data = (char *)malloc(xim->bytes_per_line * xim->height);
-  if (xim->data == NULL) {
+  if (xim->data == nullptr) {
     vlog.error("malloc() failed");
     exit(1);
   }
@@ -100,7 +100,7 @@ Image::~Image()
   imageCleanup.images.remove(this);
 
   // XDestroyImage will free xim->data if necessary
-  if (xim != NULL)
+  if (xim != nullptr)
     XDestroyImage(xim);
 }
 
@@ -242,7 +242,7 @@ void ShmImage::Init(int width, int height, const XVisualInfo *vinfo)
   Visual *visual;
   int depth;
 
-  if (vinfo == NULL) {
+  if (vinfo == nullptr) {
     visual = DefaultVisual(dpy, DefaultScreen(dpy));
     depth = DefaultDepth(dpy, DefaultScreen(dpy));
   } else {
@@ -259,7 +259,7 @@ void ShmImage::Init(int width, int height, const XVisualInfo *vinfo)
 
   xim = XShmCreateImage(dpy, visual, depth, ZPixmap, nullptr, shminfo,
 			width, height);
-  if (xim == NULL) {
+  if (xim == nullptr) {
     vlog.error("XShmCreateImage() failed");
     delete shminfo;
     shminfo = nullptr;
@@ -313,7 +313,7 @@ void ShmImage::Init(int width, int height, const XVisualInfo *vinfo)
 
 ShmImage::~ShmImage()
 {
-  if (shminfo != NULL) {
+  if (shminfo != nullptr) {
     XShmDetach(dpy, shminfo);
     shmdt(shminfo->shmaddr);
     shmctl(shminfo->shmid, IPC_RMID, nullptr);
@@ -355,13 +355,13 @@ ImageFactory::~ImageFactory()
 
 Image *ImageFactory::newImage(Display *d, int width, int height)
 {
-  Image *image = NULL;
+  Image *image = nullptr;
 
   // Now, try to use shared memory image.
 
   if (mayUseShm) {
     image = new ShmImage(d, width, height);
-    if (image->xim != NULL) {
+    if (image->xim != nullptr) {
       return image;
     }
 

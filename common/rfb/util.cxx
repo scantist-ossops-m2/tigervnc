@@ -68,13 +68,13 @@ namespace rfb {
     start = src;
     do {
       stop = strchr(start, delimiter);
-      if (stop == NULL) {
+      if (stop == nullptr) {
         out.push_back(start);
       } else {
         out.push_back(std::string(start, stop-start));
         start = stop + 1;
       }
-    } while (stop != NULL);
+    } while (stop != nullptr);
 
     return out;
   }

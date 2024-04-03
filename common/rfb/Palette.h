@@ -78,7 +78,7 @@ inline bool rfb::Palette::insert(uint32_t colour, int numPixels)
   prev_pnode = nullptr;
 
   // Do we already have an entry for this colour?
-  while (pnode != NULL) {
+  while (pnode != nullptr) {
     if (pnode->colour == colour) {
       // Yup
 
@@ -119,7 +119,7 @@ inline bool rfb::Palette::insert(uint32_t colour, int numPixels)
   pnode->colour = colour;
 
   // Add it to the hash table
-  if (prev_pnode != NULL)
+  if (prev_pnode != nullptr)
     prev_pnode->next = pnode;
   else
     hash[hash_key] = pnode;
@@ -152,7 +152,7 @@ inline unsigned char rfb::Palette::lookup(uint32_t colour) const
   hash_key = genHash(colour);
   pnode = hash[hash_key];
 
-  while (pnode != NULL) {
+  while (pnode != nullptr) {
     if (pnode->colour == colour)
       return pnode->idx;
     pnode = pnode->next;

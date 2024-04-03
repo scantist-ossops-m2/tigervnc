@@ -702,7 +702,7 @@ unsigned int Viewport::getModifierMask(unsigned int keysym)
   mask = 0;
 
   xkb = XkbGetMap(fl_display, XkbAllComponentsMask, XkbUseCoreKbd);
-  if (xkb == NULL)
+  if (xkb == nullptr)
     return 0;
 
   for (keycode = xkb->min_key_code; keycode <= xkb->max_key_code; keycode++) {
@@ -722,7 +722,7 @@ unsigned int Viewport::getModifierMask(unsigned int keysym)
     goto out;
 
   act = XkbKeyAction(xkb, keycode, 0);
-  if (act == NULL)
+  if (act == nullptr)
     goto out;
   if (act->type != XkbSA_LockMods)
     goto out;
@@ -1298,7 +1298,7 @@ void Viewport::popupContextMenu()
   if (Fl::belowmouse())
     window()->cursor(cursor, cursorHotspot.x, cursorHotspot.y);
 
-  if (m == NULL)
+  if (m == nullptr)
     return;
 
   switch (m->argument()) {

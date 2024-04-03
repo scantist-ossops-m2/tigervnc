@@ -167,7 +167,7 @@ Socket* SocketListener::accept() {
   Socket* s = createSocket(new_sock);
   if (filter && !filter->verifyConnection(s)) {
     delete s;
-    return NULL;
+    return nullptr;
   }
 
   return s;

@@ -78,14 +78,14 @@ void ZlibOutStream::setCompressionLevel(int level)
 void ZlibOutStream::flush()
 {
   BufferedOutStream::flush();
-  if (underlying != NULL)
+  if (underlying != nullptr)
     underlying->flush();
 }
 
 void ZlibOutStream::cork(bool enable)
 {
   BufferedOutStream::cork(enable);
-  if (underlying != NULL)
+  if (underlying != nullptr)
     underlying->cork(enable);
 }
 

@@ -116,7 +116,7 @@ static void processParams(int argc, char** argv) {
           if (ancd.showDialog())
             host = ancd.getHostName();
         }
-        if (host != NULL) {
+        if (host != nullptr) {
           HWND hwnd = FindWindow(nullptr, "winvnc::IPC_Interface");
           if (!hwnd)
             throw rdr::Exception("Unable to locate existing VNC Server.");

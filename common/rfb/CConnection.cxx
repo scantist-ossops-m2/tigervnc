@@ -71,7 +71,7 @@ CConnection::~CConnection()
 
 void CConnection::setServerName(const char* name_)
 {
-  if (name_ == NULL)
+  if (name_ == nullptr)
     name_ = "";
   serverName = name_;
 }
@@ -91,7 +91,7 @@ void CConnection::setFramebuffer(ModifiablePixelBuffer* fb)
     assert(fb->height() == server.height());
   }
 
-  if ((framebuffer != NULL) && (fb != NULL)) {
+  if ((framebuffer != nullptr) && (fb != nullptr)) {
     Rect rect;
 
     const uint8_t* data;

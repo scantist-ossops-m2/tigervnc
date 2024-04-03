@@ -146,7 +146,7 @@ void ServerDialog::run(const char* servername, char *newservername)
 
   while (dialog.shown()) Fl::wait();
 
-  if (dialog.serverName->value() == NULL) {
+  if (dialog.serverName->value() == nullptr) {
     newservername[0] = '\0';
     return;
   }
@@ -180,7 +180,7 @@ void ServerDialog::handleLoad(Fl_Widget* /*widget*/, void* data)
     Fl::wait();
   
   // Did the user hit cancel?
-  if (file_chooser->value() == NULL) {
+  if (file_chooser->value() == nullptr) {
     delete(file_chooser);
     return;
   }
@@ -223,7 +223,7 @@ void ServerDialog::handleSaveAs(Fl_Widget* /*widget*/, void* data)
       Fl::wait();
     
     // Did the user hit cancel?
-    if (file_chooser->value() == NULL) {
+    if (file_chooser->value() == nullptr) {
       delete(file_chooser);
       return;
     }
@@ -316,7 +316,7 @@ void ServerDialog::loadServerHistory()
 #endif
 
   const char* homeDir = os::getvnchomedir();
-  if (homeDir == NULL)
+  if (homeDir == nullptr)
     throw Exception(_("Could not obtain the home directory path"));
 
   char filepath[PATH_MAX];
@@ -382,7 +382,7 @@ void ServerDialog::saveServerHistory()
 #endif
 
   const char* homeDir = os::getvnchomedir();
-  if (homeDir == NULL)
+  if (homeDir == nullptr)
     throw Exception(_("Could not obtain the home directory path"));
 
   char filepath[PATH_MAX];

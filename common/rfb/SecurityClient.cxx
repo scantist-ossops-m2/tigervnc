@@ -41,9 +41,9 @@
 using namespace rdr;
 using namespace rfb;
 
-UserPasswdGetter *CSecurity::upg = NULL;
+UserPasswdGetter *CSecurity::upg = nullptr;
 #if defined(HAVE_GNUTLS) || defined(HAVE_NETTLE)
-UserMsgBox *CSecurity::msg = NULL;
+UserMsgBox *CSecurity::msg = nullptr;
 #endif
 
 StringParameter SecurityClient::secTypes

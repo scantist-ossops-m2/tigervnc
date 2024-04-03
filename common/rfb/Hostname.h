@@ -29,7 +29,7 @@
 namespace rfb {
 
   static bool isAllSpace(const char *string) {
-    if (string == NULL)
+    if (string == nullptr)
       return false;
     while(*string != '\0') {
       if (! isspace(*string))
@@ -46,7 +46,7 @@ namespace rfb {
     const char* hostEnd;
     const char* portStart;
 
-    if (hi == NULL)
+    if (hi == nullptr)
       throw rdr::Exception("NULL host specified");
 
     // Trim leading whitespace
@@ -59,7 +59,7 @@ namespace rfb {
     if (hi[0] == '[') {
       hostStart = &hi[1];
       hostEnd = strchr(hostStart, ']');
-      if (hostEnd == NULL)
+      if (hostEnd == nullptr)
         throw rdr::Exception("unmatched [ in host");
 
       portStart = hostEnd + 1;
@@ -69,7 +69,7 @@ namespace rfb {
       hostStart = &hi[0];
       hostEnd = strrchr(hostStart, ':');
 
-      if (hostEnd == NULL) {
+      if (hostEnd == nullptr) {
         hostEnd = hostStart + strlen(hostStart);
         portStart = nullptr;
       } else {
@@ -93,7 +93,7 @@ namespace rfb {
     else
       *host = std::string(hostStart, hostEnd - hostStart);
 
-    if (portStart == NULL)
+    if (portStart == nullptr)
       *port = basePort;
     else {
       char* end;

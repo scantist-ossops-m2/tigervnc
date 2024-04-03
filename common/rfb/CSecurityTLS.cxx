@@ -75,7 +75,7 @@ static const char* homedirfn(const char* fn)
   const char* homedir;
 
   homedir = os::getvnchomedir();
-  if (homedir == NULL)
+  if (homedir == nullptr)
     return "";
 
   snprintf(full_path, sizeof(full_path), "%s/%s", homedir, fn);
@@ -209,7 +209,7 @@ void CSecurityTLS::setParam()
 
     prio = (char*)malloc(strlen(Security::GnuTLSPriority) +
                          strlen(kx_anon_priority) + 1);
-    if (prio == NULL)
+    if (prio == nullptr)
       throw AuthFailureException("Not enough memory for GnuTLS priority string");
 
     strcpy(prio, Security::GnuTLSPriority);
@@ -245,7 +245,7 @@ void CSecurityTLS::setParam()
 
     prio = (char*)malloc(strlen(gnutls_default_priority) +
                          strlen(kx_anon_priority) + 1);
-    if (prio == NULL)
+    if (prio == nullptr)
       throw AuthFailureException("Not enough memory for GnuTLS priority string");
 
     strcpy(prio, gnutls_default_priority);
@@ -388,7 +388,7 @@ void CSecurityTLS::checkSession()
   /* Certificate has some user overridable problems, so TOFU time */
 
   homeDir = os::getvnchomedir();
-  if (homeDir == NULL) {
+  if (homeDir == nullptr) {
     throw AuthFailureException("Could not obtain VNC home directory "
                                "path for known hosts storage");
   }

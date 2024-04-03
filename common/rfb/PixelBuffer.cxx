@@ -365,7 +365,7 @@ void FullFramePixelBuffer::setBuffer(int width, int height,
     throw rfb::Exception("Invalid PixelBuffer height of %d pixels requested", height);
   if ((stride_ < 0) || (stride_ > maxPixelBufferStride) || (stride_ < width))
     throw rfb::Exception("Invalid PixelBuffer stride of %d pixels requested", stride_);
-  if ((width != 0) && (height != 0) && (data_ == NULL))
+  if ((width != 0) && (height != 0) && (data_ == nullptr))
     throw rfb::Exception("PixelBuffer requested without a valid memory area");
 
   ModifiablePixelBuffer::setSize(width, height);

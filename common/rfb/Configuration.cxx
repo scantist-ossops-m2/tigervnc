@@ -195,7 +195,7 @@ VoidParameter::VoidParameter(const char* name_, const char* desc_,
 			     ConfigurationObject co)
   : immutable(false), name(name_), description(desc_)
 {
-  Configuration *conf = NULL;
+  Configuration *conf = nullptr;
 
   switch (co) {
   case ConfGlobal: conf = Configuration::global();

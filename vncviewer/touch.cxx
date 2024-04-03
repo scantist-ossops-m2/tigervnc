@@ -103,7 +103,7 @@ static void x11_change_touch_ownership(bool enable)
 
   for (iter = handlers.begin(); iter != handlers.end(); ++iter) {
     curmasks = XIGetSelectedEvents(fl_display, iter->first, &num_masks);
-    if (curmasks == NULL) {
+    if (curmasks == nullptr) {
       if (num_masks == -1)
         vlog.error(_("Unable to get X Input 2 event mask for window 0x%08lx"), iter->first);
       continue;

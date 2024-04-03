@@ -101,7 +101,7 @@ static int encrypt_pipe() {
 static std::vector<uint8_t> readpassword() {
   while (true) {
     const char *passwd = getpassword("Password:");
-    if (passwd == NULL) {
+    if (passwd == nullptr) {
       perror("getpassword error");
       exit(1);
     }
@@ -116,7 +116,7 @@ static std::vector<uint8_t> readpassword() {
     }
 
     passwd = getpassword("Verify:");
-    if (passwd == NULL) {
+    if (passwd == nullptr) {
       perror("getpass error");
       exit(1);
     }
@@ -157,7 +157,7 @@ int main(int argc, char** argv)
 
   if (fname[0] == '\0') {
     const char *homeDir = os::getvnchomedir();
-    if (homeDir == NULL) {
+    if (homeDir == nullptr) {
       fprintf(stderr, "Can't obtain VNC home directory\n");
       exit(1);
     }
@@ -171,7 +171,7 @@ int main(int argc, char** argv)
 
     fprintf(stderr, "Would you like to enter a view-only password (y/n)? ");
     char yesno[3];
-    if (fgets(yesno, 3, stdin) != NULL && (yesno[0] == 'y' || yesno[0] == 'Y')) {
+    if (fgets(yesno, 3, stdin) != nullptr && (yesno[0] == 'y' || yesno[0] == 'Y')) {
       obfuscatedReadOnly = readpassword();
     } else {
       fprintf(stderr, "A view-only password is not used\n");

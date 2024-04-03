@@ -72,7 +72,7 @@ Clipboard::processMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
       } else {
         vlog.debug("local clipboard changed by %p", owner);
 
-        if (notifier == NULL)
+        if (notifier == nullptr)
           vlog.debug("no clipboard notifier registered");
         else
           notifier->notifyClipboardChanged(IsClipboardFormatAvailable(CF_UNICODETEXT));
@@ -94,19 +94,19 @@ Clipboard::getClipText() {
 
   // Open the clipboard
   if (!OpenClipboard(getHandle()))
-    return NULL;
+    return nullptr;
 
   // Get the clipboard data
   cliphandle = GetClipboardData(CF_UNICODETEXT);
   if (!cliphandle) {
     CloseClipboard();
-    return NULL;
+    return nullptr;
   }
 
   clipdata = (wchar_t*) GlobalLock(cliphandle);
   if (!clipdata) {
     CloseClipboard();
-    return NULL;
+    return nullptr;
   }
 
   // Convert it to UTF-8

@@ -101,8 +101,8 @@ static MsgWindowClass baseClass;
 MsgWindow::MsgWindow(const char* name_) : name(name_), handle(nullptr) {
   vlog.debug("creating window \"%s\"", name.c_str());
   handle = CreateWindow((const char*)(intptr_t)baseClass.classAtom,
-                        name.c_str(), WS_OVERLAPPED, 0, 0, 10, 10, 0, 0,
-                        baseClass.instance, this);
+                        name.c_str(), WS_OVERLAPPED, 0, 0, 10, 10,
+                        nullptr, nullptr, baseClass.instance, this);
   if (!handle) {
     throw rdr::SystemException("unable to create WMNotifier window instance", GetLastError());
   }

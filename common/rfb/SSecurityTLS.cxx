@@ -72,7 +72,7 @@ SSecurityTLS::SSecurityTLS(SConnection* sc, bool _anon)
     rawis(nullptr), rawos(nullptr)
 {
 #if defined (SSECURITYTLS__USE_DEPRECATED_DH)
-  dh_params = NULL;
+  dh_params = nullptr;
 #endif
 
   if (gnutls_global_init() != GNUTLS_E_SUCCESS)
@@ -203,7 +203,7 @@ void SSecurityTLS::setParams(gnutls_session_t session)
 
     prio = (char*)malloc(strlen(Security::GnuTLSPriority) +
                          strlen(kx_anon_priority) + 1);
-    if (prio == NULL)
+    if (prio == nullptr)
       throw AuthFailureException("Not enough memory for GnuTLS priority string");
 
     strcpy(prio, Security::GnuTLSPriority);
@@ -239,7 +239,7 @@ void SSecurityTLS::setParams(gnutls_session_t session)
 
     prio = (char*)malloc(strlen(gnutls_default_priority) +
                          strlen(kx_anon_priority) + 1);
-    if (prio == NULL)
+    if (prio == nullptr)
       throw AuthFailureException("Not enough memory for GnuTLS priority string");
 
     strcpy(prio, gnutls_default_priority);

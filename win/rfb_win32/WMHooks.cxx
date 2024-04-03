@@ -65,45 +65,45 @@ static WM_Hooks_EnableRealInputs_proto WM_Hooks_EnableRealInputs;
 
 static void LoadHooks()
 {
-  if (hooksLibrary != NULL)
+  if (hooksLibrary != nullptr)
     return;
 
   hooksLibrary = LoadLibrary("wm_hooks.dll");
-  if (hooksLibrary == NULL)
+  if (hooksLibrary == nullptr)
     return;
 
   WM_Hooks_WindowChanged = (WM_Hooks_WMVAL_proto)(void*)GetProcAddress(hooksLibrary, "WM_Hooks_WindowChanged");
-  if (WM_Hooks_WindowChanged == NULL)
+  if (WM_Hooks_WindowChanged == nullptr)
     goto error;
   WM_Hooks_WindowBorderChanged = (WM_Hooks_WMVAL_proto)(void*)GetProcAddress(hooksLibrary, "WM_Hooks_WindowBorderChanged");
-  if (WM_Hooks_WindowBorderChanged == NULL)
+  if (WM_Hooks_WindowBorderChanged == nullptr)
     goto error;
   WM_Hooks_WindowClientAreaChanged = (WM_Hooks_WMVAL_proto)(void*)GetProcAddress(hooksLibrary, "WM_Hooks_WindowClientAreaChanged");
-  if (WM_Hooks_WindowClientAreaChanged == NULL)
+  if (WM_Hooks_WindowClientAreaChanged == nullptr)
     goto error;
   WM_Hooks_RectangleChanged = (WM_Hooks_WMVAL_proto)(void*)GetProcAddress(hooksLibrary, "WM_Hooks_RectangleChanged");
-  if (WM_Hooks_RectangleChanged == NULL)
+  if (WM_Hooks_RectangleChanged == nullptr)
     goto error;
 #ifdef _DEBUG
   WM_Hooks_Diagnostic = (WM_Hooks_WMVAL_proto)(void*)GetProcAddress(hooksLibrary, "WM_Hooks_Diagnostic");
-  if (WM_Hooks_Diagnostic == NULL)
+  if (WM_Hooks_Diagnostic == nullptr)
     goto error;
 #endif
 
   WM_Hooks_Install = (WM_Hooks_Install_proto)(void*)GetProcAddress(hooksLibrary, "WM_Hooks_Install");
-  if (WM_Hooks_Install == NULL)
+  if (WM_Hooks_Install == nullptr)
     goto error;
   WM_Hooks_Remove = (WM_Hooks_Remove_proto)(void*)GetProcAddress(hooksLibrary, "WM_Hooks_Remove");
-  if (WM_Hooks_Remove == NULL)
+  if (WM_Hooks_Remove == nullptr)
     goto error;
 #ifdef _DEBUG
   WM_Hooks_SetDiagnosticRange = (WM_Hooks_SetDiagnosticRange_proto)(void*)GetProcAddress(hooksLibrary, "WM_Hooks_SetDiagnosticRange");
-  if (WM_Hooks_SetDiagnosticRange == NULL)
+  if (WM_Hooks_SetDiagnosticRange == nullptr)
     goto error;
 #endif
 
   WM_Hooks_EnableRealInputs = (WM_Hooks_EnableRealInputs_proto)(void*)GetProcAddress(hooksLibrary, "WM_Hooks_EnableRealInputs");
-  if (WM_Hooks_EnableRealInputs == NULL)
+  if (WM_Hooks_EnableRealInputs == nullptr)
     goto error;
 
   return;
@@ -134,7 +134,7 @@ static os::Mutex hook_mgr_lock;
 static bool StartHookThread() {
   if (hook_mgr)
     return true;
-  if (hooksLibrary == NULL)
+  if (hooksLibrary == nullptr)
     return false;
   vlog.debug("creating thread");
   hook_mgr = new WMHooksThread();
@@ -358,7 +358,7 @@ rfb::win32::WMBlockInput::~WMBlockInput() {
 static bool blocking = false;
 static bool blockRealInputs(bool block_) {
   // NB: Requires blockMutex to be held!
-  if (hooksLibrary == NULL)
+  if (hooksLibrary == nullptr)
     return false;
   if (block_) {
     if (blocking)

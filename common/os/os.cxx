@@ -53,12 +53,12 @@ static const char* gethomedir(bool userDir)
 
 #ifndef WIN32
   homedir = getenv("HOME");
-  if (homedir == NULL) {
+  if (homedir == nullptr) {
     uid = getuid();
     passwd = getpwuid(uid);
-    if (passwd == NULL) {
+    if (passwd == nullptr) {
       /* Do we want emit error msg here? */
-      return NULL;
+      return nullptr;
     }
     homedir = passwd->pw_dir;
   }
@@ -76,13 +76,13 @@ static const char* gethomedir(bool userDir)
     ret = SHGetSpecialFolderPath(nullptr, dir, CSIDL_APPDATA, FALSE);
 
   if (ret == FALSE)
-    return NULL;
+    return nullptr;
 
   if (userDir)
     return dir;
 
   if (strlen(dir) + strlen("\\vnc") >= sizeof(dir))
-    return NULL;
+    return nullptr;
 
   strcat(dir, "\\vnc");
 

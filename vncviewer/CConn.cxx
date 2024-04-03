@@ -90,10 +90,10 @@ CConn::CConn(const char* vncServerName, network::Socket* socket=nullptr)
   if (!noJpeg)
     setQualityLevel(::qualityLevel);
 
-  if(sock == NULL) {
+  if(sock == nullptr) {
     try {
 #ifndef WIN32
-      if (strchr(vncServerName, '/') != NULL) {
+      if (strchr(vncServerName, '/') != nullptr) {
         sock = new network::UnixSocket(vncServerName);
         serverHost = sock->getPeerAddress();
         vlog.info(_("Connected to socket %s"), serverHost.c_str());

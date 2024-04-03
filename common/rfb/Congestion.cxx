@@ -320,7 +320,7 @@ void Congestion::debugTrace(const char* filename, int fd)
 #ifdef __linux__
   FILE *f;
   f = fopen(filename, "ab");
-  if (f != NULL) {
+  if (f != nullptr) {
     struct tcp_info info;
     int buffered;
     socklen_t len;

@@ -65,8 +65,8 @@ cpucounter_t newCpuCounter(void)
   syscounter_t *c;
 
   c = (syscounter_t*)malloc(sizeof(syscounter_t) * 2);
-  if (c == NULL)
-    return NULL;
+  if (c == nullptr)
+    return nullptr;
 
   memset(c, 0, sizeof(syscounter_t) * 2);
 

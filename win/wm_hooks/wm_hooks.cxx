@@ -252,7 +252,7 @@ void ProcessWindowMessage(UINT msg, HWND wnd, WPARAM wParam, LPARAM /*lParam*/) 
 				if (buffsize != 0)
 				{
 					buff = (RGNDATA *) new BYTE [buffsize];
-					if (buff == NULL)
+					if (buff == nullptr)
 						break;
 
 					// Now get the region data
@@ -277,7 +277,7 @@ void ProcessWindowMessage(UINT msg, HWND wnd, WPARAM wParam, LPARAM /*lParam*/) 
 			}
 
 			// Now free the region
-			if (region != NULL)
+			if (region != nullptr)
 				DeleteObject(region);
 		}
     */

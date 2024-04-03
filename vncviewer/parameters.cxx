@@ -468,11 +468,11 @@ static void saveToReg(const char* servername) {
 
   for (size_t i = 0; i < sizeof(parameterArray)/sizeof(VoidParameter*); i++) {
     try {
-      if (dynamic_cast<StringParameter*>(parameterArray[i]) != NULL) {
+      if (dynamic_cast<StringParameter*>(parameterArray[i]) != nullptr) {
         setKeyString(parameterArray[i]->getName(), *(StringParameter*)parameterArray[i], &hKey);
-      } else if (dynamic_cast<IntParameter*>(parameterArray[i]) != NULL) {
+      } else if (dynamic_cast<IntParameter*>(parameterArray[i]) != nullptr) {
         setKeyInt(parameterArray[i]->getName(), (int)*(IntParameter*)parameterArray[i], &hKey);
-      } else if (dynamic_cast<BoolParameter*>(parameterArray[i]) != NULL) {
+      } else if (dynamic_cast<BoolParameter*>(parameterArray[i]) != nullptr) {
         setKeyInt(parameterArray[i]->getName(), (int)*(BoolParameter*)parameterArray[i], &hKey);
       } else {
         throw Exception(_("Unknown parameter type"));
@@ -553,13 +553,13 @@ static void getParametersFromReg(VoidParameter* parameters[],
 
   for (size_t i = 0; i < parameters_len/sizeof(VoidParameter*); i++) {
     try {
-      if (dynamic_cast<StringParameter*>(parameters[i]) != NULL) {
+      if (dynamic_cast<StringParameter*>(parameters[i]) != nullptr) {
         if (getKeyString(parameters[i]->getName(), stringValue, buffersize, hKey))
           parameters[i]->setParam(stringValue);
-      } else if (dynamic_cast<IntParameter*>(parameters[i]) != NULL) {
+      } else if (dynamic_cast<IntParameter*>(parameters[i]) != nullptr) {
         if (getKeyInt(parameters[i]->getName(), &intValue, hKey))
           ((IntParameter*)parameters[i])->setParam(intValue);
-      } else if (dynamic_cast<BoolParameter*>(parameters[i]) != NULL) {
+      } else if (dynamic_cast<BoolParameter*>(parameters[i]) != nullptr) {
         if (getKeyInt(parameters[i]->getName(), &intValue, hKey))
           ((BoolParameter*)parameters[i])->setParam(intValue);
       } else {
@@ -583,7 +583,7 @@ static char* loadFromReg() {
   if (res != ERROR_SUCCESS) {
     if (res == ERROR_FILE_NOT_FOUND) {
       // The key does not exist, defaults will be used.
-      return NULL;
+      return nullptr;
     }
 
     throw rdr::SystemException(_("Failed to open registry key"), res);
@@ -622,7 +622,7 @@ void saveViewerParameters(const char *filename, const char *servername) {
   char encodingBuffer[buffersize];
 
   // Write to the registry or a predefined file if no filename was specified.
-  if(filename == NULL) {
+  if(filename == nullptr) {
 
 #ifdef _WIN32
     saveToReg(servername);
@@ -630,7 +630,7 @@ void saveViewerParameters(const char *filename, const char *servername) {
 #endif
     
     const char* homeDir = os::getvnchomedir();
-    if (homeDir == NULL)
+    if (homeDir == nullptr)
       throw Exception(_("Could not obtain the home directory path"));
 
     snprintf(filepath, sizeof(filepath), "%s/default.tigervnc", homeDir);
@@ -655,7 +655,7 @@ void saveViewerParameters(const char *filename, const char *servername) {
   fprintf(f, "ServerName=%s\n", encodingBuffer);
 
   for (size_t i = 0; i < sizeof(parameterArray)/sizeof(VoidParameter*); i++) {
-    if (dynamic_cast<StringParameter*>(parameterArray[i]) != NULL) {
+    if (dynamic_cast<StringParameter*>(parameterArray[i]) != nullptr) {
       if (!encodeValue(*(StringParameter*)parameterArray[i],
           encodingBuffer, buffersize)) {
         fclose(f);
@@ -664,9 +664,9 @@ void saveViewerParameters(const char *filename, const char *servername) {
                         _("Could not encode parameter"));
       }
       fprintf(f, "%s=%s\n", ((StringParameter*)parameterArray[i])->getName(), encodingBuffer);
-    } else if (dynamic_cast<IntParameter*>(parameterArray[i]) != NULL) {
+    } else if (dynamic_cast<IntParameter*>(parameterArray[i]) != nullptr) {
       fprintf(f, "%s=%d\n", ((IntParameter*)parameterArray[i])->getName(), (int)*(IntParameter*)parameterArray[i]);
-    } else if (dynamic_cast<BoolParameter*>(parameterArray[i]) != NULL) {
+    } else if (dynamic_cast<BoolParameter*>(parameterArray[i]) != nullptr) {
       fprintf(f, "%s=%d\n", ((BoolParameter*)parameterArray[i])->getName(), (int)*(BoolParameter*)parameterArray[i]);
     } else {      
       fclose(f);
@@ -688,7 +688,7 @@ static bool findAndSetViewerParameterFromValue(
   // Find and set the correct parameter
   for (size_t i = 0; i < parameters_len/sizeof(VoidParameter*); i++) {
 
-    if (dynamic_cast<StringParameter*>(parameters[i]) != NULL) {
+    if (dynamic_cast<StringParameter*>(parameters[i]) != nullptr) {
       if (strcasecmp(line, ((StringParameter*)parameters[i])->getName()) == 0) {
         if(!decodeValue(value, decodingBuffer, sizeof(decodingBuffer)))
           throw Exception(_("Invalid format or too large value"));
@@ -696,13 +696,13 @@ static bool findAndSetViewerParameterFromValue(
         return false;
       }
 
-    } else if (dynamic_cast<IntParameter*>(parameters[i]) != NULL) {
+    } else if (dynamic_cast<IntParameter*>(parameters[i]) != nullptr) {
       if (strcasecmp(line, ((IntParameter*)parameters[i])->getName()) == 0) {
         ((IntParameter*)parameters[i])->setParam(atoi(value));
         return false;
       }
 
-    } else if (dynamic_cast<BoolParameter*>(parameters[i]) != NULL) {
+    } else if (dynamic_cast<BoolParameter*>(parameters[i]) != nullptr) {
       if (strcasecmp(line, ((BoolParameter*)parameters[i])->getName()) == 0) {
         ((BoolParameter*)parameters[i])->setParam(atoi(value));
         return false;
@@ -727,14 +727,14 @@ char* loadViewerParameters(const char *filename) {
   memset(servername, '\0', sizeof(servername));
 
   // Load from the registry or a predefined file if no filename was specified.
-  if(filename == NULL) {
+  if(filename == nullptr) {
 
 #ifdef _WIN32
     return loadFromReg();
 #endif
 
     const char* homeDir = os::getvnchomedir();
-    if (homeDir == NULL)
+    if (homeDir == nullptr)
       throw Exception(_("Could not obtain the home directory path"));
 
     snprintf(filepath, sizeof(filepath), "%s/default.tigervnc", homeDir);
@@ -746,7 +746,7 @@ char* loadViewerParameters(const char *filename) {
   FILE* f = fopen(filepath, "r");
   if (!f) {
     if (!filename)
-      return NULL; // Use defaults.
+      return nullptr; // Use defaults.
     throw Exception(_("Could not open \"%s\": %s"),
                     filepath, strerror(errno));
   }
@@ -797,7 +797,7 @@ char* loadViewerParameters(const char *filename) {
 
     // Find the parameter value
     char *value = strchr(line, '=');
-    if (value == NULL) {
+    if (value == nullptr) {
       vlog.error(_("Failed to read line %d in file %s: %s"),
                  lineNr, filepath, _("Invalid format"));
       continue;
