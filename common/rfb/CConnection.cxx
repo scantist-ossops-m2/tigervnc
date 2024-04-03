@@ -420,7 +420,7 @@ void CConnection::setDesktopSize(int w, int h)
                                            server.height());
 
   resizeFramebuffer();
-  assert(framebuffer != NULL);
+  assert(framebuffer != nullptr);
   assert(framebuffer->width() == server.width());
   assert(framebuffer->height() == server.height());
 }
@@ -440,7 +440,7 @@ void CConnection::setExtendedDesktopSize(unsigned reason,
                                            server.height());
 
   resizeFramebuffer();
-  assert(framebuffer != NULL);
+  assert(framebuffer != nullptr);
   assert(framebuffer->width() == server.width());
   assert(framebuffer->height() == server.height());
 }
@@ -471,7 +471,7 @@ void CConnection::serverInit(int width, int height,
   vlog.debug("initialisation done");
 
   initDone();
-  assert(framebuffer != NULL);
+  assert(framebuffer != nullptr);
   assert(framebuffer->width() == server.width());
   assert(framebuffer->height() == server.height());
 
@@ -501,7 +501,7 @@ void CConnection::framebufferUpdateStart()
 {
   CMsgHandler::framebufferUpdateStart();
 
-  assert(framebuffer != NULL);
+  assert(framebuffer != nullptr);
 
   // Note: This might not be true if continuous updates are supported
   pendingUpdate = false;

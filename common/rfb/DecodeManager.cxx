@@ -110,7 +110,7 @@ bool DecodeManager::decodeRect(const Rect& r, int encoding,
 
   QueueEntry *entry;
 
-  assert(pb != NULL);
+  assert(pb != nullptr);
 
   if (!Decoder::supported(encoding)) {
     vlog.error("Unknown encoding %d", encoding);

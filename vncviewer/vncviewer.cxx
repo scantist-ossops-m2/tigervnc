@@ -201,7 +201,7 @@ static void mainloop(const char* vncserver, network::Socket* sock)
     delete cc;
 
     if (fatalError) {
-      assert(exitError != NULL);
+      assert(exitError != nullptr);
       if (alertOnFatalError)
         fl_alert("%s", exitError);
       break;

@@ -496,7 +496,7 @@ std::string Fl_Monitor_Arrangement::get_monitor_name(int m)
   std::string name;
 
   fl_open_display();
-  assert(fl_display != NULL);
+  assert(fl_display != nullptr);
   Fl::screen_xywh(x, y, w, h, m);
 
   if (!XQueryExtension(fl_display, "RANDR", &xi_major, &ev, &err))

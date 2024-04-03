@@ -65,7 +65,7 @@ void ZlibInStream::reset()
 
 void ZlibInStream::init()
 {
-  assert(zs == NULL);
+  assert(zs == nullptr);
 
   zs = new z_stream;
   zs->zalloc    = nullptr;
@@ -82,7 +82,7 @@ void ZlibInStream::init()
 
 void ZlibInStream::deinit()
 {
-  assert(zs != NULL);
+  assert(zs != nullptr);
   setUnderlying(nullptr, 0);
   inflateEnd(zs);
   delete zs;

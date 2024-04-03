@@ -153,8 +153,8 @@ void VncAuthPasswdParameter::getVncAuthPasswd(std::string *password, std::string
     }
   }
 
-  assert(password != NULL);
-  assert(readOnlyPassword != NULL);
+  assert(password != nullptr);
+  assert(readOnlyPassword != nullptr);
 
   try {
     *password = deobfuscate(obfuscated.data(), obfuscated.size());

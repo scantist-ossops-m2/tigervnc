@@ -67,9 +67,9 @@ ConfViewer);
 
 CSecurity* SecurityClient::GetCSecurity(CConnection* cc, uint32_t secType)
 {
-  assert (CSecurity::upg != NULL); /* (upg == NULL) means bug in the viewer */
+  assert (CSecurity::upg != nullptr); /* (upg == nullptr) means bug in the viewer */
 #if defined(HAVE_GNUTLS) || defined(HAVE_NETTLE)
-  assert (CSecurity::msg != NULL);
+  assert (CSecurity::msg != nullptr);
 #endif
 
   if (!IsSupported(secType))

@@ -154,7 +154,7 @@ void SDisplay::terminate()
 void SDisplay::queryConnection(network::Socket* sock,
                                const char* userName)
 {
-  assert(server != NULL);
+  assert(server != nullptr);
 
   if (queryConnectionHandler) {
     queryConnectionHandler->queryConnection(sock, userName);
