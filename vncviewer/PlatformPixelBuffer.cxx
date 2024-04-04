@@ -35,7 +35,6 @@
 
 #include <rfb/LogWriter.h>
 #include <rdr/Exception.h>
-#include "Surface.h"
 #include "PlatformPixelBuffer.h"
 #include "appmanager.h"
 
@@ -44,10 +43,10 @@
 static rfb::LogWriter vlog("PlatformPixelBuffer");
 
 PlatformPixelBuffer::PlatformPixelBuffer(int width, int height) :
-  FullFramePixelBuffer(rfb::PixelFormat(32, 24, false, true, 255, 255, 255, 16, 8, 0), 0, 0, NULL, 0),
-  Surface(width, height)
+  FullFramePixelBuffer(rfb::PixelFormat(32, 24, false, true, 255, 255, 255, 16, 8, 0), 0, 0, NULL, 0)
 {
-  setBuffer(width, height, (uint8_t*)framebuffer(), width);
+  image = QImage(width, height, QImage::Format_RGB32);
+  setBuffer(width, height, image.bits(), width);
 }
 
 PlatformPixelBuffer::~PlatformPixelBuffer()
