@@ -311,15 +311,18 @@ CGImageRef cocoa_create_bitmap(int width, int height, unsigned char *data)
 int cocoa_capture_displays(NSView *view, QList<int> screens)
 {
   NSWindow *window = [view window];
+  // We're not getting put in front of the shielding window in many
+  // cases on macOS 13, despite setLevel: being documented as also
+  // pushing the window to the front. So let's explicitly move it.
+  [window orderFront:window];
+
+  if (captured)
+      return 2;
+
   CGDirectDisplayID displays[16];
-
-  NSRect r = [window frame];
-  rfb::Rect windows_rect;
-  windows_rect.setXYWH(r.origin.x, r.origin.y, r.size.width, r.size.height);
-
   CGDisplayCount count;
   if (CGGetActiveDisplayList(16, displays, &count) != kCGErrorSuccess) {
-    return 1;
+    return 0;
   }
 
   if (screens.size() == (int)count) {
@@ -328,24 +331,19 @@ int cocoa_capture_displays(NSView *view, QList<int> screens)
   else {
     for (int dix = 0; dix < (int)count; dix++) {
       if (screens.contains(dix)) {
-	if (CGDisplayCapture(displays[dix]) != kCGErrorSuccess) {
-	  return 1;
-	}
-      }
-      else {
-	// A display might have been captured with the previous
-	// monitor selection. In that case we don't want to keep
-	// it when its no longer inside the window_rect.
-	CGDisplayRelease(displays[dix]);
+        if (CGDisplayCapture(displays[dix]) != kCGErrorSuccess) {
+          return 0;
+        }
+      } else {
+        // A display might have been captured with the previous
+        // monitor selection. In that case we don't want to keep
+        // it when its no longer inside the window_rect.
+        CGDisplayRelease(displays[dix]);
       }
     }
   }
 
   captured = true;
-
-  if ([window level] == CGShieldingWindowLevel()) {
-    return 0;
-  }
 
   [window setLevel:CGShieldingWindowLevel()];
 
@@ -354,7 +352,7 @@ int cocoa_capture_displays(NSView *view, QList<int> screens)
   // pushing the window to the front. So let's explicitly move it.
   [window orderFront:window];
   
-  return 0;
+  return screens.size() == (int)count ? 3 : 0;
 }
 
 void cocoa_release_displays(NSView *view, bool fullscreen)
@@ -365,12 +363,16 @@ void cocoa_release_displays(NSView *view, bool fullscreen)
   CGReleaseAllDisplays();
   captured = false;
 
-  // Someone else has already changed the level of this window
-  if ([window level] != CGShieldingWindowLevel()) {
-    return;
-  }
-
   [window setLevel:NSNormalWindowLevel];
+}
+
+void cocoa_fullscreen(bool enabled)
+{
+  if (enabled) {
+    [[NSApplication sharedApplication] setPresentationOptions: NSApplicationPresentationAutoHideMenuBar | NSApplicationPresentationAutoHideDock];
+  } else {
+    [[NSApplication sharedApplication] setPresentationOptions: NSApplicationPresentationDefault];
+  }
 }
 
 int cocoa_is_keyboard_sync(const void *event)
@@ -774,10 +776,8 @@ void cocoa_set_overlay_property(WId winid)
   [window setCollectionBehavior:NSWindowCollectionBehaviorCanJoinAllSpaces | NSWindowCollectionBehaviorFullScreenAuxiliary];
 }
 
-
 void cocoa_dim(NSView *view, bool enabled)
 {
   CGFloat alpha = enabled ? 0.4 : 1.0;
   [view setAlphaValue:(alpha)];
 }
-

@@ -41,6 +41,8 @@ void cocoa_invalidate_region(NSView *view, int x, int y, int w, int h);
 int cocoa_capture_displays(NSView *view, QList<int> screens);
 void cocoa_release_displays(NSView *view, bool fullscreen);
 
+void cocoa_fullscreen(bool enabled);
+
 int cocoa_is_keyboard_sync(const void *event);
 int cocoa_is_keyboard_event(const void *event);
 

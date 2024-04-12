@@ -170,16 +170,22 @@ void MacKeyboardHandler::pushLEDState()
 
 void MacKeyboardHandler::grabKeyboard()
 {
+  vlog.debug("MacKeyboardHandler::grabKeyboard");
   int ret = cocoa_capture_displays(cocoa_get_view(AppManager::instance()->getWindow()), AppManager::instance()->getWindow()->fullscreenScreens());
-  if (ret != 0) {
+  if (ret == 1) {
       vlog.error(_("Failure grabbing keyboard"));
       return;
+  } else if (ret == 2) {
+    vlog.error(_("Keyboard already grabbed"));
+  } else if (ret == 3) {
+    vlog.error(_("Capturing all displays"));
   }
   BaseKeyboardHandler::grabKeyboard();
 }
 
 void MacKeyboardHandler::ungrabKeyboard()
 {
+  vlog.debug("MacKeyboardHandler::ungrabKeyboard");
   cocoa_release_displays(cocoa_get_view(AppManager::instance()->getWindow()), AppManager::instance()->getWindow()->allowKeyboardGrab());
   BaseKeyboardHandler::ungrabKeyboard();
 }

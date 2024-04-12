@@ -25,6 +25,7 @@
 #include <QStyleFactory>
 #include <QTimer>
 #include <QWindow>
+#include <QProxyStyle>
 #undef asprintf
 #if defined(WIN32)
 #include <windows.h>
@@ -39,8 +40,45 @@
 #include <xcb/xcb.h>
 #endif
 #endif
+#ifdef __APPLE__
+#include "cocoa.h"
+#endif
 
 static rfb::LogWriter vlog("VNCWindow");
+
+class ScrollBarStyle : public QProxyStyle
+{
+public:
+  int styleHint(StyleHint sh, const QStyleOption *opt, const QWidget *widget, QStyleHintReturn *hret) const
+  {
+    int ret = 0;
+
+    switch (sh) {
+    case SH_ScrollBar_Transient:
+      ret = false;
+      break;
+    default:
+      return QProxyStyle::styleHint(sh, opt, widget, hret);
+    }
+
+    return ret;
+  }
+
+  int pixelMetric(PixelMetric metric, const QStyleOption *opt, const QWidget *widget) const
+  {
+    int ret = 0;
+
+    switch (metric) {
+    case PM_ScrollView_ScrollBarOverlap:
+      ret = false;
+      break;
+    default:
+      return QProxyStyle::pixelMetric(metric, opt, widget);
+    }
+
+    return ret;
+  }
+};
 
 class ScrollArea : public QScrollArea
 {
@@ -54,7 +92,13 @@ public:
     setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    horizontalScrollBar()->setStyle(&style);
+    verticalScrollBar()->setStyle(&style);
+    setStyle(&style);
   }
+
+private:
+  ScrollBarStyle style;
 };
 
 QVNCWindow::QVNCWindow(QWidget* parent)
@@ -62,6 +106,7 @@ QVNCWindow::QVNCWindow(QWidget* parent)
   , resizeTimer(new QTimer(this))
   , devicePixelRatio(devicePixelRatioF())
 {
+  setAttribute(Qt::WA_NativeWindow, true);
   setFocusPolicy(Qt::StrongFocus);
 
   setContentsMargins(0, 0, 0, 0);
@@ -235,35 +280,6 @@ void QVNCWindow::fullscreen(bool enabled)
   }
 }
 
-void QVNCWindow::fullscreenOnCurrentDisplay()
-{
-#ifdef Q_OS_LINUX
-
-#else
-  QScreen* screen = getCurrentScreen();
-  vlog.debug("QVNCWindow::fullscreenOnCurrentDisplay geometry=(%d, %d, %d, %d)",
-             screen->geometry().x(),
-             screen->geometry().y(),
-             screen->geometry().width(),
-             screen->geometry().height());
-  show();
-  QApplication::sync();
-  windowHandle()->setScreen(screen);
-  showFullScreen();
-
-  // Capture the fullscreen geometry.
-  double dpr = effectiveDevicePixelRatio(screen);
-  QRect vg = screen->geometry();
-  fullscreenX = vg.x();
-  fullscreenY = vg.y();
-  fullscreenWidth = vg.width() * dpr;
-  fullscreenHeight = vg.height() * dpr;
-
-  QAbstractVNCView* view = AppManager::instance()->getView();
-  view->maybeGrabKeyboard();
-#endif
-}
-
 void QVNCWindow::fullscreenOnSelectedDisplay(QScreen* screen)
 {
   vlog.debug("QVNCWindow::fullscreenOnSelectedDisplay geometry=(%d, %d, %d, %d)",
@@ -271,7 +287,14 @@ void QVNCWindow::fullscreenOnSelectedDisplay(QScreen* screen)
              screen->geometry().y(),
              screen->geometry().width(),
              screen->geometry().height());
+#ifdef __APPLE__
+  fullscreenOnSelectedDisplays(screen->geometry().x(),
+                               screen->geometry().y(),
+                               screen->geometry().width(),
+                               screen->geometry().height());
+#else
   show();
+  QApplication::sync();
   QTimer::singleShot(std::chrono::milliseconds(100), [=]() {
     windowHandle()->setScreen(screen);
     move(screen->geometry().x(), screen->geometry().y());
@@ -280,6 +303,7 @@ void QVNCWindow::fullscreenOnSelectedDisplay(QScreen* screen)
     QAbstractVNCView* view = AppManager::instance()->getView();
     view->maybeGrabKeyboard();
   });
+#endif
 }
 
 #ifdef Q_OS_LINUX
@@ -343,7 +367,11 @@ void QVNCWindow::fullscreenOnSelectedDisplays(int vx, int vy, int vwidth, int vh
   setWindowFlag(Qt::WindowStaysOnTopHint, true);
   setWindowFlag(Qt::FramelessWindowHint, true);
 
+#ifdef __APPLE__
+  showNormal();
+#else
   show();
+#endif
   QTimer::singleShot(std::chrono::milliseconds(100), [=]() {
     move(vx, vy);
     resize(vwidth, vheight);
@@ -631,19 +659,27 @@ void QVNCWindow::changeEvent(QEvent* e)
                height(),
                int(windowState()),
                oldState);
-    if (!(oldState & Qt::WindowFullScreen) && windowState() & Qt::WindowFullScreen) {
-      vlog.debug("QVNCWindow::changeEvent window has gone fullscreen, checking if it our doing");
-      vlog.debug("QVNCWindow::changeEvent fullscreenEnabled=%d pendingFullscreen=%d",
-                 fullscreenEnabled, pendingFullscreen);
-      if (!fullscreenEnabled && !pendingFullscreen) {
-        fullscreen(true);
-      }
-    } else if (oldState & Qt::WindowFullScreen && !(windowState() & Qt::WindowFullScreen)) {
-      vlog.debug("QVNCWindow::changeEvent window has left fullscreen, checking if it our doing");
-      vlog.debug("QVNCWindow::changeEvent fullscreenEnabled=%d pendingFullscreen=%d",
-                   fullscreenEnabled, pendingFullscreen);
-      if (fullscreenEnabled || pendingFullscreen) {
+    vlog.debug("QVNCWindow::changeEvent fullscreenEnabled=%d pendingFullscreen=%d",
+               fullscreenEnabled, pendingFullscreen);
+    if (!fullscreenEnabled && !pendingFullscreen) {
+      if (!(oldState & Qt::WindowFullScreen) && windowState() & Qt::WindowFullScreen) {
+#ifdef __APPLE__
+        vlog.debug("QVNCWindow::changeEvent window has gone fullscreen, we do not like it on Mac");
         fullscreen(false);
+        QTimer::singleShot(std::chrono::milliseconds(100), [=]() {
+          fullscreen(true);
+        });
+#else
+        vlog.debug("QVNCWindow::changeEvent window has gone fullscreen, checking if it our doing");
+        fullscreen(true);
+#endif
+      }
+    } else if (fullscreenEnabled && !pendingFullscreen) {
+      if (oldState & Qt::WindowFullScreen && !(windowState() & Qt::WindowFullScreen)) {
+#ifndef __APPLE__
+        vlog.debug("QVNCWindow::changeEvent window has left fullscreen, checking if it our doing");
+        fullscreen(false);
+#endif
       }
     }
   }

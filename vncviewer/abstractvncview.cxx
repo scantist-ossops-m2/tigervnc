@@ -69,6 +69,7 @@ QAbstractVNCView::QAbstractVNCView(QWidget* parent, Qt::WindowFlags f)
 #endif
 {
   setAttribute(Qt::WA_OpaquePaintEvent, true);
+  setAttribute(Qt::WA_NativeWindow, true);
   setAttribute(Qt::WA_AcceptTouchEvents);
   setFocusPolicy(Qt::StrongFocus);
   setContentsMargins(0, 0, 0, 0);
